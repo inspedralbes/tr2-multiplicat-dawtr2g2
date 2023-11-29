@@ -70,4 +70,30 @@ class RespostaController extends Controller
     
         return response()->json(['message' => 'Resposta eliminada']);
     }
+
+    // MÈTODES DE LA PART D'ADMINISTRACIÓ
+    public function adminIndex()
+    {
+        $respostes = Resposta::all();
+
+        return view('respostes.index', ['respostes' => $respostes]);
+    }
+
+    public function adminStore(Request $request)
+    {
+        
+            $request->validate([
+                'resposta' => 'required',
+                'tema_id' => 'required',
+                'dificultat_id' => 'required'
+            ]);
+    
+            $resposta = new Resposta;
+            $resposta->resposta = $request->resposta;
+            $resposta->tema_id = $request->tema_id;
+            $resposta->dificultat_id = $request->dificultat_id;
+            $resposta->save();
+    
+            return redirect()->route('view-afegir-resposta')->with('success', 'Pregunta afegida correctament');
+    }
 }

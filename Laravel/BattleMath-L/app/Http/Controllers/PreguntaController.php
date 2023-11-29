@@ -70,4 +70,48 @@ class PreguntaController extends Controller
 
         return view('preguntes.index', ['preguntes' => $preguntes]);
     }
+
+    public function adminStore(Request $request)
+    {
+        
+            $request->validate([
+                'pregunta' => 'required',
+                'resposta_correcta_id' => 'required',
+                'tema_id' => 'required',
+                'dificultat_id' => 'required'
+            ]);
+    
+            $pregunta = new Pregunta;
+            $pregunta->pregunta = $request->pregunta;
+            $pregunta->resposta_correcta_id = $request->resposta_correcta_id;
+            $pregunta->tema_id = $request->tema_id;
+            $pregunta->dificultat_id = $request->dificultat_id;
+            $pregunta->save();
+    
+            return redirect()->route('view-afegir-pregunta')->with('success', 'Pregunta afegida correctament');
+    }
+
+    public function adminShow($id) {
+        $pregunta = Pregunta::find($id);
+        return view('perguntes.modificar', ['pregunta' => $pregunta]);
+    }
+    
+    public function adminUpdate(Request $request, $id) {
+
+        $request->validate([
+            'pregunta' => 'required',
+            'resposta_correcta_id' => 'required',
+            'tema_id' => 'required',
+            'dificultat_id' => 'required'
+        ]);
+
+        $pregunta = new Pregunta;
+        $pregunta->pregunta = $request->pregunta;
+        $pregunta->resposta_correcta_id = $request->resposta_correcta_id;
+        $pregunta->tema_id = $request->tema_id;
+        $pregunta->dificultat_id = $request->dificultat_id;
+        $pregunta->save();
+
+        return redirect()->route('view-modificar-pregunta', ['id' => $pregunta->id])->with('success', 'La pregunta a estat actualitzada correctament');
+    }
 }
