@@ -1,8 +1,6 @@
 
 <template>
-  <div id="app">
-    <phaserGame />
-  </div>
+  <phaserGame />
 </template>
 
 <script>
