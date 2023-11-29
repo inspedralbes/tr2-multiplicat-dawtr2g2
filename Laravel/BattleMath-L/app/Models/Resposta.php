@@ -9,4 +9,10 @@ class Resposta extends Model
 {
     use HasFactory;
     protected $table = 'respostes';
+    protected $fillable = [
+        'resposta',
+        'dificultat_id',
+        'tema_id'
+        
+    ];
 }

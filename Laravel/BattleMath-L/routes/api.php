@@ -18,4 +18,9 @@ use App\Http\Controllers\RespostaController;
 
 Route::get('/preguntes', [PreguntaController::class, 'index']);
 Route::get('/respostes', [RespostaController::class, 'index']);
-
+Route::post('/crearRespostes', [RespostaController::class, 'store']);
+Route::get('/veurePregunta/{id}', [PreguntaController::class, 'show']);
+Route::get('/veureResposta/{id}', [RespostaController::class, 'show']);
+Route::put('/modificarPregunta/{id}', [PreguntaController::class, 'update']);
+Route::put('/modificarResposta/{id}', [RespostaController::class, 'update']);
+Route::delete('/eliminarResposta/{id}', [RespostaController::class, 'destroy']);

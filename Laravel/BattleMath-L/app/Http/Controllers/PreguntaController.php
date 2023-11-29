@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pregunta;
+use Illuminate\Support\Facades\DB;
 
 class PreguntaController extends Controller
 {
@@ -24,8 +25,13 @@ class PreguntaController extends Controller
     {
         $request->validate([
             'pregunta' => 'required',
-            ''
+            'dificultat_id' => 'required',
+            'tema_id' => 'required'
         ]);
+
+        $mostrar=Pregunta::create($request->all());
+
+        return response()->json($mostrar);
     }
 
     /**
@@ -33,7 +39,9 @@ class PreguntaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $mostrarPreg = Pregunta::find($id);
+
+        return response()->json($mostrarPreg);
     }
 
     /**
@@ -41,7 +49,10 @@ class PreguntaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $pregunta = Pregunta::find($id);
+        $pregunta->update($request->all());
+
+        return response()->json($pregunta);
     }
 
     /**
@@ -50,5 +61,13 @@ class PreguntaController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    // MÈTODES DE LA PART D'ADMINISTRACIÓ
+    public function adminIndex()
+    {
+        $preguntes = Pregunta::all();
+
+        return view('preguntes.index', ['preguntes' => $preguntes]);
     }
 }

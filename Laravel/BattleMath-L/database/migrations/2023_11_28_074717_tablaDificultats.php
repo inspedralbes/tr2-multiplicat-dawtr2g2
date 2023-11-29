@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('dificultats', function (Blueprint $table) {
             $table->id();
             $table->string('nom_dificultat' , 100);
+            $table->timestamps();
+
         });
     }
 

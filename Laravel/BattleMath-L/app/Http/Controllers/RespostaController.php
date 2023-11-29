@@ -22,7 +22,16 @@ class RespostaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'resposta' => 'required',
+            'dificultat_id' => 'required',
+            'tema_id' => 'required'
+        ]);
+
+        $mostrar=Resposta::create($request->all());
+
+        return response()->json($mostrar);
+
     }
 
     /**
@@ -30,7 +39,9 @@ class RespostaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $mostrarResp = Resposta::find($id);
+
+        return response()->json($mostrarResp);
     }
 
     /**
@@ -38,7 +49,10 @@ class RespostaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $resposta = Resposta::find($id);
+        $resposta->update($request->all());
+        
+        return response()->json($resposta);
     }
 
     /**
@@ -46,6 +60,14 @@ class RespostaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $resposta = Resposta::find($id);
+    
+        if (!$resposta) {
+            return response()->json(['message' => 'No s\'ha trobat cap resposta amb aquest id!'], 404);
+        }
+    
+        $resposta->delete();
+    
+        return response()->json(['message' => 'Resposta eliminada']);
     }
 }
