@@ -17,7 +17,10 @@ export default defineComponent({
         walls: null,
         furniture: null,
       },
-      zoom: 2,
+      cameraConfig: {
+        zoom: 4,
+        offset: 4.8
+      }
     }
   },
   mounted() {
@@ -29,15 +32,18 @@ export default defineComponent({
 
       const config = {
         type: Phaser.AUTO,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        zoom: self.zoom,
+        width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
+        height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
+        zoom: self.cameraConfig.zoom,
+        scale: {
+          autoCenter: Phaser.Scale.CENTER_BOTH
+        },
         parent: this.$refs.gameContainer,
         physics: {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: true
+            debug: false
           }
         },
         scene: {
@@ -53,11 +59,12 @@ export default defineComponent({
             ///Funciones-variables que en en metodos no funcionan pero aqui si
             this.knight = this.physics.add.sprite(780, 774, 'knight', 'knight_walk_right_1.png');
             this.knight.anims.play('knight_idle_right');
-            this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.8);
+            this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.7);
             this.physics.world.enable(this.knight);
             this.physics.add.collider(this.knight, self.layers.walls);
             this.physics.add.collider(this.knight, self.layers.furniture);
-            this.cameras.main.startFollow(this.knight, true);
+            // this.cameras.main.startFollow(this.knight, true);
+            this.cameras.main.centerOn(this.knight.x, this.knight.y);
           },
           update: function () {
             if (!this.knight) {
@@ -99,7 +106,7 @@ export default defineComponent({
       this.game = new Phaser.Game(config);
     },
     preloadPlayerHouse(scene) {
-      scene.load.image('pHouse_Furniture', 'tiles/player_house/TilesetElement.png');
+      scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
       scene.load.image('pHouse_Walls', 'tiles/player_house/TilesetWallSimple.png');
       scene.load.image('pHouse_Floor', 'tiles/player_house/TilesetInteriorFloor.png');
       scene.load.tilemapTiledJSON('playerHouse', 'tiles/player_house/playerHouse.json');
@@ -138,6 +145,8 @@ export default defineComponent({
       this.cursorsLoaded = true;
     },
     createPlayer(scene) {
+      const frameRate = 7;
+
       scene.anims.create({
         key: 'knight_idle_down',
         frames: [{ key: 'knight', frame: 'knight_walk_down_1.png' }]
@@ -167,7 +176,7 @@ export default defineComponent({
           suffix: '.png'
         }),
         repeat: -1,
-        frameRate: 10,
+        frameRate: frameRate,
       });
       scene.anims.create({
         key: 'knight_move_down',
@@ -178,7 +187,7 @@ export default defineComponent({
           suffix: '.png'
         }),
         repeat: -1,
-        frameRate: 10,
+        frameRate: frameRate,
       });
       scene.anims.create({
         key: 'knight_move_left',
@@ -189,7 +198,7 @@ export default defineComponent({
           suffix: '.png'
         }),
         repeat: -1,
-        frameRate: 10,
+        frameRate: frameRate,
       });
       scene.anims.create({
         key: 'knight_move_right',
@@ -200,7 +209,7 @@ export default defineComponent({
           suffix: '.png'
         }),
         repeat: -1,
-        frameRate: 10,
+        frameRate: frameRate,
       });
 
     },
