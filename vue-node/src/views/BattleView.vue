@@ -4,6 +4,7 @@
 
 
 <template>
+    <h1>SEGUIR</h1>
     <div class="container">
         <div class="game">
             <header>
