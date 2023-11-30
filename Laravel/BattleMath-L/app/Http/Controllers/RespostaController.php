@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Resposta;
 
@@ -12,7 +13,7 @@ class RespostaController extends Controller
      */
     public function index()
     {
-        $preguntes = Resposta::all(); 
+        $preguntes = Resposta::all();
 
         return response()->json($preguntes);
     }
@@ -28,10 +29,9 @@ class RespostaController extends Controller
             'tema_id' => 'required'
         ]);
 
-        $mostrar=Resposta::create($request->all());
+        $mostrar = Resposta::create($request->all());
 
         return response()->json($mostrar);
-
     }
 
     /**
@@ -51,7 +51,7 @@ class RespostaController extends Controller
     {
         $resposta = Resposta::find($id);
         $resposta->update($request->all());
-        
+
         return response()->json($resposta);
     }
 
@@ -61,13 +61,13 @@ class RespostaController extends Controller
     public function destroy(string $id)
     {
         $resposta = Resposta::find($id);
-    
+
         if (!$resposta) {
             return response()->json(['message' => 'No s\'ha trobat cap resposta amb aquest id!'], 404);
         }
-    
+
         $resposta->delete();
-    
+
         return response()->json(['message' => 'Resposta eliminada']);
     }
 
@@ -81,19 +81,44 @@ class RespostaController extends Controller
 
     public function adminStore(Request $request)
     {
-        
-            $request->validate([
-                'resposta' => 'required',
-                'tema_id' => 'required',
-                'dificultat_id' => 'required'
-            ]);
-    
-            $resposta = new Resposta;
-            $resposta->resposta = $request->resposta;
-            $resposta->tema_id = $request->tema_id;
-            $resposta->dificultat_id = $request->dificultat_id;
-            $resposta->save();
-    
-            return redirect()->route('view-afegir-resposta')->with('success', 'Pregunta afegida correctament');
+
+        $request->validate([
+            'resposta' => 'required',
+            'tema_id' => 'required',
+            'dificultat_id' => 'required'
+        ]);
+
+        $resposta = new Resposta;
+        $resposta->resposta = $request->resposta;
+        $resposta->tema_id = $request->tema_id;
+        $resposta->dificultat_id = $request->dificultat_id;
+        $resposta->save();
+
+        return redirect()->route('view-afegir-resposta')->with('success', 'Pregunta afegida correctament');
+    }
+
+    public function adminShow($id)
+    {
+        $resposta = Resposta::find($id);
+        return view('respostes.modificar', ['resposta' => $resposta]);
+    }
+
+    public function adminUpdate(Request $request, $id)
+    {
+
+        $resposta = Resposta::find($id);
+        $resposta->update($request->all());
+
+
+
+        return redirect()->route('view-modificar-resposta', ['id' => $resposta->id])->with('success', 'La resposta a estat actualitzada correctament');
+    }
+
+    public function adminDelete($id)
+    {
+        $resposta = Resposta::find($id);
+        $resposta->delete();
+
+        return redirect()->route('respostes')->with('success', 'resposta eliminada correctament');
     }
 }

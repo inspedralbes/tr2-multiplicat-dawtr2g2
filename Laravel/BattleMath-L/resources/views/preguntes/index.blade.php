@@ -27,10 +27,16 @@
         <tr>
             <td>{{ $pregunta->id }}</td>
             <td><a href="{{ route('view-modificar-pregunta', ['id' => $pregunta->id]) }}">{{ $pregunta->pregunta }}</a></td>
-            <td>{{ $pregunta->esposta_correcta_id}}</td>
+            <td>{{ $pregunta->resposta_correcta_id}}</td>
             <td>{{ $pregunta->dificultat_id }}</td>
             <td>{{ $pregunta->tema_id }}</td>
-            
+            <td>
+                    <form action="{{ route('eliminar-pregunta', ['id' => $pregunta->id]) }}" method="POST">
+                        @method('DELETE')
+                        @csrf
+                        <button class="button is-danger is-small is-centered eliminar">Eliminar</button>
+                    </form>
+                </td>
         </tr>
         @endforeach
     </table>

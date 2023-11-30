@@ -23,8 +23,8 @@
                 <input type="text" name="dificultat_id" class="input" value="{{ $pregunta->dificultat_id }}">
             </div>
             
-            <button type="submit" class="button button--icon is-warning is-rounded is-responsive mt-4"><p>MODIFICAR LLIBRE</p><img class="icon" src="{{url('/img/update.png')}}" alt="modificar" width=23 height=23></button>
-            <a href="{{ route('preguntes') }}" class="button button--icon is-danger is-rounded is-responsive mt-4"><p>CANCEL·LAR</p><img class="icon" src="{{url('/img/cross.png')}}" alt="creu" width=30 height=30></a>
+            <button type="submit" class="button button--icon is-warning is-rounded is-responsive mt-4"><p>MODIFICAR LLIBRE</p></button>
+            <a href="{{ route('preguntes') }}" class="button button--icon is-danger is-rounded is-responsive mt-4"><p>CANCEL·LAR</p></a>
         </form>
     </div>
 @endsection

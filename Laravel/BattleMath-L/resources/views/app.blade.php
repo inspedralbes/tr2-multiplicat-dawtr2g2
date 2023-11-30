@@ -12,7 +12,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <!-- Título del Navbar -->
-            <a class="navbar-brand" href="#">Administració</a>
+            <a class="navbar-brand" href="{{route('preguntes')}}">Administració</a>
 
             <!-- Botón colapsable para dispositivos pequeños -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

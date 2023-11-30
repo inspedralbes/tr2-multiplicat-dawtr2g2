@@ -10,7 +10,9 @@
     <form class="p-4 mb-4" action="{{ route('view-afegir-resposta') }}" method="POST">
         @method('GET')
         @csrf
-        <button class="button button--icon is-success is-rounded is-responsive"><p>Afegir Resposta</p></button>
+        <button class="button button--icon is-success is-rounded is-responsive">
+            <p>Afegir Resposta</p>
+        </button>
     </form>
 
     <table class="table is-striped is-hoverable is-fullwidth">
@@ -24,9 +26,16 @@
         @foreach ($respostes as $resposta)
         <tr>
             <td>{{ $resposta->id }}</td>
-            <td>{{ $resposta->resposta }}</a></td>
+            <td><a href="{{ route('view-modificar-resposta', ['id' => $resposta->id]) }}">{{ $resposta->resposta }}</a></td>
             <td>{{ $resposta->dificultat_id }}</td>
             <td>{{ $resposta->tema_id }}</td>
+            <td>
+                <form action="{{ route('eliminar-resposta', ['id' => $resposta->id]) }}" method="POST">
+                    @method('DELETE')
+                    @csrf
+                    <button class="button is-danger is-small is-centered eliminar">Eliminar</button>
+                </form>
+            </td>
         </tr>
         @endforeach
     </table>
