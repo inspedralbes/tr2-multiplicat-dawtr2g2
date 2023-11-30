@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('temes', function (Blueprint $table) {
             $table->id();
             $table->string('nom_tematica' , 100);
+            $table->timestamps();
+
         });
     }
 

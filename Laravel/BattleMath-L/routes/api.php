@@ -16,6 +16,16 @@ use App\Http\Controllers\RespostaController;
 |
 */
 
+//Preguntes
 Route::get('/preguntes', [PreguntaController::class, 'index']);
-Route::get('/respostes', [RespostaController::class, 'index']);
+Route::post('/crearpreguntes', [PreguntaController::class, 'store']);
+Route::get('/veurePregunta/{id}', [PreguntaController::class, 'show']);
+Route::put('/modificarPregunta/{id}', [PreguntaController::class, 'update']);
+Route::delete('/eliminarPregunta/{id}', [PreguntaController::class, 'destroy']);
 
+//Respostes 
+Route::delete('/eliminarResposta/{id}', [RespostaController::class, 'destroy']);
+Route::put('/modificarResposta/{id}', [RespostaController::class, 'update']);
+Route::get('/veureResposta/{id}', [RespostaController::class, 'show']);
+Route::post('/crearRespostes', [RespostaController::class, 'store']);
+Route::get('/respostes', [RespostaController::class, 'index']);

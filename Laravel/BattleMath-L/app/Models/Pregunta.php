@@ -9,4 +9,10 @@ class Pregunta extends Model
 {
     use HasFactory;
     protected $table = 'preguntes';
+    protected $fillable = [
+        'pregunta',
+        'dificultat_id',
+        'tema_id'
+        
+    ];
 }
