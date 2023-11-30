@@ -18,14 +18,15 @@ use App\Http\Controllers\RespostaController;
 
 //Preguntes
 Route::get('/preguntes', [PreguntaController::class, 'index']);
-Route::post('/crearpreguntes', [PreguntaController::class, 'store']);
-Route::get('/veurePregunta/{id}', [PreguntaController::class, 'show']);
-Route::put('/modificarPregunta/{id}', [PreguntaController::class, 'update']);
-Route::delete('/eliminarPregunta/{id}', [PreguntaController::class, 'destroy']);
+Route::post('/preguntes/crear', [PreguntaController::class, 'store']);
+Route::get('/preguntes/mostrar/{id}', [PreguntaController::class, 'show']);
+Route::get('/preguntes/dificultat/{dif}', [PreguntaController::class, 'showPregDif']);
+Route::put('/preguntes/modificar/{id}', [PreguntaController::class, 'update']);
+Route::delete('/preguntes/eliminar/{id}', [PreguntaController::class, 'destroy']);
 
 //Respostes 
-Route::delete('/eliminarResposta/{id}', [RespostaController::class, 'destroy']);
-Route::put('/modificarResposta/{id}', [RespostaController::class, 'update']);
-Route::get('/veureResposta/{id}', [RespostaController::class, 'show']);
-Route::post('/crearRespostes', [RespostaController::class, 'store']);
+Route::delete('/respostes/eliminar/{id}', [RespostaController::class, 'destroy']);
+Route::put('/respostes/modificar/{id}', [RespostaController::class, 'update']);
+Route::get('/respostes/mostrar/{id}', [RespostaController::class, 'show']);
+Route::post('/respostes/crear', [RespostaController::class, 'store']);
 Route::get('/respostes', [RespostaController::class, 'index']);
