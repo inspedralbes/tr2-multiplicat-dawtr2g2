@@ -16,7 +16,8 @@ export default defineComponent({
       layers: {
         walls: null,
         furniture: null,
-      }
+      },
+      zoom: 2,
     }
   },
   mounted() {
@@ -28,13 +29,15 @@ export default defineComponent({
 
       const config = {
         type: Phaser.AUTO,
-        zoom: 2,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        zoom: self.zoom,
         parent: this.$refs.gameContainer,
         physics: {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
           }
         },
         scene: {
@@ -48,7 +51,7 @@ export default defineComponent({
             self.cursors = this.input.keyboard.createCursorKeys();
 
             ///Funciones-variables que en en metodos no funcionan pero aqui si
-            this.knight = this.physics.add.sprite(200, 119, 'knight', 'knight_walk_right_1.png');
+            this.knight = this.physics.add.sprite(780, 774, 'knight', 'knight_walk_right_1.png');
             this.knight.anims.play('knight_idle_right');
             this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.8);
             this.physics.world.enable(this.knight);
@@ -58,7 +61,7 @@ export default defineComponent({
           },
           update: function () {
             if (!this.knight) {
-              this.knight = this.physics.add.sprite(200, 119, 'knight', 'knight_walk_right_1.png');
+              this.knight = this.physics.add.sprite(780, 774, 'knight', 'knight_walk_right_1.png');
             }
 
             if (!this.cursorsLoaded) {
@@ -70,7 +73,6 @@ export default defineComponent({
                 this.knight.setVelocity(-speed, 0);
                 this.knight.anims.play('knight_move_left', true);
 
-                // this.knight.scaleX = -1;
               } else if (this.cursors.right?.isDown) {
                 this.knight.setVelocity(speed, 0);
                 this.knight.anims.play('knight_move_right', true);
@@ -89,6 +91,7 @@ export default defineComponent({
                 this.knight.setVelocity(0, 0);
               }
             }
+            // console.log(this.knight.x, this.knight.y);
           }
         }
       };
@@ -117,11 +120,6 @@ export default defineComponent({
       this.layers.furniture.setCollisionByProperty({ collides: true });
 
       // this.debugCollision(scene);
-
-
-      const width = map.widthInPixels;
-      const height = map.heightInPixels;
-      this.game.scale.resize(width, height);
     },
     debugCollision(scene) {
       const debugGraphics = scene.add.graphics().setAlpha(0.75);
