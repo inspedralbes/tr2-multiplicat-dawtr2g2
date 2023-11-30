@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pregunta;
+use App\Models\Dificultat;
 use Illuminate\Support\Facades\DB;
 
 class PreguntaController extends Controller
@@ -16,6 +17,14 @@ class PreguntaController extends Controller
         $preguntes = Pregunta::all(); 
 
         return response()->json($preguntes);
+    }
+
+    public function showPregDif($dif)
+    {
+        $mostrarPreg = Pregunta::where('dificultat_id', $dif)->get();
+
+        return response()->json($mostrarPreg);
+
     }
 
     /**
@@ -43,6 +52,7 @@ class PreguntaController extends Controller
 
         return response()->json($mostrarPreg);
     }
+
 
     /**
      * Update the specified resource in storage.
