@@ -2,7 +2,7 @@
   <div ref="gameContainer"></div>
 </template>
 
-<script>
+<script scoped>
 import { defineComponent } from 'vue';
 import Phaser from 'phaser';
 

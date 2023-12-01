@@ -4,14 +4,9 @@
 
 
 <template>
-   
     <div class="landing">
-        
+
     </div>
 </template>
- <style>
-        body{
-            background-image: ;
 
-        }
-    </style>
+<style></style>
