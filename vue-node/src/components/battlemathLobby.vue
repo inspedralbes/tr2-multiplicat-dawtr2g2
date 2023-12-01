@@ -20,6 +20,7 @@ export default defineComponent({
         buildBottom: null,
         build: null,
         buildTop: null,
+        floor: null,
       },
       cameraConfig: {
         zoom: 3,
@@ -132,7 +133,7 @@ export default defineComponent({
       const furniture = map.addTilesetImage('TilesetElement', 'TilesetElement');
 
       map.createLayer('bg', tileset);
-      map.createLayer('floor', tileset);
+      this.layers.floor = map.createLayer('floor', tileset);
       this.layers.furn = map.createLayer('furniture', furniture);
       this.layers.buildBottom2 = map.createLayer('buildings-bottom_2', tileset);
       this.layers.buildBottom = map.createLayer('buildings-bottom', tileset);
@@ -146,6 +147,7 @@ export default defineComponent({
       this.layers.build.setCollisionByProperty({ collides: true });
       this.layers.buildTop.setCollisionByProperty({ collides: true });
       this.layers.furnTop.setCollisionByProperty({ collides: true });
+      this.layers.floor.setCollisionByProperty({ collides: true });
 
 
       this.debugCollision(scene);
@@ -176,7 +178,10 @@ export default defineComponent({
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(200, 134, 48, 255),
       });
-
+      this.layers.floor.renderDebug(debugGraphics, {
+        tileColor: null,
+        collidingTileColor: new Phaser.Display.Color(220, 134, 48, 255),
+      });
     },
     async loadCursor(scene) {
       await new Promise(resolve => setTimeout(resolve, 1000));
