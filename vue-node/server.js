@@ -40,7 +40,8 @@ io.on('connection', (socket) => {
     
     axios.get(url)
       .then(response => {
-        const data = response.data;        io.emit('viewQuest', data);
+        const data = response.data;        
+        io.emit('viewQuest', data);
       })
       .catch(error => {
         console.error(error);

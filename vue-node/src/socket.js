@@ -32,7 +32,10 @@ socket.on("GameStart", () => {
 });
 
 socket.on("viewQuest", (quest) => {
-  console.log('Received viewQuest event with quest:', quest);
-  const store = useAppStore();
-  store.addQuest(quest);
+  if (router.currentRoute.value.path == '/partida') {
+    console.log('Received viewQuest event with quest:', quest);
+    const store = useAppStore();
+    store.addQuest(quest);
+  }
+  
 });
