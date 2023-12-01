@@ -3,8 +3,10 @@ import { createPinia } from 'pinia'
 import { defineCustomElements as defineIonPhaser } from '@ion-phaser/core/loader';
 
 import App from './App.vue'
+import './index.css'
 import router from './router'
 import Phaser from 'phaser';
+
 
 defineIonPhaser(window);
 
