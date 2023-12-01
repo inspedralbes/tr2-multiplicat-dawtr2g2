@@ -1,5 +1,5 @@
 <template>
-  <div ref="gameContainer"></div>
+  <!-- <div ref="gameContainer"></div> -->
 </template>
 
 <script scoped>
@@ -38,7 +38,7 @@ export default defineComponent({
         scale: {
           autoCenter: Phaser.Scale.CENTER_BOTH
         },
-        parent: this.$refs.gameContainer,
+        // parent: this.$refs.gameContainer,
         physics: {
           default: 'arcade',
           arcade: {
@@ -60,11 +60,14 @@ export default defineComponent({
             this.knight = this.physics.add.sprite(780, 774, 'knight', 'knight_walk_right_1.png');
             this.knight.anims.play('knight_idle_right');
             this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.7);
+            this.knight.body.setOffset(this.knight.width * 0.25, this.knight.height * 0.3);
             this.physics.world.enable(this.knight);
             this.physics.add.collider(this.knight, self.layers.walls);
             this.physics.add.collider(this.knight, self.layers.furniture);
             // this.cameras.main.startFollow(this.knight, true);
             this.cameras.main.centerOn(this.knight.x, this.knight.y);
+
+            self.createPlayerHouse_foreground(this);
           },
           update: function () {
             if (!this.knight) {
@@ -79,12 +82,9 @@ export default defineComponent({
               if (this.cursors.left?.isDown) {
                 this.knight.setVelocity(-speed, 0);
                 this.knight.anims.play('knight_move_left', true);
-
               } else if (this.cursors.right?.isDown) {
                 this.knight.setVelocity(speed, 0);
                 this.knight.anims.play('knight_move_right', true);
-
-                this.knight.scaleX = 1;
               } else if (this.cursors.up?.isDown) {
                 this.knight.setVelocity(0, -speed);
                 this.knight.anims.play('knight_move_up', true);
@@ -128,6 +128,11 @@ export default defineComponent({
 
       // this.debugCollision(scene);
     },
+    createPlayerHouse_foreground(scene) {
+      const map = scene.make.tilemap({ key: 'playerHouse' });
+      const furnitureTileset = map.addTilesetImage('phFurniture', 'pHouse_Furniture');
+      map.createLayer('foreground', furnitureTileset);
+    },
     debugCollision(scene) {
       const debugGraphics = scene.add.graphics().setAlpha(0.75);
       this.layers.walls.renderDebug(debugGraphics, {
@@ -138,11 +143,6 @@ export default defineComponent({
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(100, 134, 48, 255),
       });
-    },
-    async loadCursor(scene) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.cursors = scene.input.keyboard.createCursorKeys();
-      this.cursorsLoaded = true;
     },
     createPlayer(scene) {
       const frameRate = 7;
