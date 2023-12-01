@@ -18,7 +18,7 @@ export default {
     </div>
 </template>
 
-<style>
+<style >
 body {
     background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/01073865290819.5d61d475f0072.jpg');
     background-repeat: no-repeat;
@@ -54,7 +54,7 @@ body {
     overflow: hidden;
 }
 
-.pixel-art-button::before {
+/* .pixel-art-button::before {
     content: '';
     position: absolute;
     top: -4px;
@@ -64,4 +64,5 @@ body {
     background-image: url('ruta/a/imagen_pixel_art.png');
     background-size: cover;
     z-index: -1;
-}</style>
+} */
+</style>
