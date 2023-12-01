@@ -1,7 +1,7 @@
 <template>
   <div ref="gameContainer"></div>
 </template>
-
+  
 <script>
 import { defineComponent } from 'vue';
 import Phaser from 'phaser';
