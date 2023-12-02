@@ -1,10 +1,11 @@
 <template>
-  <div ref="gameContainer"></div>
+  <div class="game" ref="gameContainer"></div>
 </template>
 
 <script scoped>
 import { defineComponent } from 'vue';
 import Phaser from 'phaser';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'battlemathGame',
@@ -23,7 +24,7 @@ export default defineComponent({
         floor: null,
       },
       cameraConfig: {
-        zoom: 1,
+        zoom: this.rescaleCamera(),
         offset: 4.8
       }
     }
@@ -37,16 +38,13 @@ export default defineComponent({
 
       const config = {
         type: Phaser.AUTO,
-        // width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
-        // height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
-        // zoom: self.cameraConfig.zoom,
+        width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
+        height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
+        zoom: self.cameraConfig.zoom,
         scale: {
-          mode: Phaser.Scale.RESIZE,
-          width: '100%',
-          height: '100%',
-          autoCenter: Phaser.Scale.CENTER_BOTH,
-          parent: 'gameContainer',
+          autoCenter: Phaser.Scale.RESIZE,
         },
+        parent: this.$refs.gameContainer,
         physics: {
           default: 'arcade',
           arcade: {
@@ -58,70 +56,72 @@ export default defineComponent({
           preload: function () {
             self.preloadPlayerHouse(this);
             this.load.atlas('knight', 'characters/knight/knight.png', 'characters/knight/knight.json');
+            self.rescaleCamera(this);
           },
           create: function () {
-            this.game.canvas.focus();
             self.createLobby(this);
             self.createPlayer(this);
             self.cursors = this.input.keyboard.createCursorKeys();
 
-            ///Funciones-variables que en en metodos no funcionan pero aqui si
-            this.knight = this.physics.add.sprite(888, 390, 'knight', 'knight_walk_down_1.png');
-            this.knight.anims.play('knight_idle_down');
-            this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.7);
-            this.knight.body.setOffset(this.knight.width * 0.25, this.knight.height * 0.3);
-            this.physics.world.enable(this.knight);
-            this.physics.add.collider(this.knight, self.layers.buildBottom2);
-            this.physics.add.collider(this.knight, self.layers.buildBottom);
-            this.physics.add.collider(this.knight, self.layers.build);
-            this.physics.add.collider(this.knight, self.layers.buildTop);
-            this.physics.add.collider(this.knight, self.layers.furnTop);
-            this.physics.add.collider(this.knight, self.layers.floor);
-            this.cameras.main.startFollow(this.knight, true);
+            ///Create player
+            self.knight = this.physics.add.sprite(888, 390, 'knight', 'knight_walk_down_1.png');
+            self.knight.anims.play('knight_idle_down');
+            self.knight.body.setSize(self.knight.width * 0.5, self.knight.height * 0.7);
+            self.knight.body.setOffset(self.knight.width * 0.25, self.knight.height * 0.3);
+            this.physics.world.enable(self.knight);
+            this.physics.add.collider(self.knight, self.layers.buildBottom2);
+            this.physics.add.collider(self.knight, self.layers.buildBottom);
+            this.physics.add.collider(self.knight, self.layers.build);
+            this.physics.add.collider(self.knight, self.layers.buildTop);
+            this.physics.add.collider(self.knight, self.layers.furnTop);
+            this.physics.add.collider(self.knight, self.layers.floor);
+            this.cameras.main.startFollow(self.knight, true);
             // this.cameras.main.centerOn(this.knight.x, this.knight.y);
-            self.rescaleCamera(this);
             self.createLobby_foreground(this);
           },
           update: function () {
-            if (!this.knight) {
-              this.knight = this.physics.add.sprite(888, 390, 'knight', 'knight_walk_down_1.png');
-            }
+            const speed = 50;
+            const runSpeedMultiplier = 1.5;
 
-            if (!this.cursorsLoaded) {
-              this.cursors = this.input.keyboard.createCursorKeys();
-              this.cursorsLoaded = true;
+            let currentSpeed = speed;
+
+            // if (self.tecla(this, 'SHIFT')) {
+            //   currentSpeed *= runSpeedMultiplier;
+            // } else {
+            //   currentSpeed = speed;
+            // }
+            this.$nextTick(() => {
+              console.log('tick?');
+            });
+            if ((self.cursors.left?.isDown || self.tecla(this, 'A'))) {
+              self.knight.setVelocity(-currentSpeed, 0);
+              self.knight.anims.play('knight_move_left', true);
+            } else if (self.cursors.right?.isDown || self.tecla(this, 'D')) {
+              self.knight.setVelocity(currentSpeed, 0);
+              self.knight.anims.play('knight_move_right', true);
+            } else if (self.cursors.up?.isDown || self.tecla(this, 'W')) {
+              self.knight.setVelocity(0, -currentSpeed);
+              self.knight.anims.play('knight_move_up', true);
+            } else if (self.cursors.down?.isDown || self.tecla(this, 'S')) {
+              self.knight.setVelocity(0, currentSpeed);
+              self.knight.anims.play('knight_move_down', true);
             } else {
-              const speed = 100;
-              if (this.cursors.left?.isDown) {
-                this.knight.setVelocity(-speed, 0);
-                this.knight.anims.play('knight_move_left', true);
-              } else if (this.cursors.right?.isDown) {
-                this.knight.setVelocity(speed, 0);
-                this.knight.anims.play('knight_move_right', true);
-              } else if (this.cursors.up?.isDown) {
-                this.knight.setVelocity(0, -speed);
-                this.knight.anims.play('knight_move_up', true);
-              } else if (this.cursors.down?.isDown) {
-                this.knight.setVelocity(0, speed);
-                this.knight.anims.play('knight_move_down', true);
-              } else {
-                const parts = this.knight.anims.currentAnim.key.split('_');
-                parts[1] = 'idle';
-                this.knight.anims.play(parts.join('_'));
-                this.knight.setVelocity(0, 0);
-              }
+              const parts = self.knight.anims.currentAnim.key.split('_');
+              parts[1] = 'idle';
+              self.knight.anims.play(parts.join('_'));
+              self.knight.setVelocity(0, 0);
             }
             // console.log(this.knight.x, this.knight.y);
           }
         },
         render: {
-          antialias: true, // Activar anti-aliasing para suavizar bordes
-          pixelArt: true, // Si estás usando gráficos pixelados, configúralo en 'true'
-          roundPixels: true, // Redondear píxeles para evitar el desenfoque
+          antialias: true,
+          pixelArt: true,
+          roundPixels: true,
           fps: {
-            min: 30, // Framerate mínimo
-            target: 60, // Objetivo de framerate
-            forceSetTimeOut: true // Forzar el uso de setTimeout en lugar de requestAnimationFrame
+            min: 30,
+            target: 60,
+            forceSetTimeOut: true
           },
           // ...
         }
@@ -130,14 +130,17 @@ export default defineComponent({
       this.game = new Phaser.Game(config);
 
     },
-    rescaleCamera(scene) {
-      const baseWidth = 800; // Ancho base
-      const baseHeight = 600; // Alto base
-      const scaleX = window.innerWidth / baseWidth;
-      const scaleY = window.innerHeight / baseHeight;
-      const scaleFactor = Math.min(scaleX, scaleY);
+    rescaleCamera() {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
 
-      scene.cameras.main.setZoom(scaleFactor);
+      if (screenWidth < 768 && screenHeight < 1024) {
+        return 1.5;
+      } else if (screenWidth < 1024 && screenHeight < 1366) {
+        return 2;
+      } else {
+        return 3;
+      }
     },
     preloadPlayerHouse(scene) {
       scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
@@ -275,6 +278,9 @@ export default defineComponent({
       });
 
     },
+    tecla(scene, key) {
+      return scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[key]).isDown;
+    }
   }
 });
 </script>

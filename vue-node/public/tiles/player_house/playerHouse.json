@@ -671,7 +671,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":100,
-         "id":7,
+         "id":10,
          "name":"foreground",
          "opacity":1,
          "type":"tilelayer",
@@ -679,10 +679,39 @@
          "width":100,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":9,
+         "name":"Doors",
+         "objects":[
+                {
+                 "gid":725,
+                 "height":16,
+                 "id":8,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":784,
+                 "y":877.333333333333
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":1,
+ "nextlayerid":11,
+ "nextobjectid":14,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"door",
+         "type":"bool",
+         "value":true
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
  "tileheight":16,
@@ -3638,7 +3667,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -3647,7 +3676,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -3656,7 +3685,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -3665,7 +3694,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -3734,6 +3763,19 @@
          "name":"phFloor",
          "spacing":0,
          "tilecount":374,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":1,
+         "firstgid":725,
+         "image":"..\/..\/objects\/door.png",
+         "imageheight":16,
+         "imagewidth":16,
+         "margin":0,
+         "name":"doors",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":16,
          "tilewidth":16
         }],
