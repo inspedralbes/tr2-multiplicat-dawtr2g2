@@ -1,5 +1,5 @@
 <template>
-  <!-- <div ref="gameContainer"></div> -->
+  <div ref="gameContainer"></div>
 </template>
 
 <script scoped>
@@ -23,7 +23,7 @@ export default defineComponent({
         floor: null,
       },
       cameraConfig: {
-        zoom: 3,
+        zoom: 1,
         offset: 4.8
       }
     }
@@ -37,13 +37,16 @@ export default defineComponent({
 
       const config = {
         type: Phaser.AUTO,
-        width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
-        height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
-        zoom: self.cameraConfig.zoom,
+        // width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
+        // height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
+        // zoom: self.cameraConfig.zoom,
         scale: {
-          autoCenter: Phaser.Scale.CENTER_BOTH
+          mode: Phaser.Scale.RESIZE,
+          width: '100%',
+          height: '100%',
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+          parent: 'gameContainer',
         },
-        // parent: this.$refs.gameContainer,
         physics: {
           default: 'arcade',
           arcade: {
@@ -58,7 +61,7 @@ export default defineComponent({
           },
           create: function () {
             this.game.canvas.focus();
-            self.createPlayerHouse(this);
+            self.createLobby(this);
             self.createPlayer(this);
             self.cursors = this.input.keyboard.createCursorKeys();
 
@@ -66,13 +69,18 @@ export default defineComponent({
             this.knight = this.physics.add.sprite(888, 390, 'knight', 'knight_walk_down_1.png');
             this.knight.anims.play('knight_idle_down');
             this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.7);
+            this.knight.body.setOffset(this.knight.width * 0.25, this.knight.height * 0.3);
             this.physics.world.enable(this.knight);
-            this.physics.add.collider(this.knight, self.layers.walls);
-            this.physics.add.collider(this.knight, self.layers.furniture);
+            this.physics.add.collider(this.knight, self.layers.buildBottom2);
+            this.physics.add.collider(this.knight, self.layers.buildBottom);
+            this.physics.add.collider(this.knight, self.layers.build);
+            this.physics.add.collider(this.knight, self.layers.buildTop);
+            this.physics.add.collider(this.knight, self.layers.furnTop);
+            this.physics.add.collider(this.knight, self.layers.floor);
             this.cameras.main.startFollow(this.knight, true);
-            this.cameras.main.scrollX = Math.round(this.cameras.main.scrollX);
-            this.cameras.main.scrollY = Math.round(this.cameras.main.scrollY);
             // this.cameras.main.centerOn(this.knight.x, this.knight.y);
+            self.rescaleCamera(this);
+            self.createLobby_foreground(this);
           },
           update: function () {
             if (!this.knight) {
@@ -122,26 +130,33 @@ export default defineComponent({
       this.game = new Phaser.Game(config);
 
     },
+    rescaleCamera(scene) {
+      const baseWidth = 800; // Ancho base
+      const baseHeight = 600; // Alto base
+      const scaleX = window.innerWidth / baseWidth;
+      const scaleY = window.innerHeight / baseHeight;
+      const scaleFactor = Math.min(scaleX, scaleY);
+
+      scene.cameras.main.setZoom(scaleFactor);
+    },
     preloadPlayerHouse(scene) {
       scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
       scene.load.image('TilesetElement', 'tiles/TilesetElement.png')
       scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
     },
-    createPlayerHouse(scene) {
+    createLobby(scene) {
       const map = scene.make.tilemap({ key: 'lobby' });
       const tileset = map.addTilesetImage('TilesetLobby', 'TilesetLobby');
       const furniture = map.addTilesetImage('TilesetElement', 'TilesetElement');
 
       map.createLayer('bg', tileset);
       this.layers.floor = map.createLayer('floor', tileset);
-      this.layers.furn = map.createLayer('furniture', furniture);
       this.layers.buildBottom2 = map.createLayer('buildings-bottom_2', tileset);
       this.layers.buildBottom = map.createLayer('buildings-bottom', tileset);
       this.layers.build = map.createLayer('buildings', tileset);
       this.layers.buildTop = map.createLayer('buildings-top', tileset);
       this.layers.furnTop = map.createLayer('furniture-top', tileset);
 
-      this.layers.furn.setCollisionByProperty({ collides: true });
       this.layers.buildBottom2.setCollisionByProperty({ collides: true });
       this.layers.buildBottom.setCollisionByProperty({ collides: true });
       this.layers.build.setCollisionByProperty({ collides: true });
@@ -150,14 +165,17 @@ export default defineComponent({
       this.layers.floor.setCollisionByProperty({ collides: true });
 
 
-      this.debugCollision(scene);
+      // this.debugCollision(scene);
+    },
+    createLobby_foreground(scene) {
+      const map = scene.make.tilemap({ key: 'lobby' });
+      const tileset = map.addTilesetImage('TilesetLobby', 'TilesetLobby');
+
+      map.createLayer('foreground', tileset);
+
     },
     debugCollision(scene) {
       const debugGraphics = scene.add.graphics().setAlpha(0.75);
-      this.layers.furn.renderDebug(debugGraphics, {
-        tileColor: null,
-        collidingTileColor: new Phaser.Display.Color(100, 134, 48, 255),
-      });
       this.layers.buildBottom2.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(120, 134, 48, 255),
