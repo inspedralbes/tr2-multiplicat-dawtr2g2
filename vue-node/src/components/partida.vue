@@ -8,7 +8,7 @@
     <div >{{ quest.pregunta }}</div>
     <button @click="genQuest()">Generar Pregunta</button>
     <div v-for="(answer, index) in ans" :key="index">
-      <button :value="answer.id" @click="compAns(answer.id)">{{ answer.resposta }}</button>
+      <button :value="answer.id" @click="compAns(quest.id,answer.id)">{{ answer.resposta }}</button>
     </div>
   </template>
   
@@ -47,9 +47,9 @@
       genQuest(){
         socket.emit('genQuest');
       },
-      compAns(ans){
+      compAns(quest, ans){
         this.ans = [];
-        socket.emit('compAns',ans);
+        socket.emit('compAns',quest,ans);
       },
       dibujarCirculos() {
         const pelotaInferiorIzquierda = {

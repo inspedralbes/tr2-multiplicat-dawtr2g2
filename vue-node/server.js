@@ -66,13 +66,30 @@ io.on('connection', (socket) => {
               id: data.id,
               pregunta: data.pregunta
             };
-            console.log(quest);
             io.emit('viewQuest', quest);
             socket.broadcast.emit('viewResp', resp);
           })
           .catch(error => {
             console.error(error);
           });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  });
+
+  socket.on('compAns', (quest,resp) => { 
+    var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
+    
+    axios.get(url)
+      .then(response => {
+        var data = response.data.resposta_correcta_id;
+        console.log(data);
+        if (data == resp) {
+          console.log('Correcte');
+        }else{
+          console.log('Incorrecte');
+        }
       })
       .catch(error => {
         console.error(error);
