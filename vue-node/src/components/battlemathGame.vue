@@ -1,10 +1,13 @@
 <template>
-  <div ref="gameContainer"></div>
+  <div ref="gameContainer">
+    <button @click="irALogin()">Login</button>
+  </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import Phaser from 'phaser';
+import router from '../router';
 
 export default defineComponent({
   name: 'battlemathGame',
@@ -27,6 +30,9 @@ export default defineComponent({
     this.initializeGame();
   },
   methods: {
+    irALogin() {
+        router.push('/login');
+    },
     initializeGame() {
       const self = this;
 

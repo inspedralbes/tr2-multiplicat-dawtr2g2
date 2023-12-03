@@ -18,7 +18,7 @@ export default {
     </div>
 </template>
 
-<style >
+<style scoped>
 body {
     background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/01073865290819.5d61d475f0072.jpg');
     background-repeat: no-repeat;
