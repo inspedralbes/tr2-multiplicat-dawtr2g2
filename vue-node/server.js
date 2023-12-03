@@ -17,7 +17,8 @@ const io = require('socket.io')(server, {
 });
 
 const connectedUsers = [];
-var quest = '';
+var resp = [];
+
 io.on('connection', (socket) => {
   console.log("connected");
 
@@ -35,19 +36,48 @@ io.on('connection', (socket) => {
   });
   
   socket.on('genQuest', () => {
-    const randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
-    const url = `http://127.0.0.1:8000/api/veurePregunta/${randomNumber}`;
+    var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
+    const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
     
     axios.get(url)
       .then(response => {
-        const data = response.data;        
-        io.emit('viewQuest', data);
+        var data = response.data;
+        var respCorr = Math.floor(Math.random() * 4);
+
+        var promises = [];
+        for (let i = 0; i < 4; i++) {
+          if (respCorr == i) {
+            var urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${data.resposta_correcta_id}`;
+          } else {
+            randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
+            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;    
+          }
+          promises.push(axios.get(urlResp));
+        }
+        
+        Promise.all(promises)
+          .then(responses => {
+            resp = responses.map(response => ({
+              id: response.data.id,
+              resposta: response.data.resposta
+            }));
+            console.log(resp);
+            var quest = {
+              id: data.id,
+              pregunta: data.pregunta
+            };
+            console.log(quest);
+            io.emit('viewQuest', quest);
+            socket.broadcast.emit('viewResp', resp);
+          })
+          .catch(error => {
+            console.error(error);
+          });
       })
       .catch(error => {
         console.error(error);
       });
   });
-    
   socket.on('disconnect', () => {
     console.log('Cliente desconectado');
   });

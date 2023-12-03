@@ -5,8 +5,11 @@
         <canvas ref="miCanvas"></canvas>
       </div>
     -->
-    <div >{{ quest }}</div>
+    <div >{{ quest.pregunta }}</div>
     <button @click="genQuest()">Generar Pregunta</button>
+    <div v-for="(answer, index) in ans" :key="index">
+      <button :value="answer.id" @click="compAns(answer.id)">{{ answer.resposta }}</button>
+    </div>
   </template>
   
   <script>
@@ -23,6 +26,7 @@
         ctx: null,
         pelotas: [],
         quest: '',
+        ans: [],
       };
     },
     mounted() {
@@ -32,12 +36,20 @@
       
       const store = useAppStore();
       watch(() => store.questAct, newVal => {
-        this.quest = newVal.pregunta;
+        this.quest = newVal;
+      });
+
+      watch(() => store.respAct, ss => {
+        this.ans = ss;
       });
     },
     methods: {
       genQuest(){
         socket.emit('genQuest');
+      },
+      compAns(ans){
+        this.ans = [];
+        socket.emit('compAns',ans);
       },
       dibujarCirculos() {
         const pelotaInferiorIzquierda = {
@@ -74,7 +86,7 @@
 
   </script>
   
-  <style>
+  <style scoped>
   canvas {
     border: 1px solid white;
     width: 100%;

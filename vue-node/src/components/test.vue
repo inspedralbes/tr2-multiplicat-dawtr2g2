@@ -3,7 +3,7 @@
     <button @click="addUser()">enviar</button>
 </template>
   
-<style>
+<style scoped>
     
 </style>
   

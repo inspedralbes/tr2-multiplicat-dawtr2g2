@@ -5,6 +5,7 @@ export const useAppStore = defineStore('app', {
     users: [],
     usersCon: 0,
     questAct: {},
+    respAct: {}, 
   }),
   actions: {
     addUser(users,long) {
@@ -20,9 +21,10 @@ export const useAppStore = defineStore('app', {
       return this.usersCon;
     },
     addQuest(quest){
-      console.log('Adding quest to store:', quest);
       this.questAct = quest;
-      console.log('QuestAct: ', this.questAct);
+    },
+    addResp(resp){
+      this.respAct = resp;
     },
     getQuest(){
       console.log(this.questAct);

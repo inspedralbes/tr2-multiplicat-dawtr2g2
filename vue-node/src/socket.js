@@ -37,5 +37,12 @@ socket.on("viewQuest", (quest) => {
     const store = useAppStore();
     store.addQuest(quest);
   }
-  
+});
+
+socket.on("viewResp", (resp) => {
+  if (router.currentRoute.value.path == '/partida') {
+    console.log('Received viewResp event with resp:', resp);
+    const store = useAppStore();
+    store.addResp(resp);
+  }
 });
