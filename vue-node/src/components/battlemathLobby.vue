@@ -14,7 +14,7 @@ export default defineComponent({
       cursorsLoaded: false,
       cursors: null,
       knight: null,
-      layers: {
+      lobby_layers: {
         furn: null,
         furnTop: null,
         buildBottom2: null,
@@ -69,12 +69,12 @@ export default defineComponent({
             self.knight.body.setSize(self.knight.width * 0.5, self.knight.height * 0.7);
             self.knight.body.setOffset(self.knight.width * 0.25, self.knight.height * 0.3);
             this.physics.world.enable(self.knight);
-            this.physics.add.collider(self.knight, self.layers.buildBottom2);
-            this.physics.add.collider(self.knight, self.layers.buildBottom);
-            this.physics.add.collider(self.knight, self.layers.build);
-            this.physics.add.collider(self.knight, self.layers.buildTop);
-            this.physics.add.collider(self.knight, self.layers.furnTop);
-            this.physics.add.collider(self.knight, self.layers.floor);
+            this.physics.add.collider(self.knight, self.lobby_layers.buildBottom2);
+            this.physics.add.collider(self.knight, self.lobby_layers.buildBottom);
+            this.physics.add.collider(self.knight, self.lobby_layers.build);
+            this.physics.add.collider(self.knight, self.lobby_layers.buildTop);
+            this.physics.add.collider(self.knight, self.lobby_layers.furnTop);
+            this.physics.add.collider(self.knight, self.lobby_layers.floor);
             this.cameras.main.startFollow(self.knight, true);
             // this.cameras.main.centerOn(this.knight.x, this.knight.y);
             self.createLobby_foreground(this);
@@ -90,9 +90,7 @@ export default defineComponent({
             // } else {
             //   currentSpeed = speed;
             // }
-            this.$nextTick(() => {
-              console.log('tick?');
-            });
+
             if ((self.cursors.left?.isDown || self.tecla(this, 'A'))) {
               self.knight.setVelocity(-currentSpeed, 0);
               self.knight.anims.play('knight_move_left', true);
@@ -153,19 +151,19 @@ export default defineComponent({
       const furniture = map.addTilesetImage('TilesetElement', 'TilesetElement');
 
       map.createLayer('bg', tileset);
-      this.layers.floor = map.createLayer('floor', tileset);
-      this.layers.buildBottom2 = map.createLayer('buildings-bottom_2', tileset);
-      this.layers.buildBottom = map.createLayer('buildings-bottom', tileset);
-      this.layers.build = map.createLayer('buildings', tileset);
-      this.layers.buildTop = map.createLayer('buildings-top', tileset);
-      this.layers.furnTop = map.createLayer('furniture-top', tileset);
+      this.lobby_layers.floor = map.createLayer('floor', tileset);
+      this.lobby_layers.buildBottom2 = map.createLayer('buildings-bottom_2', tileset);
+      this.lobby_layers.buildBottom = map.createLayer('buildings-bottom', tileset);
+      this.lobby_layers.build = map.createLayer('buildings', tileset);
+      this.lobby_layers.buildTop = map.createLayer('buildings-top', tileset);
+      this.lobby_layers.furnTop = map.createLayer('furniture-top', tileset);
 
-      this.layers.buildBottom2.setCollisionByProperty({ collides: true });
-      this.layers.buildBottom.setCollisionByProperty({ collides: true });
-      this.layers.build.setCollisionByProperty({ collides: true });
-      this.layers.buildTop.setCollisionByProperty({ collides: true });
-      this.layers.furnTop.setCollisionByProperty({ collides: true });
-      this.layers.floor.setCollisionByProperty({ collides: true });
+      this.lobby_layers.buildBottom2.setCollisionByProperty({ collides: true });
+      this.lobby_layers.buildBottom.setCollisionByProperty({ collides: true });
+      this.lobby_layers.build.setCollisionByProperty({ collides: true });
+      this.lobby_layers.buildTop.setCollisionByProperty({ collides: true });
+      this.lobby_layers.furnTop.setCollisionByProperty({ collides: true });
+      this.lobby_layers.floor.setCollisionByProperty({ collides: true });
 
 
       // this.debugCollision(scene);
@@ -179,27 +177,27 @@ export default defineComponent({
     },
     debugCollision(scene) {
       const debugGraphics = scene.add.graphics().setAlpha(0.75);
-      this.layers.buildBottom2.renderDebug(debugGraphics, {
+      this.lobby_layers.buildBottom2.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(120, 134, 48, 255),
       });
-      this.layers.buildBottom.renderDebug(debugGraphics, {
+      this.lobby_layers.buildBottom.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(140, 134, 48, 255),
       });
-      this.layers.build.renderDebug(debugGraphics, {
+      this.lobby_layers.build.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(160, 134, 48, 255),
       });
-      this.layers.buildTop.renderDebug(debugGraphics, {
+      this.lobby_layers.buildTop.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(180, 134, 48, 255),
       });
-      this.layers.furnTop.renderDebug(debugGraphics, {
+      this.lobby_layers.furnTop.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(200, 134, 48, 255),
       });
-      this.layers.floor.renderDebug(debugGraphics, {
+      this.lobby_layers.floor.renderDebug(debugGraphics, {
         tileColor: null,
         collidingTileColor: new Phaser.Display.Color(220, 134, 48, 255),
       });
