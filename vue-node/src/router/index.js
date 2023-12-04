@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Game from '../components/battlemathGame.vue'
-import Lobby from '../components/battlemathLobby.vue'
 import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
 import Battlemath from '../views/battlemathGame.vue'
@@ -14,22 +12,12 @@ const router = createRouter({
       component: Landing
     },
     {
-      path: '/game',
-      name: 'game',
-      component: Game
-    },
-    {
-      path: '/lobby',
-      name: 'lobby',
-      component: Lobby
-    },
-    {
       path: '/battle',
       name: 'battle',
       component: Battle
     },
     {
-      path: '/battlemath',
+      path: '/game',
       name: 'battlemath',
       component: Battlemath
     }

@@ -266,13 +266,13 @@ export default defineComponent({
             // }
 
 
-            // if (this.tecla(scene, 'M')) {
-            //     if (scene.scene.isActive('lobby')) {
-            //         this.cambiarEscena(scene, 'playerHouse');
-            //     } else {
-            //         this.cambiarEscena(scene, 'lobby');
-            //     }
-            // }
+            if (this.tecla(scene, 'M')) {
+                if (scene.scene.isActive('lobby')) {
+                    this.cambiarEscena(scene, 'playerHouse');
+                } else {
+                    this.cambiarEscena(scene, 'lobby');
+                }
+            }
 
             if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
                 this.knight.setVelocity(-currentSpeed, 0);
