@@ -5,6 +5,7 @@ import partida from '../components/partida.vue'
 import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
 import Login from '../views/Login.vue'
+import Battlemath from '../views/battlemathGame.vue'
 import Register from '../views/RegisterView.vue'
 
 const router = createRouter({
@@ -39,11 +40,6 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: Register
-    },
-    {
-      path: '/game',
-      name: 'game',
-      component: Game
     },
     {
       path: '/battle',
