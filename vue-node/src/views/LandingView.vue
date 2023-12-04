@@ -11,18 +11,23 @@ export default {
 </script>
 
 <template>
-    <div class="landing">
+    <div class="landing__container">
+        <div class="landing">
         <h1>BattleMath</h1>
         <p>Lucha con tus conocimientos de mateámticas</p>
         <button class="pixel-art-button" @click="irARuta()">Go!</button>
     </div>
+    </div>
 </template>
 
 <style>
-body {
+@import url('https://fonts.cdnfonts.com/css/minecraft-4');
+
+.landing__container {
     background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/01073865290819.5d61d475f0072.jpg');
     background-repeat: no-repeat;
     background-size: cover;
+
 }
 
 .landing {
@@ -36,6 +41,7 @@ body {
     border: 15px solid black;
     border-radius: 10px;
     padding: 20px;
+    font-family: 'Minecraft', sans-serif;
 }
 
 .pixel-art-button {
@@ -54,7 +60,7 @@ body {
     overflow: hidden;
 }
 
-.pixel-art-button::before {
+/* .pixel-art-button::before {
     content: '';
     position: absolute;
     top: -4px;
@@ -64,5 +70,5 @@ body {
     background-image: url('ruta/a/imagen_pixel_art.png');
     background-size: cover;
     z-index: -1;
-}
+} */
 </style>
