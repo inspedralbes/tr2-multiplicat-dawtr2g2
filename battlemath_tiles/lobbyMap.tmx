@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="27" nextobjectid="4">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="27" nextobjectid="9">
  <editorsettings>
   <export target="../vue-node/public/tiles/lobby_map/lobbyMap.json" format="json"/>
  </editorsettings>
@@ -27092,6 +27092,12 @@
  <tileset firstgid="5433" name="dojo_door_left" tilewidth="16" tileheight="16" tilecount="1" columns="1">
   <image source="../vue-node/public/objects/dojo_door_left.png" width="16" height="16"/>
  </tileset>
+ <tileset firstgid="5434" name="dojo_door_right" tilewidth="16" tileheight="16" tilecount="1" columns="1">
+  <image source="../vue-node/public/objects/dojo_door_right.png" width="16" height="16"/>
+ </tileset>
+ <tileset firstgid="5435" name="phouse_door" tilewidth="16" tileheight="16" tilecount="1" columns="1">
+  <image source="../vue-node/public/objects/phouse_door.png" width="16" height="16"/>
+ </tileset>
  <layer id="17" name="bg" width="100" height="100">
   <data encoding="csv">
 779,1123,1123,1123,1123,1123,1123,1123,1123,1123,425,1123,1123,1123,308,1123,1123,1123,1123,1123,1123,1123,543,1123,1123,1123,543,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,779,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,543,1123,1123,661,1123,1123,1123,1123,1123,1123,1123,1123,543,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,1123,661,1123,1123,1123,
@@ -27925,20 +27931,8 @@
 </data>
  </layer>
  <objectgroup id="26" name="Doors">
-  <object id="1" name="playerHouse_door" gid="2391" x="880" y="384" width="16" height="16">
-   <properties>
-    <property name="collides" type="bool" value="false"/>
-   </properties>
-  </object>
-  <object id="2" name="dojo_door" gid="713" x="672" y="544" width="16" height="16">
-   <properties>
-    <property name="collides" type="bool" value="false"/>
-   </properties>
-  </object>
-  <object id="3" name="dojo_door" gid="714" x="688" y="544" width="16" height="16">
-   <properties>
-    <property name="collides" type="bool" value="false"/>
-   </properties>
-  </object>
+  <object id="5" name="dojo_door" gid="5433" x="672" y="544" width="16" height="16"/>
+  <object id="7" name="player_door" gid="5435" x="880" y="384" width="16" height="16"/>
+  <object id="8" name="dojo_door_right" gid="5434" x="688" y="544" width="16" height="16"/>
  </objectgroup>
 </map>
