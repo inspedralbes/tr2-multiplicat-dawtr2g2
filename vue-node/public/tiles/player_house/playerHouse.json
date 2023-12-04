@@ -688,14 +688,14 @@
                 {
                  "gid":725,
                  "height":16,
-                 "id":8,
+                 "id":15,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":16,
                  "x":784,
-                 "y":877.333333333333
+                 "y":880
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -704,7 +704,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":14,
+ "nextobjectid":16,
  "orientation":"orthogonal",
  "properties":[
         {
