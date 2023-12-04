@@ -4,6 +4,7 @@ const app = express();
 const axios = require('axios');
 
 const http = require('http'); // Add this line to import the 'http' module
+const { emit } = require('process');
 
 const server = http.createServer(app); // Create an HTTP server using the 'app' instance
 
@@ -17,7 +18,7 @@ const io = require('socket.io')(server, {
 });
 
 const connectedUsers = [];
-var resp = [];
+
 
 io.on('connection', (socket) => {
   console.log("connected");
@@ -38,7 +39,8 @@ io.on('connection', (socket) => {
   socket.on('genQuest', () => {
     var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
     const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
-    
+    var resp = [];
+
     axios.get(url)
       .then(response => {
         var data = response.data;
@@ -86,12 +88,14 @@ io.on('connection', (socket) => {
         var data = response.data.resposta_correcta_id;
         console.log(data);
         if (data == resp) {
+          io.emit('correct');
           console.log('Correcte');
         }else{
+          io.emit('incorrect');
           console.log('Incorrecte');
         }
       })
-      .catch(error => {
+      .catch(error => { 
         console.error(error);
       });
   });

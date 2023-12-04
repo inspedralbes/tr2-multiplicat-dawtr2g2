@@ -10,13 +10,14 @@
     <div v-for="(answer, index) in ans" :key="index">
       <button :value="answer.id" @click="compAns(quest.id,answer.id)">{{ answer.resposta }}</button>
     </div>
+    <div>{{est}}</div>
   </template>
   
   <script>
   import { socket } from "@/socket";
   import {useAppStore} from '../stores/app';
   import { watch } from 'vue';
-
+  import router from '../router'
 
   export default {
     
@@ -27,6 +28,7 @@
         pelotas: [],
         quest: '',
         ans: [],
+        est: '',
       };
     },
     mounted() {
@@ -42,13 +44,27 @@
       watch(() => store.respAct, ss => {
         this.ans = ss;
       });
+
+      socket.on('correct', () => {
+        if (router.currentRoute.value.path == '/partida') {
+          this.est = 'Correcte';
+        }
+      });
+
+      socket.on('incorrect', () => {
+        if (router.currentRoute.value.path == '/partida') {
+          this.est = 'Incorrecte';
+        }
+      });
     },
     methods: {
       genQuest(){
+        this.est = '';
         socket.emit('genQuest');
       },
       compAns(quest, ans){
         this.ans = [];
+        this.est = '';
         socket.emit('compAns',quest,ans);
       },
       dibujarCirculos() {
@@ -81,9 +97,8 @@
       }
       
     },
-
+    
   };
-
   </script>
   
   <style scoped>
