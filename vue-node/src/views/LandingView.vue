@@ -64,4 +64,5 @@ body {
     background-image: url('ruta/a/imagen_pixel_art.png');
     background-size: cover;
     z-index: -1;
-}</style>
+}
+</style>

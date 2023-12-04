@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Game from '../components/battlemathGame.vue'
 import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
+import Battlemath from '../views/battlemathGame.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,14 +12,14 @@ const router = createRouter({
       component: Landing
     },
     {
-      path: '/game',
-      name: 'game',
-      component: Game
-    },
-    {
       path: '/battle',
       name: 'battle',
       component: Battle
+    },
+    {
+      path: '/game',
+      name: 'battlemath',
+      component: Battlemath
     }
   ]
 })
