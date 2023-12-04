@@ -17,6 +17,10 @@ export default {
                 <h2>BattleMath</h2>
             </div>
             <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
                 <label for="username">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
@@ -24,7 +28,11 @@ export default {
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Login</button>
+            <div class="input-group">
+                <label for="password">Password Confirmation</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Register</button>
         </form>
     </div>
 </template>
