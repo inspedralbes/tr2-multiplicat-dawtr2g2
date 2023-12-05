@@ -1,11 +1,13 @@
+
+
 <template>
     <div class="rooms_container">
         <div class="box">
             <div class="options">
-                <button class="option">LISTA PARTIDAS</button>
-                <button class="option">CREAR PARTIDAS</button>
+                <button class="option" @click="changeScreen(0)">LISTA PARTIDAS</button>
+                <button class="option" @click="changeScreen(1)">CREAR PARTIDAS</button>
             </div>
-            <div class="rooms">
+            <div class="rooms" v-if="screen == 0">
                 <div class="room">
                     <h2 class="title">Partida Clase #1</h2>
                     <h3 class="user">Julian</h3>
@@ -49,9 +51,28 @@
                 </div>
 
             </div>
+
+            <div class="createRoom" v-if="screen == 1">
+                Holaaaaaaa
+            </div>
         </div>
     </div>
 </template>
+
+<script>
+export default {
+    data()  {
+        return{
+            screen: 0,    
+        }
+    },
+    methods: {
+        changeScreen(index){
+            this.screen = index;
+        }
+    },
+}
+</script>
 
 <style scoped>
 .rooms_container {
