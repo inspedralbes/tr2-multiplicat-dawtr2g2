@@ -2,7 +2,10 @@
 import router from '../router';
 
 export default {
-    methods: {
+    data() {
+        return {
+        }
+    }, methods: {
         irARuta() {
             router.push('/game');
         }
@@ -29,8 +32,8 @@ export default {
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="input-group">
-                <label for="password">Password Confirmation</label>
-                <input type="password" id="password" name="password" required>
+                <label for="password_confirmation">Password Confirmation</label>
+                <input type="password" id="password_confirmation" name="password_confirmation" required>
             </div>
             <button type="submit">Register</button>
         </form>

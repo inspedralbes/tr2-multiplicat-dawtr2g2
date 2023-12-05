@@ -45,4 +45,15 @@ socket.on("viewResp", (resp) => {
     const store = useAppStore();
     store.addResp(resp);
   }
+
+
+});
+
+socket.on("loginParameters", (token, username) => {
+  
+  const store = useAppStore();
+  store.getToken(token);
+  store.getUsername(username);
+
+  
 });

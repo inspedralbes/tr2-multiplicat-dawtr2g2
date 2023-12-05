@@ -11,10 +11,10 @@ const server = http.createServer(app); // Create an HTTP server using the 'app' 
 app.use(cors());
 
 const io = require('socket.io')(server, {
-    cors: {
-        origin: "*", // Reemplaza con la URL de tu cliente
-        methods: ["GET", "POST"]
-    }
+  cors: {
+    origin: "*", // Reemplaza con la URL de tu cliente
+    methods: ["GET", "POST"]
+  }
 });
 
 const connectedUsers = [];
@@ -26,16 +26,32 @@ io.on('connection', (socket) => {
   socket.emit('long', connectedUsers.length);
 
   socket.on('user', (userId) => {
-    if (connectedUsers.length != 2){
+    if (connectedUsers.length != 2) {
       connectedUsers.push(userId);
-      socket.emit('waiting',userId,connectedUsers.length);    
+      socket.emit('waiting', userId, connectedUsers.length);
     }
+  });
+
+  socket.on('login', async (email, password) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/login', {
+        email: email,
+        password: password
+      });
+      console.log('Respuesta del servidor:', response.data);
+      const token = response.data.token;
+      const username = response.data.username;
+      socket.emit('loginParameters', {token, username});
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
+    }
+
   });
 
   socket.on('startGame', () => {
     io.emit('GameStart');
   });
-  
+
   socket.on('genQuest', () => {
     var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
     const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
@@ -52,11 +68,11 @@ io.on('connection', (socket) => {
             var urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${data.resposta_correcta_id}`;
           } else {
             randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
-            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;    
+            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;
           }
           promises.push(axios.get(urlResp));
         }
-        
+
         Promise.all(promises)
           .then(responses => {
             resp = responses.map(response => ({
@@ -74,15 +90,15 @@ io.on('connection', (socket) => {
           .catch(error => {
             console.error(error);
           });
-      })
+      }) 
       .catch(error => {
         console.error(error);
       });
   });
 
-  socket.on('compAns', (quest,resp) => { 
+  socket.on('compAns', (quest, resp) => {
     var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
-    
+
     axios.get(url)
       .then(response => {
         var data = response.data.resposta_correcta_id;
@@ -90,12 +106,12 @@ io.on('connection', (socket) => {
         if (data == resp) {
           io.emit('correct');
           console.log('Correcte');
-        }else{
+        } else {
           io.emit('incorrect');
           console.log('Incorrecte');
         }
       })
-      .catch(error => { 
+      .catch(error => {
         console.error(error);
       });
   });
@@ -107,5 +123,5 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`);
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
