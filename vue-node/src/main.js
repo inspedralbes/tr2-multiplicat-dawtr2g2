@@ -1,3 +1,5 @@
+// import index from './index.css'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { defineCustomElements as defineIonPhaser } from '@ion-phaser/core/loader';

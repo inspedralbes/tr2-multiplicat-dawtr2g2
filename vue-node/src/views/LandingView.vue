@@ -13,14 +13,14 @@ export default {
 <template>
     <div class="landing__container">
         <div class="landing">
-        <h1>BattleMath</h1>
-        <p>Lucha con tus conocimientos de mateámticas</p>
-        <button class="pixel-art-button" @click="irARuta()">Go!</button>
-    </div>
+            <h1>BattleMath</h1>
+            <p>Lucha con tus conocimientos de mateámticas</p>
+            <button class="pixel-art-button" @click="irARuta()">Go!</button>
+        </div>
     </div>
 </template>
 
-<style>
+<style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-4');
 
 .landing__container {

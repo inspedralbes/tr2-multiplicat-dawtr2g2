@@ -1,5 +1,7 @@
 <template>
-    <div class="game" ref="gameContainer"></div>
+    <div class="game-container">
+        <div class="gameCanvas" ref="gameContainer"></div>
+    </div>
 </template>
   
 <script scoped>
@@ -110,6 +112,30 @@ export default defineComponent({
                     self.createLobby_foreground(this);
                     this.physics.add.collider(self.knight, self.lobby_layers.fg);
                     // self.createParticlesLobby(this, 888, 390);
+
+
+                    // this.anims.create({
+                    //     key: 'leaf_move',
+                    //     frames: this.anims.generateFrameNumbers('leaves', { start: 1, end: 6 }),
+                    //     repeat: -1,
+                    //     frameRate: 7,
+                    // });
+
+                    // // Crear el sprite y reproducir la animación
+                    // let hojasSprite = this.add.sprite(888, 390, 'leaves');
+                    // hojasSprite.play('leaf_move');
+
+                    // // Acceder al fotograma actual (si la animación está reproduciéndose)
+                    // if (hojasSprite.anims.isPlaying) {
+                    //     let currentFrame = hojasSprite.anims.currentFrame;
+                    //     if (currentFrame) {
+                    //         console.log("Fotograma actual:", currentFrame);
+                    //     } else {
+                    //         console.log("El fotograma actual no está disponible.");
+                    //     }
+                    // } else {
+                    //     console.log("La animación no está reproduciéndose actualmente.");
+                    // }
                 },
                 update: function () {
                     self.playerMovement(this);
@@ -141,7 +167,7 @@ export default defineComponent({
             this.game.scene.add('playerHouse', playerHouseConfig, false);
             this.game.scene.add('lobby', lobbyConfig, false);
 
-            const sceneStart = 1;
+            const sceneStart = 2;
 
             if (sceneStart === 1) {
                 this.game.scene.start('playerHouse');
@@ -213,7 +239,7 @@ export default defineComponent({
             scene.load.image('dojo_door_left', 'public/objects/dojo_door_left.png');
             scene.load.image('dojo_door_right', 'public/objects/dojo_door_right.png');
             scene.load.image('phouse_door', 'public/objects/phouse_door.png');
-            scene.load.spritesheet('grass', 'particles/Grass.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('leaves', 'particles/Leaf.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
         },
         createLobby(scene) {
@@ -286,8 +312,8 @@ export default defineComponent({
             this.knight = scene.physics.add.sprite(x, y, 'knight', 'knight_walk_right_1.png');
 
             this.knight.anims.play('knight_idle_right');
-            this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.2);
-            this.knight.body.setOffset(this.knight.width * 0.25, this.knight.height * .8);
+            this.knight.body.setSize(this.knight.width * 0.7, this.knight.height * 0.2);
+            this.knight.body.setOffset(this.knight.width * .15, this.knight.height * .8);
             this.knight.body.bounce.set(0);
             scene.physics.world.enable(this.knight);
 
@@ -445,22 +471,18 @@ export default defineComponent({
             return emitter;
         },
         createParticlesLobby(scene, x, y) {
-            scene.anims.create({
-                key: 'grass_anim',
-                frames: scene.anims.generateFrameNumbers('grass', { start: 0, end: 6 }),
-                frameRate: 10,
-                repeat: -1
-            });
 
-            const emitter = scene.add.particles(x, y, 'grass_anim',
+
+            const emitter = scene.add.particles(x, y, 'leaves',
                 {
-                    speed: { min: -50, max: 50 },
-                    angle: { min: 0, max: 360 },
-                    scale: { start: 0.5, end: 0 },
+                    // speed: { min: -50, max: 50 },
+                    // angle: { min: 0, max: 360 },
+                    // scale: { start: 0.5, end: 0 },
                     lifespan: 3000,
-                    blendMode: 'ADD'
+                    quantity: 1,
+                    on: false
                 });
-            emitter.setWindX(-50);
+
             return emitter;
         }
 
@@ -470,8 +492,19 @@ export default defineComponent({
 </script>
   
 <style scoped>
-.game {
-    width: 100vw;
-    height: 100vh;
+.game-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: auto;
+}
+
+.game-container {
+    /* Asegúrate de que el canvas ocupe todo el contenedor */
+    width: 100%;
+    height: 100%;
+    background-color: #141B1B !important;
 }
 </style>

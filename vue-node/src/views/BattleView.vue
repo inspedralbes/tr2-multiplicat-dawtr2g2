@@ -312,4 +312,5 @@ main {
 
 .blue {
     background-color: #5ad5db;
-}</style>
+}
+</style>

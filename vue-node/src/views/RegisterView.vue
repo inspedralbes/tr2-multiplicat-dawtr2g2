@@ -40,12 +40,12 @@ export default {
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
 
-h2{
+h2 {
     color: white;
     margin-top: 20px;
 }
 
-.titulo{
+.titulo {
     background-color: #007bff;
     width: 100%;
     height: 65px;
@@ -53,6 +53,7 @@ h2{
     justify-content: center;
     align-content: center;
 }
+
 .register-container {
     width: 100vw;
     height: 75vh;
@@ -80,7 +81,7 @@ h2{
 
 .register-group {
     margin-bottom: 15px;
-    
+
 }
 
 .input-group label {
@@ -117,7 +118,7 @@ button {
 }
 
 button:hover {
-    
+
     background-color: #0056b3;
 }
 </style>
