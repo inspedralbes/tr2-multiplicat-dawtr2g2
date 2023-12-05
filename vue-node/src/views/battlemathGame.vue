@@ -25,6 +25,8 @@ export default defineComponent({
                 build: null,
                 buildTop: null,
                 floor: null,
+                bg: null,
+                fg: null,
             },
             objects: {
                 doors: null,
@@ -33,7 +35,7 @@ export default defineComponent({
                 zoom: this.rescaleCamera(),
                 offset: 4.8
             },
-            firstTime: true
+            firstTime: true,
         }
     },
     mounted() {
@@ -42,8 +44,6 @@ export default defineComponent({
     methods: {
         initializeGame() {
             const self = this;
-
-
 
             const playerHouseConfig = {
                 key: 'playerHouse',
@@ -55,25 +55,35 @@ export default defineComponent({
                 },
                 create: function () {
                     self.createPlayerHouse(this);
-                    self.createPlayerAnims(this);
+                    self.createParticleHouse(this, 664, 723);
+                    self.createParticleHouse(this, 856, 723);
+                    self.createParticleHouse(this, 920, 723);
 
+                    self.createPlayerAnims(this);
                     ///Create player
-                    if (!self.knight) {
+                    if (self.firstTime) {
+                        self.firstTime = false;
                         self.playerCreate(this, 780, 774);
+                    } else {
+                        self.playerCreate(this, 793, 856);
                     }
                     self.addHouseCollisions(this);
 
-                    this.cameras.main.centerOn(self.knight.x, self.knight.y);
+                    this.cameras.main.centerOn(780, 774);
                     self.createPlayerHouse_foreground(this);
+                    self.createParticleHouse(this, 664, 851);
+                    self.createParticleHouse(this, 856, 851);
+                    self.createParticleHouse(this, 920, 851);
 
                 },
                 update: function () {
                     self.playerMovement(this);
-                    this.physics.add.overlap(self.knight, self.objects.doors, () => {
-                        if (self.tecla(this, 'E')) {
-                            self.cambiarEscena(this, 'lobby', 793, 856);
-                        }
-                    });
+
+                    // this.physics.add.overlap(self.knight, self.objects.doors, () => {
+                    //     if (self.tecla(this, 'E')) {
+                    //         self.cambiarEscena(this, 'lobby', 793, 856);
+                    //     }
+                    // });
                 }
 
             };
@@ -93,12 +103,13 @@ export default defineComponent({
                     if (!self.knight) {
                         self.playerCreate(this, 888, 390);
                     } else {
-                        // self.knight.setPosition(888, 390);
                         this.knight.setVelocity(0, 0);
                     }
                     self.addLobbyCollisions(this);
                     this.cameras.main.startFollow(self.knight, true);
                     self.createLobby_foreground(this);
+                    this.physics.add.collider(self.knight, self.lobby_layers.fg);
+                    // self.createParticlesLobby(this, 888, 390);
                 },
                 update: function () {
                     self.playerMovement(this);
@@ -130,7 +141,13 @@ export default defineComponent({
             this.game.scene.add('playerHouse', playerHouseConfig, false);
             this.game.scene.add('lobby', lobbyConfig, false);
 
-            this.game.scene.start('playerHouse');
+            const sceneStart = 1;
+
+            if (sceneStart === 1) {
+                this.game.scene.start('playerHouse');
+            } else {
+                this.game.scene.start('lobby');
+            }
 
         },
         rescaleCamera() {
@@ -149,6 +166,7 @@ export default defineComponent({
             scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
             scene.load.image('pHouse_Walls', 'tiles/player_house/TilesetWallSimple.png');
             scene.load.image('pHouse_Floor', 'tiles/player_house/TilesetInteriorFloor.png');
+            scene.load.image('fire', 'particles/Fire.png')
             scene.load.tilemapTiledJSON('playerHouse', 'tiles/player_house/playerHouse.json');
         },
         createPlayerHouse(scene) {
@@ -156,7 +174,6 @@ export default defineComponent({
             const floorTileset = map.addTilesetImage('phFloor', 'pHouse_Floor');
             const wallTileset = map.addTilesetImage('phWall', 'pHouse_Walls');
             const furnitureTileset = map.addTilesetImage('phFurniture', 'pHouse_Furniture');
-            const doorTileset = map.addTilesetImage('phDoor', 'pHouse_Furniture');
 
             map.createLayer('Background', wallTileset);
             map.createLayer('FloorGroup/Floor', floorTileset);
@@ -170,10 +187,8 @@ export default defineComponent({
             this.objects.doors = scene.physics.add.staticGroup();
             const doorLayer = map.getObjectLayer('Doors');
             doorLayer.objects.forEach(doorsObj => {
-                this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 3, 'door');
+                this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'door');
             });
-
-
             // this.debugCollision(scene);
         },
         createPlayerHouse_foreground(scene) {
@@ -185,10 +200,20 @@ export default defineComponent({
             scene.physics.add.collider(this.knight, this.pHouse_layers.walls);
             scene.physics.add.collider(this.knight, this.pHouse_layers.furniture);
             scene.physics.add.collider(this.knight, this.objects.doors);
+
+            scene.physics.add.overlap(this.knight, this.objects.doors, () => {
+                if (this.tecla(scene, 'E')) {
+                    this.cambiarEscena(scene, 'lobby', 793, 856);
+                }
+            });
         },
         preloadLobby(scene) {
             scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
-            scene.load.image('TilesetElement', 'tiles/TilesetElement.png')
+            scene.load.image('TilesetElement', 'tiles/TilesetElement.png');
+            scene.load.image('dojo_door_left', 'public/objects/dojo_door_left.png');
+            scene.load.image('dojo_door_right', 'public/objects/dojo_door_right.png');
+            scene.load.image('phouse_door', 'public/objects/phouse_door.png');
+            scene.load.spritesheet('grass', 'particles/Grass.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
         },
         createLobby(scene) {
@@ -196,13 +221,13 @@ export default defineComponent({
             const tileset = map.addTilesetImage('TilesetLobby', 'TilesetLobby');
             const furniture = map.addTilesetImage('TilesetElement', 'TilesetElement');
 
-            map.createLayer('bg', tileset);
+            this.lobby_layers.bg = map.createLayer('bg', tileset);
             this.lobby_layers.floor = map.createLayer('floor', tileset);
             this.lobby_layers.buildBottom2 = map.createLayer('buildings-bottom_2', tileset);
             this.lobby_layers.buildBottom = map.createLayer('buildings-bottom', tileset);
             this.lobby_layers.build = map.createLayer('buildings', tileset);
             this.lobby_layers.buildTop = map.createLayer('buildings-top', tileset);
-            this.lobby_layers.furnTop = map.createLayer('furniture-top', furniture);
+            this.lobby_layers.furnTop = map.createLayer('furniture-top', tileset);
 
             this.lobby_layers.buildBottom2.setCollisionByProperty({ collides: true });
             this.lobby_layers.buildBottom.setCollisionByProperty({ collides: true });
@@ -210,31 +235,59 @@ export default defineComponent({
             this.lobby_layers.buildTop.setCollisionByProperty({ collides: true });
             this.lobby_layers.furnTop.setCollisionByProperty({ collides: true });
             this.lobby_layers.floor.setCollisionByProperty({ collides: true });
+            this.lobby_layers.bg.setCollisionByProperty({ collides: true });
 
 
+            ///1
+            ///241
+
+            this.objects.doors = scene.physics.add.staticGroup();
+            const doorLayer = map.getObjectLayer('Doors');
+            let door = null;
+            doorLayer.objects.forEach(doorsObj => {
+                if (doorsObj.name === 'player_door') {
+                    door = this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'phouse_door');
+                } else if (doorsObj.name === 'dojo_door_right') {
+                    door = this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'dojo_door_right');
+                } else {
+                    door = this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'dojo_door_left');
+                }
+                door.name = doorsObj.name;
+            });
 
         },
         createLobby_foreground(scene) {
             const map = scene.make.tilemap({ key: 'lobby' });
             const tileset = map.addTilesetImage('TilesetLobby', 'TilesetLobby');
 
-            map.createLayer('foreground', tileset);
+            this.lobby_layers.fg = map.createLayer('foreground', tileset);
+            this.lobby_layers.fg.setCollisionByProperty({ collides: true });
 
         },
         addLobbyCollisions(scene) {
+            scene.physics.add.collider(this.knight, this.lobby_layers.bg);
             scene.physics.add.collider(this.knight, this.lobby_layers.floor);
             scene.physics.add.collider(this.knight, this.lobby_layers.buildBottom2);
             scene.physics.add.collider(this.knight, this.lobby_layers.buildBottom);
             scene.physics.add.collider(this.knight, this.lobby_layers.build);
             scene.physics.add.collider(this.knight, this.lobby_layers.buildTop);
             scene.physics.add.collider(this.knight, this.lobby_layers.furnTop);
+
+
+            scene.physics.add.overlap(this.knight, this.objects.doors, (knight, door) => {
+                if (door.name === 'player_door') {
+                    this.cambiarEscena(scene, 'playerHouse', 793, 856);
+                } else {
+                    console.log('aun nada')
+                }
+            });
         },
         playerCreate(scene, x, y) {
             this.knight = scene.physics.add.sprite(x, y, 'knight', 'knight_walk_right_1.png');
 
             this.knight.anims.play('knight_idle_right');
-            this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.7);
-            this.knight.body.setOffset(this.knight.width * 0.25, this.knight.height * 0.3);
+            this.knight.body.setSize(this.knight.width * 0.5, this.knight.height * 0.2);
+            this.knight.body.setOffset(this.knight.width * 0.25, this.knight.height * .8);
             this.knight.body.bounce.set(0);
             scene.physics.world.enable(this.knight);
 
@@ -266,6 +319,7 @@ export default defineComponent({
             // }
 
 
+            // console.log(this.knight.x, this.knight.y)
             if (this.tecla(scene, 'M')) {
                 if (scene.scene.isActive('lobby')) {
                     this.cambiarEscena(scene, 'playerHouse');
@@ -292,6 +346,7 @@ export default defineComponent({
                 this.knight.anims.play(parts.join('_'));
                 this.knight.setVelocity(0, 0);
             }
+
         },
         createPlayerAnims(scene) {
             const frameRate = 7;
@@ -374,7 +429,42 @@ export default defineComponent({
                 scene.scene.stop('lobby');
                 scene.scene.start('playerHouse');
             }
+        },
+        createParticleHouse(scene, x, y) {
+            const emitter = scene.add.particles(x, y, 'fire',
+                {
+                    color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
+                    colorEase: 'quad.out',
+                    lifespan: 1600,
+                    angle: { min: -100, max: -80 },
+                    scale: { start: 0.70, end: 0, ease: 'sine.out' },
+                    speed: 10,
+                    advance: 2000,
+                });
+
+            return emitter;
+        },
+        createParticlesLobby(scene, x, y) {
+            scene.anims.create({
+                key: 'grass_anim',
+                frames: scene.anims.generateFrameNumbers('grass', { start: 0, end: 6 }),
+                frameRate: 10,
+                repeat: -1
+            });
+
+            const emitter = scene.add.particles(x, y, 'grass_anim',
+                {
+                    speed: { min: -50, max: 50 },
+                    angle: { min: 0, max: 360 },
+                    scale: { start: 0.5, end: 0 },
+                    lifespan: 3000,
+                    blendMode: 'ADD'
+                });
+            emitter.setWindX(-50);
+            return emitter;
         }
+
+
     }
 });
 </script>
