@@ -14,7 +14,6 @@
   import { socket } from "@/socket";
   import {useAppStore} from '../stores/app';
   import { watch } from 'vue';
-  import router from '../router'
 
   export default {
     
@@ -39,7 +38,6 @@
       watch(() => store.respAct, ss => {
         this.ans = ss;
       });
-
 
       socket.on('correct', () => {
           this.est = 'Correcte';

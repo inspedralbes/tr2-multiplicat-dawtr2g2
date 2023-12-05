@@ -4,11 +4,15 @@ export const useAppStore = defineStore('app', {
   state: () => ({
     questAct: {},
     respAct: {}, 
-    room: {}
+    room: {},
+    rooms: [],
   }),
   actions: {
     addRoom(room){
       this.room = room;
+    },
+    addRooms(rooms){
+      this.rooms = rooms;
     },
     getRoom(){
       return this.room.players;

@@ -93,6 +93,10 @@ io.on('connection', (socket) => {
       });
   });
 
+  socket.on('getRooms', () => {
+    io.emit('viewRooms', rooms);
+  });
+
   socket.on('createRoom', (name,id) => {
     var room = {
       name: name,
@@ -107,6 +111,7 @@ io.on('connection', (socket) => {
       players: 1
     };
     socket.emit('roomCreated', room);
+    io.emit('viewRooms', rooms);
   });
 
   socket.on('disconnect', () => {
