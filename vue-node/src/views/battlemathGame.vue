@@ -13,7 +13,9 @@ export default defineComponent({
 
     data() {
         return {
-            knight: null,
+            player: null,
+            // playerSprite: 'redCamouflag',
+            playerSprite: 'goldKnight',
             speed: 30,
             pHouse_layers: {
                 walls: null,
@@ -50,9 +52,9 @@ export default defineComponent({
             const playerHouseConfig = {
                 key: 'playerHouse',
                 preload: function () {
-                    self.knight = null;
+                    self.player = null;
                     self.preloadPlayerHouse(this);
-                    this.load.atlas('knight', 'characters/knight/knight.png', 'characters/knight/knight.json');
+                    this.load.spritesheet('player', `characters/${self.playerSprite}.png`, { frameWidth: 16, frameHeight: 16 });
                     this.load.image('door', 'public/objects/door.png')
                 },
                 create: function () {
@@ -80,12 +82,6 @@ export default defineComponent({
                 },
                 update: function () {
                     self.playerMovement(this);
-
-                    // this.physics.add.overlap(self.knight, self.objects.doors, () => {
-                    //     if (self.tecla(this, 'E')) {
-                    //         self.cambiarEscena(this, 'lobby', 793, 856);
-                    //     }
-                    // });
                 }
 
             };
@@ -93,25 +89,24 @@ export default defineComponent({
             const lobbyConfig = {
                 key: 'lobby',
                 preload: function () {
-                    self.knight = null;
+                    self.player = null;
                     self.preloadLobby(this);
-                    this.load.atlas('knight', 'characters/knight/knight.png', 'characters/knight/knight.json');
-                    this.load.spritesheet('Leaf', 'particles/Leaf.png', { frameWidth: 12, frameHeight: 7 });
+                    this.load.spritesheet('player', `characters/${self.playerSprite}.png`, { frameWidth: 16, frameHeight: 16 });
                 },
                 create: function () {
                     self.createLobby(this);
                     self.createPlayerAnims(this);
 
                     ///Create player
-                    if (!self.knight) {
+                    if (!self.player) {
                         self.playerCreate(this, 888, 390);
                     } else {
-                        this.knight.setVelocity(0, 0);
+                        this.player.setVelocity(0, 0);
                     }
                     self.addLobbyCollisions(this);
-                    this.cameras.main.startFollow(self.knight, true);
+                    this.cameras.main.startFollow(self.player, true);
                     self.createLobby_foreground(this);
-                    this.physics.add.collider(self.knight, self.lobby_layers.fg);
+                    this.physics.add.collider(self.player, self.lobby_layers.fg);
 
 
                 },
@@ -145,7 +140,7 @@ export default defineComponent({
             this.game.scene.add('playerHouse', playerHouseConfig, false);
             this.game.scene.add('lobby', lobbyConfig, false);
 
-            const sceneStart = 2;
+            const sceneStart = 1;
 
             if (sceneStart === 1) {
                 this.game.scene.start('playerHouse');
@@ -201,11 +196,11 @@ export default defineComponent({
             map.createLayer('foreground', furnitureTileset);
         },
         addHouseCollisions(scene) {
-            scene.physics.add.collider(this.knight, this.pHouse_layers.walls);
-            scene.physics.add.collider(this.knight, this.pHouse_layers.furniture);
-            scene.physics.add.collider(this.knight, this.objects.doors);
+            scene.physics.add.collider(this.player, this.pHouse_layers.walls);
+            scene.physics.add.collider(this.player, this.pHouse_layers.furniture);
+            scene.physics.add.collider(this.player, this.objects.doors);
 
-            scene.physics.add.overlap(this.knight, this.objects.doors, () => {
+            scene.physics.add.overlap(this.player, this.objects.doors, () => {
                 if (this.tecla(scene, 'E')) {
                     this.cambiarEscena(scene, 'lobby', 793, 856);
                 }
@@ -241,10 +236,6 @@ export default defineComponent({
             this.lobby_layers.floor.setCollisionByProperty({ collides: true });
             this.lobby_layers.bg.setCollisionByProperty({ collides: true });
 
-
-            ///1
-            ///241
-
             this.objects.doors = scene.physics.add.staticGroup();
             const doorLayer = map.getObjectLayer('Doors');
             let door = null;
@@ -269,16 +260,16 @@ export default defineComponent({
 
         },
         addLobbyCollisions(scene) {
-            scene.physics.add.collider(this.knight, this.lobby_layers.bg);
-            scene.physics.add.collider(this.knight, this.lobby_layers.floor);
-            scene.physics.add.collider(this.knight, this.lobby_layers.buildBottom2);
-            scene.physics.add.collider(this.knight, this.lobby_layers.buildBottom);
-            scene.physics.add.collider(this.knight, this.lobby_layers.build);
-            scene.physics.add.collider(this.knight, this.lobby_layers.buildTop);
-            scene.physics.add.collider(this.knight, this.lobby_layers.furnTop);
+            scene.physics.add.collider(this.player, this.lobby_layers.bg);
+            scene.physics.add.collider(this.player, this.lobby_layers.floor);
+            scene.physics.add.collider(this.player, this.lobby_layers.buildBottom2);
+            scene.physics.add.collider(this.player, this.lobby_layers.buildBottom);
+            scene.physics.add.collider(this.player, this.lobby_layers.build);
+            scene.physics.add.collider(this.player, this.lobby_layers.buildTop);
+            scene.physics.add.collider(this.player, this.lobby_layers.furnTop);
 
 
-            scene.physics.add.overlap(this.knight, this.objects.doors, (knight, door) => {
+            scene.physics.add.overlap(this.player, this.objects.doors, (player, door) => {
                 if (door.name === 'player_door') {
                     this.cambiarEscena(scene, 'playerHouse', 793, 856);
                 } else {
@@ -287,13 +278,13 @@ export default defineComponent({
             });
         },
         playerCreate(scene, x, y) {
-            this.knight = scene.physics.add.sprite(x, y, 'knight', 'knight_walk_right_1.png');
+            this.player = scene.physics.add.sprite(x, y, 'player');
 
-            this.knight.anims.play('knight_idle_right');
-            this.knight.body.setSize(this.knight.width * 0.7, this.knight.height * 0.2);
-            this.knight.body.setOffset(this.knight.width * .15, this.knight.height * .8);
-            this.knight.body.bounce.set(0);
-            scene.physics.world.enable(this.knight);
+            this.player.anims.play(`player_idle_down`);
+            this.player.body.setSize(this.player.width * 0.7, this.player.height * 0.2);
+            this.player.body.setOffset(this.player.width * .15, this.player.height * .8);
+            this.player.body.bounce.set(0);
+            scene.physics.world.enable(this.player);
 
         },
         debugCollision(scene) {
@@ -316,7 +307,7 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
-            // console.log(this.knight.x, this.knight.y)
+            // console.log(this.player.x, this.player.y)
             if (this.tecla(scene, 'M')) {
                 if (scene.scene.isActive('lobby')) {
                     this.cambiarEscena(scene, 'playerHouse');
@@ -326,88 +317,86 @@ export default defineComponent({
             }
 
             if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
-                this.knight.setVelocity(-currentSpeed, 0);
-                this.knight.anims.play('knight_move_left', true);
+                this.player.setVelocity(-currentSpeed, 0);
+                this.player.anims.play(`player_move_left`, true);
             } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
-                this.knight.setVelocity(currentSpeed, 0);
-                this.knight.anims.play('knight_move_right', true);
+                this.player.setVelocity(currentSpeed, 0);
+                this.player.anims.play(`player_move_right`, true);
             } else if (this.tecla(scene, 'UP') || this.tecla(scene, 'W')) {
-                this.knight.setVelocity(0, -currentSpeed);
-                this.knight.anims.play('knight_move_up', true);
+                this.player.setVelocity(0, -currentSpeed);
+                this.player.anims.play(`player_move_up`, true);
             } else if (this.tecla(scene, 'DOWN') || this.tecla(scene, 'S')) {
-                this.knight.setVelocity(0, currentSpeed);
-                this.knight.anims.play('knight_move_down', true);
+                this.player.setVelocity(0, currentSpeed);
+                this.player.anims.play(`player_move_down`, true);
             } else {
-                const parts = this.knight.anims.currentAnim.key.split('_');
+                const parts = this.player.anims.currentAnim.key.split('_');
                 parts[1] = 'idle';
-                this.knight.anims.play(parts.join('_'));
-                this.knight.setVelocity(0, 0);
+                this.player.anims.play(parts.join('_'));
+                this.player.setVelocity(0, 0);
             }
 
         },
         createPlayerAnims(scene) {
-            const frameRate = 7;
+            const frameRate = 8;
 
             scene.anims.create({
-                key: 'knight_idle_down',
-                frames: [{ key: 'knight', frame: 'knight_walk_down_1.png' }]
+                key: 'player_idle_down',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [0], // Especifica los números de las columnas que quieres
+                }),
+                repeat: -1,
+                frameRate: frameRate,
             });
 
             scene.anims.create({
-                key: 'knight_idle_up',
-                frames: [{ key: 'knight', frame: 'knight_walk_up_1.png' }]
+                key: 'player_idle_up',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [1],
+                }),
             });
 
             scene.anims.create({
-                key: 'knight_idle_left',
-                frames: [{ key: 'knight', frame: 'knight_walk_left_1.png' }]
+                key: 'player_idle_left',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [2],
+                }),
             });
 
             scene.anims.create({
-                key: 'knight_idle_right',
-                frames: [{ key: 'knight', frame: 'knight_walk_right_1.png' }]
+                key: 'player_idle_right',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [3],
+                }),
             });
 
             scene.anims.create({
-                key: 'knight_move_up',
-                frames: scene.anims.generateFrameNames('knight', {
-                    prefix: 'knight_walk_up_',
-                    start: 1,
-                    end: 4,
-                    suffix: '.png'
+                key: 'player_move_up',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [1, 5, 9, 13]
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
             scene.anims.create({
-                key: 'knight_move_down',
-                frames: scene.anims.generateFrameNames('knight', {
-                    prefix: 'knight_walk_down_',
-                    start: 1,
-                    end: 4,
-                    suffix: '.png'
+                key: 'player_move_down',
+                frames: scene.anims.generateFrameNumbers("player", {
+                    frames: [0, 4, 8, 12], // Especifica los números de las columnas que quieres
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
             scene.anims.create({
-                key: 'knight_move_left',
-                frames: scene.anims.generateFrameNames('knight', {
-                    prefix: 'knight_walk_left_',
-                    start: 1,
-                    end: 4,
-                    suffix: '.png'
+                key: 'player_move_left',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [2, 6, 10, 14]
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
             scene.anims.create({
-                key: 'knight_move_right',
-                frames: scene.anims.generateFrameNames('knight', {
-                    prefix: 'knight_walk_right_',
-                    start: 1,
-                    end: 4,
-                    suffix: '.png'
+                key: 'player_move_right',
+                frames: scene.anims.generateFrameNumbers('player', {
+                    frames: [3, 7, 11, 15]
                 }),
                 repeat: -1,
                 frameRate: frameRate,
@@ -418,7 +407,7 @@ export default defineComponent({
             return scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[key]).isDown;
         },
         cambiarEscena(scene, escena, x, y) {
-            this.knight.setPosition(x, y);
+            this.player.setPosition(x, y);
             if (escena === 'lobby') {
                 scene.scene.stop('playerHouse');
                 scene.scene.start('lobby');
