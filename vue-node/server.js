@@ -8,7 +8,10 @@ const { emit } = require('process');
 
 const server = http.createServer(app); // Create an HTTP server using the 'app' instance
 
+
 app.use(cors());
+
+var rooms = [];
 
 const io = require('socket.io')(server, {
     cors: {
@@ -17,20 +20,9 @@ const io = require('socket.io')(server, {
     }
 });
 
-const connectedUsers = [];
-
-
 io.on('connection', (socket) => {
   console.log("connected");
 
-  socket.emit('long', connectedUsers.length);
-
-  socket.on('user', (userId) => {
-    if (connectedUsers.length != 2){
-      connectedUsers.push(userId);
-      socket.emit('waiting',userId,connectedUsers.length);    
-    }
-  });
 
   socket.on('startGame', () => {
     io.emit('GameStart');
@@ -87,6 +79,7 @@ io.on('connection', (socket) => {
       .then(response => {
         var data = response.data.resposta_correcta_id;
         console.log(data);
+
         if (data == resp) {
           io.emit('correct');
           console.log('Correcte');
@@ -99,6 +92,23 @@ io.on('connection', (socket) => {
         console.error(error);
       });
   });
+
+  socket.on('createRoom', (name,id) => {
+    var room = {
+      name: name,
+      id: id,
+      players: 0
+    };
+    room.players++;
+    rooms.push(room);
+    socket.join(id);
+    room = {
+      name: name,
+      players: 1
+    };
+    socket.emit('roomCreated', room);
+  });
+
   socket.on('disconnect', () => {
     console.log('Cliente desconectado');
   });

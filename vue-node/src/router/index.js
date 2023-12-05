@@ -7,6 +7,7 @@ import Landing from '../views/LandingView.vue'
 import Login from '../views/Login.vue'
 import Battlemath from '../views/battlemathGame.vue'
 import Register from '../views/RegisterView.vue'
+import Rooms from '../views/RoomsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,11 @@ const router = createRouter({
       path: '/game',
       name: 'battlemath',
       component: Battlemath
+    },
+    {
+      path: '/rooms',
+      name: 'rooms',
+      component: Rooms
     }
   ]
 })

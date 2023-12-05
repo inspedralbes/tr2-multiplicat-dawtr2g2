@@ -8,20 +8,7 @@ const URL = "http://localhost:3000";
 
 export const socket = io(URL);
 
-socket.on('long',(long) =>{
-    if (long == 2) {
-      router.push('/lleno');
-    }
-});
 
-socket.on("waiting", (user,long) => {
-  router.push('/esperar');
-  const store = useAppStore();
-  store.addUser(user,long);
-  if (store.getLong() == 2) {
-    socket.emit('startGame');
-  }
-});
 
 socket.on("GameStart", () => {
   if (router.currentRoute.value.path == '/esperar') {
@@ -30,6 +17,13 @@ socket.on("GameStart", () => {
     router.push('/lleno');
   }
 });
+
+socket.on("roomCreated", (room) => {
+  const store = useAppStore();
+  store.addRoom(room);
+  router.push('/partida');
+});
+
 
 socket.on("viewQuest", (quest) => {
   if (router.currentRoute.value.path == '/partida') {
