@@ -96,6 +96,7 @@ export default defineComponent({
                     self.knight = null;
                     self.preloadLobby(this);
                     this.load.atlas('knight', 'characters/knight/knight.png', 'characters/knight/knight.json');
+                    this.load.spritesheet('Leaf', 'particles/Leaf.png', { frameWidth: 12, frameHeight: 7 });
                 },
                 create: function () {
                     self.createLobby(this);
@@ -111,31 +112,8 @@ export default defineComponent({
                     this.cameras.main.startFollow(self.knight, true);
                     self.createLobby_foreground(this);
                     this.physics.add.collider(self.knight, self.lobby_layers.fg);
-                    // self.createParticlesLobby(this, 888, 390);
 
 
-                    // this.anims.create({
-                    //     key: 'leaf_move',
-                    //     frames: this.anims.generateFrameNumbers('leaves', { start: 1, end: 6 }),
-                    //     repeat: -1,
-                    //     frameRate: 7,
-                    // });
-
-                    // // Crear el sprite y reproducir la animación
-                    // let hojasSprite = this.add.sprite(888, 390, 'leaves');
-                    // hojasSprite.play('leaf_move');
-
-                    // // Acceder al fotograma actual (si la animación está reproduciéndose)
-                    // if (hojasSprite.anims.isPlaying) {
-                    //     let currentFrame = hojasSprite.anims.currentFrame;
-                    //     if (currentFrame) {
-                    //         console.log("Fotograma actual:", currentFrame);
-                    //     } else {
-                    //         console.log("El fotograma actual no está disponible.");
-                    //     }
-                    // } else {
-                    //     console.log("La animación no está reproduciéndose actualmente.");
-                    // }
                 },
                 update: function () {
                     self.playerMovement(this);
@@ -338,13 +316,6 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
-            // if (self.tecla(this, 'SHIFT')) {
-            //   currentSpeed *= runSpeedMultiplier;
-            // } else {
-            //   currentSpeed = speed;
-            // }
-
-
             // console.log(this.knight.x, this.knight.y)
             if (this.tecla(scene, 'M')) {
                 if (scene.scene.isActive('lobby')) {
@@ -470,23 +441,6 @@ export default defineComponent({
 
             return emitter;
         },
-        createParticlesLobby(scene, x, y) {
-
-
-            const emitter = scene.add.particles(x, y, 'leaves',
-                {
-                    // speed: { min: -50, max: 50 },
-                    // angle: { min: 0, max: 360 },
-                    // scale: { start: 0.5, end: 0 },
-                    lifespan: 3000,
-                    quantity: 1,
-                    on: false
-                });
-
-            return emitter;
-        }
-
-
     }
 });
 </script>
