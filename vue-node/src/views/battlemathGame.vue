@@ -14,8 +14,7 @@ export default defineComponent({
     data() {
         return {
             player: null,
-            // playerSprite: 'redCamouflag',
-            playerSprite: 'goldKnight',
+            playerSprite: '',
             speed: 30,
             pHouse_layers: {
                 walls: null,
@@ -43,7 +42,9 @@ export default defineComponent({
         }
     },
     mounted() {
+        this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
         this.initializeGame();
+
     },
     methods: {
         initializeGame() {
@@ -430,6 +431,10 @@ export default defineComponent({
 
             return emitter;
         },
+        randomStartSkin(str1, str2) {
+            const randomIndex = Math.random() < 0.5 ? 0 : 1;
+            return randomIndex === 0 ? str1 : str2;
+        }
     }
 });
 </script>
