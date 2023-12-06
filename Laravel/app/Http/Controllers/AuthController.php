@@ -10,6 +10,16 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        $existUser = User::where('email', $request->email)->first();
+
+        if ($existUser) {
+            return response()->json(['message' => 'El email ya está en uso'], 400);
+        }
+
+        if ($request->password != $request->password_confirmation) {
+            return response()->json(['message' => 'La contraseña no coincide'], 400);
+        }
+
         $fields = $request->validate([
             'username' => 'required|string',
             'email' => 'required|email|unique:users,email',
@@ -50,9 +60,9 @@ class AuthController extends Controller
             ], 400);
         } else if (!Hash::check($fields['password'], $user->password)) {
             return response([
-                'message'=> 'La contrasenya és incorrecta',
-                'errors' => []    
-            ],400);
+                'message' => 'La contrasenya és incorrecta',
+                'errors' => []
+            ], 400);
         }
 
         $token = $user->createToken('BattleMath')->plainTextToken;

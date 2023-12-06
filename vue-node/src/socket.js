@@ -49,11 +49,10 @@ socket.on("viewResp", (resp) => {
 
 });
 
-socket.on("loginParameters", (token, username) => {
+socket.on("loginParameters", (user) => {
   
   const store = useAppStore();
-  store.getToken(token);
-  store.getUsername(username);
+  store.setUser(user);
 
   
 });

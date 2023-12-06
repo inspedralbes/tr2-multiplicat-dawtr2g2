@@ -3,6 +3,8 @@ const cors = require('cors');
 const app = express();
 const axios = require('axios');
 
+
+
 const http = require('http'); // Add this line to import the 'http' module
 const { emit } = require('process');
 
@@ -39,13 +41,38 @@ io.on('connection', (socket) => {
         password: password
       });
       console.log('Respuesta del servidor:', response.data);
-      const token = response.data.token;
-      const username = response.data.username;
-      socket.emit('loginParameters', {token, username});
+      const user = {
+        token: response.data.token,
+        username: response.data.username
+      };
+
+      socket.emit('loginParameters', user);
     } catch (error) {
       console.error('Error al realizar la solicitud:', error);
     }
 
+  });
+
+  socket.on('register', async (username, email, password, password_confirmation) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/registre', {
+        username: username,
+        email: email,
+        password: password,
+        password_confirmation: password_confirmation,
+      });
+  
+      console.log('Respuesta del servidor:', response.data);
+  
+    } catch (error) {
+      if (error.response.status === 400) {
+
+        console.error('Error al realizar la solicitud:', error.response.data.message);
+        socket.emit('error400', error.response.data.message);
+
+      }
+      
+    }
   });
 
   socket.on('startGame', () => {
@@ -90,7 +117,7 @@ io.on('connection', (socket) => {
           .catch(error => {
             console.error(error);
           });
-      }) 
+      })
       .catch(error => {
         console.error(error);
       });

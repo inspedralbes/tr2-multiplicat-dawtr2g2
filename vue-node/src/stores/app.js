@@ -6,8 +6,7 @@ export const useAppStore = defineStore('app', {
     usersCon: 0,
     questAct: {},
     respAct: {},
-    username: '',
-    token:''
+    user:{}
   }),
   actions: {
     addUser(users,long) {
@@ -32,11 +31,8 @@ export const useAppStore = defineStore('app', {
       console.log(this.questAct);
       return this.questAct.pregunta;
     },
-    getToken(){
-
-    },
-    getusername(){
-
+    setUser(user){
+      this.user = user;
     }
   },
 })

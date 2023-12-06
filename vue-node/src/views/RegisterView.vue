@@ -1,41 +1,75 @@
 <script>
 import router from '../router';
+import { socket } from "@/socket";
 
 export default {
     data() {
         return {
+            username: '',
+            email: '',
+            password: '',
+            password_confirmation: '',
+            message: '',
+            error:false
         }
-    }, methods: {
+    },
+    methods: {
         irARuta() {
             router.push('/game');
+        },
+        irARutaload() {
+            router.push('/loading');
+            console.log("entra?")
+        },
+        async registerUser() {
+            socket.emit('register', this.username, this.email, this.password, this.password_confirmation);
+        },
+        async registerAndNavigate() {
+
+            await this.registerUser();
+            
+        },
+        recibirerror() {
+            socket.on('error400', (errorMessage) => {
+                this.message = errorMessage;
+                this.error = true;
+                console.log('Mensaje de error recibido:', this.message);
+            });
+            
         }
+    },
+    mounted() {
+        this.recibirerror();
     }
 }
 </script>
+
 
 <template>
     <div class="register-container">
         <form class="register-form">
             <div class="titulo">
-                <h2>BattleMath</h2>
+                <h2 >BattleMath</h2>
             </div>
+            <h1 v-if="error" class="error-message">{{ message }}</h1>
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" v-model="username" required>
             </div>
             <div class="input-group">
                 <label for="username">Email</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" v-model="email" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" v-model="password" required>
             </div>
             <div class="input-group">
                 <label for="password_confirmation">Password Confirmation</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" required>
+                <input type="password" id="password_confirmation" name="password_confirmation"
+                    v-model="password_confirmation" required>
             </div>
-            <button type="submit">Register</button>
+            <button @click="registerAndNavigate()" type="submit">Register</button>
         </form>
     </div>
 </template>
@@ -43,12 +77,21 @@ export default {
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
 
-h2{
+.error-message {
+    background-color: rgb(255, 95, 95);
+    color: white;
+    padding: 10px;
+    border-radius: 0 0 5px 5px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+h2 {
     color: white;
     margin-top: 20px;
 }
 
-.titulo{
+.titulo {
     background-color: #007bff;
     width: 100%;
     height: 65px;
@@ -56,6 +99,7 @@ h2{
     justify-content: center;
     align-content: center;
 }
+
 .register-container {
     width: 100vw;
     height: 75vh;
@@ -83,7 +127,7 @@ h2{
 
 .register-group {
     margin-bottom: 15px;
-    
+
 }
 
 .input-group label {
@@ -120,7 +164,7 @@ button {
 }
 
 button:hover {
-    
+
     background-color: #0056b3;
 }
 </style>
