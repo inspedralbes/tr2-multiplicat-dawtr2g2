@@ -130,7 +130,7 @@ export default defineComponent({
                     default: 'arcade',
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
+                        debug: true
                     }
                 },
             }
@@ -282,8 +282,8 @@ export default defineComponent({
             this.player = scene.physics.add.sprite(x, y, 'player');
 
             this.player.anims.play(`player_idle_down`);
-            this.player.body.setSize(this.player.width * 0.7, this.player.height * 0.2);
-            this.player.body.setOffset(this.player.width * .15, this.player.height * .8);
+            this.player.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
+            this.player.body.setOffset(this.player.width * .2, this.player.height * .8);
             this.player.body.bounce.set(0);
             scene.physics.world.enable(this.player);
 
