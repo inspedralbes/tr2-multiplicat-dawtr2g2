@@ -150,6 +150,10 @@ export default defineComponent({
             }
 
         },
+        randomStartSkin(skin1, skin2) {
+            const randomIndex = Math.random() < 0.5 ? 0 : 1;
+            return randomIndex === 0 ? skin1 : skin2;
+        },
         rescaleCamera() {
             const screenWidth = window.innerWidth;
             const screenHeight = window.innerHeight;
@@ -430,10 +434,6 @@ export default defineComponent({
                 });
 
             return emitter;
-        },
-        randomStartSkin(str1, str2) {
-            const randomIndex = Math.random() < 0.5 ? 0 : 1;
-            return randomIndex === 0 ? str1 : str2;
         }
     }
 });
