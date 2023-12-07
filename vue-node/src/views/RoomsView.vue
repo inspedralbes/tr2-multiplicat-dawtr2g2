@@ -4,8 +4,8 @@
     <div class="rooms__container">
         <div class="box">
             <div class="options">
-                <button class="option" @click="changeScreen(0)">LISTA PARTIDAS</button>
-                <button class="option" @click="changeScreen(1)">CREAR PARTIDAS</button>
+                <button class="option" :class="{ active: screen === 0 }" @click="changeScreen(0)">LISTA PARTIDAS</button>
+                <button class="option" :class="{ active: screen === 1 }" @click="changeScreen(1)">CREAR PARTIDAS</button>
             </div>
             <div class="rooms" v-if="screen == 0">
                 <div class="room">
@@ -230,6 +230,7 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    justify-content: center;
 }
 
 label {
@@ -240,7 +241,8 @@ label {
 
 .room__info {
     display: flex;
-    gap: 30px;
+    gap: 10%;
+
 }
 
 input {
@@ -264,28 +266,50 @@ select {
 select:focus {
     outline: none;
 }
+
 option {
     background-color: #282828;
     color: white;
     border-bottom: 2px solid white;
     margin-left: 10px;
 }
+
 option:focus {
     background-color: #E58D08;
     color: white;
     border-bottom: 2px solid white;
     margin-left: 10px;
 }
+
 option:checked {
     display: none;
 }
 
-.privacity{
+.privacity {
     font-size: 20px;
     font-weight: bold;
 }
-.privacity select{
+
+.privacity select {
     margin: 0;
+    background-color: rgb(136, 136, 136);
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid transparent;
 }
 
+.active {
+    background-color: #E58D08;
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.glass{
+    background: rgba( 255, 255, 255, 0.25 );
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+}
 </style>
