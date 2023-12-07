@@ -15,6 +15,7 @@ export default defineComponent({
         return {
             player: null,
             playerSprite: '',
+            canMove: true,
             speed: 30,
             pHouse_layers: {
                 walls: null,
@@ -55,8 +56,10 @@ export default defineComponent({
                 preload: function () {
                     self.player = null;
                     self.preloadPlayerHouse(this);
+                    self.preloadNPC(this);
                     this.load.spritesheet('player', `characters/${self.playerSprite}.png`, { frameWidth: 16, frameHeight: 16 });
                     this.load.image('door', 'public/objects/door.png')
+                    this.load.image('dialogBox', 'public/img/DialogBoxFaceset.png')
                 },
                 create: function () {
                     self.createPlayerHouse(this);
@@ -65,6 +68,8 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 723);
 
                     self.createPlayerAnims(this);
+
+
                     ///Create player
                     if (self.firstTime) {
                         self.firstTime = false;
@@ -72,6 +77,8 @@ export default defineComponent({
                     } else {
                         self.playerCreate(this, 793, 856);
                     }
+
+                    self.npcCreate(this, 700, 774, 'npcWoman', 0);
                     self.addHouseCollisions(this);
 
                     this.cameras.main.centerOn(780, 774);
@@ -79,6 +86,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
+
 
                 },
                 update: function () {
@@ -121,6 +129,7 @@ export default defineComponent({
                 width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
                 height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
                 zoom: self.cameraConfig.zoom,
+                // zoom: 1,
                 scale: {
                     autoCenter: Phaser.Scale.RESIZE,
                     mode: Phaser.Scale.NONE,
@@ -130,7 +139,7 @@ export default defineComponent({
                     default: 'arcade',
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
+                        debug: true
                     }
                 },
             }
@@ -165,6 +174,30 @@ export default defineComponent({
             } else {
                 return 3;
             }
+        },
+        preloadNPC(scene) {
+
+            ///Preload spritesheets
+            scene.load.spritesheet('npcWoman', 'npc/ss_Woman.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcVillager1', 'npc/ss_Villager1.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcVillager2', 'npc/ss_Villager2.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcVillager3', 'npc/ss_Villager3.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcVillager4', 'npc/ss_Villager4.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcMaster', 'npc/ss_Master.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcRyu', 'npc/ss_Ryu.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcSamurai', 'npc/ss_Samurai.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('npcBlueSamurai', 'npc/ss_BlueSamurai.png', { frameWidth: 16, frameHeight: 16 });
+
+            ///Preload facesets
+            scene.load.image('npcWoman_face', 'npc/face_Woman.png');
+            scene.load.image('npcVillager1_face', 'npc/face_Villager1.png');
+            scene.load.image('npcVillager2_face', 'npc/face_Villager2.png');
+            scene.load.image('npcVillager3_face', 'npc/face_Villager3.png');
+            scene.load.image('npcVillager4_face', 'npc/face_Villager4.png');
+            scene.load.image('npcMaster_face', 'npc/face_Master.png');
+            scene.load.image('npcRyu_face', 'npc/face_Ryu.png');
+            scene.load.image('npcSamurai_face', 'npc/face_Samurai.png');
+            scene.load.image('npcBlueSamurai_face', 'npc/face_BlueSamurai.png');
         },
         preloadPlayerHouse(scene) {
             scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
@@ -282,13 +315,81 @@ export default defineComponent({
                 }
             });
         },
+        npcCreate(scene, x, y, npc, frame) {
+            let accionEnEspera = false;
+            const NPC = scene.physics.add.sprite(x, y, npc, frame);
+            const NPC_face = '';
+            scene.physics.add.collider(NPC, this.player);
+            NPC.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
+            NPC.body.setOffset(this.player.width * 0.2, this.player.height * 0.8);
+            NPC.setVelocity(0, 0);
+            NPC.body.immovable = true;
+
+
+            scene.physics.add.overlap(this.player, NPC, () => {
+                if ((this.tecla(scene, 'SPACE') && this.canMove) && !accionEnEspera) {
+                    accionEnEspera = true;
+                    const distX = this.player.x - NPC.x;
+                    const distY = this.player.y - NPC.y;
+
+                    if (Math.abs(distX) > Math.abs(distY)) {
+                        if (distX > 0) {
+                            NPC.setFrame(3);
+                        } else {
+                            NPC.setFrame(2);
+                        }
+                    } else {
+                        if (distY > 0) {
+                            NPC.setFrame(0);
+                        } else if (distY < 0) {
+                            NPC.setFrame(1);
+                        } else {
+                            NPC.setFrame(0);
+                        }
+                    }
+                    switch (npc) {
+                        case 'npcWoman':
+                            // console.log('hola soy una mujer');
+                            this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?'], npc);
+                            break;
+                    }
+
+                    scene.time.delayedCall(200, () => {
+                        accionEnEspera = false;
+                    }, [], this);
+                }
+            });
+        },
+        mostrarDialogo(scene, dialogo, npc) {
+            let index = 0;
+            const centerX = scene.cameras.main.worldView.centerX;
+            const centerY = scene.cameras.main.worldView.bottom;
+            this.canMove = false;
+
+            let fondoTexto = scene.add.image(centerX, centerY - 35, 'dialogBox');
+            fondoTexto.setVisible(true);
+            fondoTexto.setAlpha(1);
+            fondoTexto.setDepth(100);
+            let faceset = scene.add.image(centerX - 125, centerY - 30, `${npc}_face`);
+            faceset.setVisible(true);
+            faceset.setAlpha(1);
+            faceset.setDepth(101);
+
+            let textoDialogo = scene.add.text(centerX, centerY - 35, dialogo[index], {
+                fontFamily: 'Arial',
+                fontSize: '12px',
+                color: '#000000'
+            });
+            textoDialogo.setDepth(101);
+            textoDialogo.setOrigin(0.5);
+            textoDialogo.setVisible(true);
+        },
         playerCreate(scene, x, y) {
             this.player = scene.physics.add.sprite(x, y, 'player');
 
             this.player.anims.play(`player_idle_down`);
             this.player.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
             this.player.body.setOffset(this.player.width * .2, this.player.height * .8);
-            this.player.body.bounce.set(0);
             scene.physics.world.enable(this.player);
 
         },
@@ -313,33 +414,34 @@ export default defineComponent({
             let currentSpeed = speed;
 
             // console.log(this.player.x, this.player.y)
-            if (this.tecla(scene, 'M')) {
-                if (scene.scene.isActive('lobby')) {
-                    this.cambiarEscena(scene, 'playerHouse');
+            // if (this.tecla(scene, 'M')) {
+            //     if (scene.scene.isActive('lobby')) {
+            //         this.cambiarEscena(scene, 'playerHouse');
+            //     } else {
+            //         this.cambiarEscena(scene, 'lobby');
+            //     }
+            // }
+
+            if (this.canMove) {
+                if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
+                    this.player.setVelocity(-currentSpeed, 0);
+                    this.player.anims.play(`player_move_left`, true);
+                } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
+                    this.player.setVelocity(currentSpeed, 0);
+                    this.player.anims.play(`player_move_right`, true);
+                } else if (this.tecla(scene, 'UP') || this.tecla(scene, 'W')) {
+                    this.player.setVelocity(0, -currentSpeed);
+                    this.player.anims.play(`player_move_up`, true);
+                } else if (this.tecla(scene, 'DOWN') || this.tecla(scene, 'S')) {
+                    this.player.setVelocity(0, currentSpeed);
+                    this.player.anims.play(`player_move_down`, true);
                 } else {
-                    this.cambiarEscena(scene, 'lobby');
+                    const parts = this.player.anims.currentAnim.key.split('_');
+                    parts[1] = 'idle';
+                    this.player.anims.play(parts.join('_'));
+                    this.player.setVelocity(0, 0);
                 }
             }
-
-            if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
-                this.player.setVelocity(-currentSpeed, 0);
-                this.player.anims.play(`player_move_left`, true);
-            } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
-                this.player.setVelocity(currentSpeed, 0);
-                this.player.anims.play(`player_move_right`, true);
-            } else if (this.tecla(scene, 'UP') || this.tecla(scene, 'W')) {
-                this.player.setVelocity(0, -currentSpeed);
-                this.player.anims.play(`player_move_up`, true);
-            } else if (this.tecla(scene, 'DOWN') || this.tecla(scene, 'S')) {
-                this.player.setVelocity(0, currentSpeed);
-                this.player.anims.play(`player_move_down`, true);
-            } else {
-                const parts = this.player.anims.currentAnim.key.split('_');
-                parts[1] = 'idle';
-                this.player.anims.play(parts.join('_'));
-                this.player.setVelocity(0, 0);
-            }
-
         },
         createPlayerAnims(scene) {
             const frameRate = 8;
