@@ -21,6 +21,7 @@ export default {
 </template>
 
 <style scoped>
+
 @import url('https://fonts.cdnfonts.com/css/minecraft-4');
 
 .landing__container {

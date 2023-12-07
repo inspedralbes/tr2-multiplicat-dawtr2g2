@@ -6,6 +6,7 @@ import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
 import Login from '../views/Login.vue'
 import Battlemath from '../views/battlemathGame.vue'
+import Rooms from '../views/RoomsView.vue'
 import Register from '../views/RegisterView.vue'
 
 const router = createRouter({
@@ -45,7 +46,12 @@ const router = createRouter({
       path: '/game',
       name: 'battlemath',
       component: Battlemath
-    }
+    },
+    {
+      path: '/rooms',
+      name: 'rooms',
+      component: Rooms
+    },
   ]
 })
 
