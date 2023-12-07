@@ -81,7 +81,7 @@
     </div>
 </template>
 
-<style>
+<style scoped>
 * {
     margin: 0;
     padding: 0;
@@ -312,4 +312,5 @@ main {
 
 .blue {
     background-color: #5ad5db;
-}</style>
+}
+</style>
