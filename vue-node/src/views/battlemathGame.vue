@@ -1,16 +1,25 @@
 <template>
     <div class="game-container">
+        <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
+            <div class="modal">
+                <char_select @selectedCharacter="selectSkin" />
+                <button @click=closeCharSelectModal>Cerrar modal</button>
+            </div>
+        </div>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
   
 <script scoped>
 import { defineComponent } from 'vue';
+import char_select from '@/components/char_select.vue';
 import Phaser from 'phaser';
 
 export default defineComponent({
     name: 'battlemathGame',
-
+    components: {
+        char_select
+    },
     data() {
         return {
             player: null,
@@ -39,13 +48,28 @@ export default defineComponent({
                 zoom: this.rescaleCamera(),
                 offset: 4.8
             },
+            navigation_menus: {
+                showCharSelectModal: false,
+            },
             firstTime: true,
         }
     },
     mounted() {
         this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
         this.initializeGame();
+    },
+    watch: {
+        playerSprite(newSkin) {
+            if (this.player) {
+                this.createPlayerAnims(this.game.scene.scenes[0], newSkin);
+                this.player.setTexture(newSkin);
+                const currentAnimKey = this.player.anims.currentAnim.key; // Obtiene el nombre de la animación actual
+                const parts = currentAnimKey.split('_'); // Divide el nombre actual por el guión bajo
 
+                parts[0] = newSkin;
+                this.player.anims.play(parts.join('_'));
+            }
+        }
     },
     methods: {
         initializeGame() {
@@ -57,7 +81,7 @@ export default defineComponent({
                     self.player = null;
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
-                    this.load.spritesheet('player', `characters/${self.playerSprite}.png`, { frameWidth: 16, frameHeight: 16 });
+                    self.preloadSkins(this);
                     this.load.image('door', 'public/objects/door.png')
                     this.load.image('dialogBox', 'public/img/DialogBoxFaceset.png')
                 },
@@ -67,18 +91,19 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 723);
                     self.createParticleHouse(this, 920, 723);
 
-                    self.createPlayerAnims(this);
+                    // self.createPlayerAnims(this, self.playerSprite);
 
 
                     ///Create player
                     if (self.firstTime) {
                         self.firstTime = false;
-                        self.playerCreate(this, 780, 774);
+                        self.playerCreate(this, 720, 774, self.playerSprite);
                     } else {
-                        self.playerCreate(this, 793, 856);
+                        self.playerCreate(this, 793, 856, self.playerSprite);
                     }
 
                     self.npcCreate(this, 700, 774, 'npcWoman', 0);
+                    self.npcCreate(this, 700, 800, 'npcSamurai', 0);
                     self.addHouseCollisions(this);
 
                     this.cameras.main.centerOn(780, 774);
@@ -87,10 +112,9 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
 
-
                 },
                 update: function () {
-                    self.playerMovement(this);
+                    self.playerMovement(this, self.playerSprite);
                 }
 
             };
@@ -104,11 +128,10 @@ export default defineComponent({
                 },
                 create: function () {
                     self.createLobby(this);
-                    self.createPlayerAnims(this);
 
                     ///Create player
                     if (!self.player) {
-                        self.playerCreate(this, 888, 390);
+                        self.playerCreate(this, 888, 390, self.playerSprite);
                     } else {
                         this.player.setVelocity(0, 0);
                     }
@@ -120,7 +143,7 @@ export default defineComponent({
 
                 },
                 update: function () {
-                    self.playerMovement(this);
+                    self.playerMovement(this, self.playerSprite);
                 }
             }
 
@@ -139,7 +162,7 @@ export default defineComponent({
                     default: 'arcade',
                     arcade: {
                         gravity: { y: 0 },
-                        debug: true
+                        debug: false
                     }
                 },
             }
@@ -162,6 +185,13 @@ export default defineComponent({
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
             return randomIndex === 0 ? skin1 : skin2;
+        },
+        selectSkin(character) {
+            this.playerSprite = character;
+        },
+        closeCharSelectModal() {
+            this.navigation_menus.showCharSelectModal = false;
+            this.canMove = true;
         },
         rescaleCamera() {
             const screenWidth = window.innerWidth;
@@ -198,6 +228,23 @@ export default defineComponent({
             scene.load.image('npcRyu_face', 'npc/face_Ryu.png');
             scene.load.image('npcSamurai_face', 'npc/face_Samurai.png');
             scene.load.image('npcBlueSamurai_face', 'npc/face_BlueSamurai.png');
+        },
+        preloadSkins(scene) {
+            scene.load.spritesheet('eggBoy', 'characters/eggBoy.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('eggGirl', 'characters/eggGirl.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('blackMage', 'characters/blackMage.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('blueNinja', 'characters/blueNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('darkNinja', 'characters/darkNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('eskimoNinja', 'characters/eskimoNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('goldKnight', 'characters/goldKnight.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('grayNinja', 'characters/grayNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('greenNinja', 'characters/greenNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('knight', 'characters/knight.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('maskedNinja', 'characters/maskedNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('maskFrog', 'characters/maskFrog.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('orangeMage', 'characters/orangeMage.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('redNinja', 'characters/redNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('yellowNinja', 'characters/yellowNinja.png', { frameWidth: 16, frameHeight: 16 });
         },
         preloadPlayerHouse(scene) {
             scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
@@ -318,6 +365,8 @@ export default defineComponent({
         npcCreate(scene, x, y, npc, frame) {
             let accionEnEspera = false;
             let overlapped = false;
+            let overlappedNPC = null;
+
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
             // const NPC_face = '';
             scene.physics.add.collider(NPC, this.player);
@@ -326,12 +375,14 @@ export default defineComponent({
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
 
-            scene.physics.add.overlap(this.player, NPC, () => {
+            scene.physics.add.overlap(this.player, NPC, (player, npc) => {
                 overlapped = true;
+                overlappedNPC = npc;
             });
 
             scene.input.keyboard.on('keydown-SPACE', () => {
-                if (overlapped && this.canMove && !accionEnEspera) {
+                const playerCloseToNPC = overlappedNPC && Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y) < 16;
+                if (playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
                     accionEnEspera = true;
                     overlapped = false;
 
@@ -354,19 +405,37 @@ export default defineComponent({
                             NPC.setFrame(0);
                         }
                     }
-                    switch (npc) {
-                        case 'npcWoman':
-                            this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc);
-                            break;
-                    }
+
+                    this.npcLogic(scene, npc);
 
                     scene.time.delayedCall(1000, () => {
                         accionEnEspera = false;
                         overlapped = true;
+                        overlappedNPC = null;
                     }, [], this);
                 }
             });
 
+            if (overlappedNPC) {
+                const distanceToNPC = Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y);
+                if (distanceToNPC > 16) {
+                    overlappedNPC = null;
+                }
+            }
+
+        },
+        npcLogic(scene, npc) {
+            switch (npc) {
+                case 'npcWoman':
+                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc);
+                    break;
+                case 'npcSamurai':
+                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc)
+                        .then(() => {
+                            this.navigation_menus.showCharSelectModal = true;
+                        });
+                    break;
+            }
         },
         mostrarDialogo(scene, dialogo, npc) {
             let index = 0;
@@ -375,62 +444,65 @@ export default defineComponent({
             const centerY = scene.cameras.main.worldView.bottom;
             this.canMove = false;
 
+            return new Promise((resolve, reject) => {
+                let container = scene.add.container(centerX, centerY);
 
-            let container = scene.add.container(centerX, centerY);
+                let fondoTexto = scene.add.image(0, 0, 'dialogBox');
+                fondoTexto.setVisible(true);
+                fondoTexto.setAlpha(1);
+                fondoTexto.setDepth(100);
+                fondoTexto.setOrigin(0.5, 1);
+                container.add(fondoTexto);
 
-            let fondoTexto = scene.add.image(0, 0, 'dialogBox');
-            fondoTexto.setVisible(true);
-            fondoTexto.setAlpha(1);
-            fondoTexto.setDepth(100);
-            fondoTexto.setOrigin(0.5, 1);
-            container.add(fondoTexto);
+                let faceset = scene.add.image(-125, -5, `${npc}_face`);
+                faceset.setVisible(true);
+                faceset.setAlpha(1);
+                faceset.setDepth(101);
+                faceset.setOrigin(0.5, 1);
+                container.add(faceset);
 
-            let faceset = scene.add.image(-125, -5, `${npc}_face`);
-            faceset.setVisible(true);
-            faceset.setAlpha(1);
-            faceset.setDepth(101);
-            faceset.setOrigin(0.5, 1);
-            container.add(faceset);
+                let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
+                    // fontFamily: 'Arial',
+                    fontSize: '10px',
+                    color: '#000000',
+                    wordWrap: { width: 200, useAdvancedWrap: true },
+                    align: 'left',
+                });
+                textoDialogo.setDepth(101);
+                // textoDialogo.setOrigin(0.5, 1);
+                textoDialogo.setVisible(true);
+                container.add(textoDialogo);
 
-            let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
-                fontFamily: 'Arial',
-                fontSize: '10px',
-                color: '#000000',
-                wordWrap: { width: 200, useAdvancedWrap: true },
-                align: 'left',
+                const avanzarDialogo = () => {
+                    if (index < dialogo.length && !this.canMove && !dialogoTerminado) {
+                        textoDialogo.setText(dialogo[index]);
+                        index++;
+                    } else {
+                        if (!container) return;
+                        container.destroy(); // Cierra el cuadro de diálogo
+                        scene.input.keyboard.off('keydown-SPACE', avanzarDialogo);
+                        dialogoTerminado = true;
+                        resolve();
+                    }
+                };
+
+
+                scene.input.keyboard.on('keydown-SPACE', avanzarDialogo);
+
+                avanzarDialogo();
+
+                container.x = centerX;
+                container.y = centerY;
+
             });
-            textoDialogo.setDepth(101);
-            // textoDialogo.setOrigin(0.5, 1);
-            textoDialogo.setVisible(true);
-            container.add(textoDialogo);
-
-            const avanzarDialogo = () => {
-                if (index < dialogo.length && !this.canMove && !dialogoTerminado) {
-                    textoDialogo.setText(dialogo[index]);
-                    index++;
-                } else {
-                    if (!container) return;
-                    container.destroy(); // Cierra el cuadro de diálogo
-                    scene.input.keyboard.off('keydown-SPACE', avanzarDialogo);
-                    this.canMove = true;
-                    dialogoTerminado = true;
-                }
-            };
-
-
-            scene.input.keyboard.on('keydown-SPACE', avanzarDialogo);
-
-            avanzarDialogo();
-
-            container.x = centerX;
-            container.y = centerY;
 
 
         },
-        playerCreate(scene, x, y) {
-            this.player = scene.physics.add.sprite(x, y, 'player');
+        playerCreate(scene, x, y, skin) {
+            this.createPlayerAnims(scene, skin);
+            this.player = scene.physics.add.sprite(x, y, skin);
 
-            this.player.anims.play(`player_idle_down`);
+            this.player.anims.play(`${skin}_idle_down`);
             this.player.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
             this.player.body.setOffset(this.player.width * .2, this.player.height * .8);
             scene.physics.world.enable(this.player);
@@ -450,7 +522,7 @@ export default defineComponent({
                 debugGraphics.fillRect(door.x - door.width / 2, door.y - door.height / 2, door.width, door.height);
             });
         },
-        playerMovement(scene) {
+        playerMovement(scene, skin) {
             const speed = 30;
             const runSpeedMultiplier = 1.5;
 
@@ -468,16 +540,16 @@ export default defineComponent({
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
                     this.player.setVelocity(-currentSpeed, 0);
-                    this.player.anims.play(`player_move_left`, true);
+                    this.player.anims.play(`${skin}_move_left`, true);
                 } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
                     this.player.setVelocity(currentSpeed, 0);
-                    this.player.anims.play(`player_move_right`, true);
+                    this.player.anims.play(`${skin}_move_right`, true);
                 } else if (this.tecla(scene, 'UP') || this.tecla(scene, 'W')) {
                     this.player.setVelocity(0, -currentSpeed);
-                    this.player.anims.play(`player_move_up`, true);
+                    this.player.anims.play(`${skin}_move_up`, true);
                 } else if (this.tecla(scene, 'DOWN') || this.tecla(scene, 'S')) {
                     this.player.setVelocity(0, currentSpeed);
-                    this.player.anims.play(`player_move_down`, true);
+                    this.player.anims.play(`${skin}_move_down`, true);
                 } else {
                     const parts = this.player.anims.currentAnim.key.split('_');
                     parts[1] = 'idle';
@@ -486,12 +558,12 @@ export default defineComponent({
                 }
             }
         },
-        createPlayerAnims(scene) {
+        createPlayerAnims(scene, skin) {
             const frameRate = 8;
 
             scene.anims.create({
-                key: 'player_idle_down',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_idle_down`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [0], // Especifica los números de las columnas que quieres
                 }),
                 repeat: -1,
@@ -499,53 +571,53 @@ export default defineComponent({
             });
 
             scene.anims.create({
-                key: 'player_idle_up',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_idle_up`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [1],
                 }),
             });
 
             scene.anims.create({
-                key: 'player_idle_left',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_idle_left`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [2],
                 }),
             });
 
             scene.anims.create({
-                key: 'player_idle_right',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_idle_right`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [3],
                 }),
             });
 
             scene.anims.create({
-                key: 'player_move_up',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_move_up`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [1, 5, 9, 13]
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
             scene.anims.create({
-                key: 'player_move_down',
-                frames: scene.anims.generateFrameNumbers("player", {
+                key: `${skin}_move_down`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [0, 4, 8, 12], // Especifica los números de las columnas que quieres
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
             scene.anims.create({
-                key: 'player_move_left',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_move_left`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [2, 6, 10, 14]
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
             scene.anims.create({
-                key: 'player_move_right',
-                frames: scene.anims.generateFrameNumbers('player', {
+                key: `${skin}_move_right`,
+                frames: scene.anims.generateFrameNumbers(skin, {
                     frames: [3, 7, 11, 15]
                 }),
                 repeat: -1,
@@ -599,5 +671,27 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     background-color: #141B1B !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    max-width: 80%;
+    max-height: 80%;
+    overflow: auto;
 }
 </style>

@@ -12,7 +12,8 @@ class SkinsController extends Controller
      */
     public function index()
     {
-        $skins = skins::all();
+        // $skins = skins::all();
+        $skins = skins::whereNotIn('id', [1, 2])->get();
         return response()->json($skins);
     }
 

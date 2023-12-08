@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1>Selecciona un personaje:</h1>
         <div class="carousel-container">
             <button @click="scroll('left')">←</button>
             <div class="carousel">
@@ -41,7 +40,11 @@ export default {
     },
     computed: {
         selectedCharacter() {
-            return this.characters[this.selectedCharacterIndex];
+            if (this.characters[this.selectedCharacterIndex] != null) {
+                const character = this.characters[this.selectedCharacterIndex].name;
+                this.$emit('selectedCharacter', character);
+                return this.characters[this.selectedCharacterIndex];
+            }
         }
     },
     methods: {
