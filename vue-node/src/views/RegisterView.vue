@@ -86,6 +86,7 @@ export default {
     flex-direction: column;
     margin: 0;
 }
+
 h2 {
     color: white;
     margin-top: 20px;

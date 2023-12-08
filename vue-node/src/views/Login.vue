@@ -41,7 +41,6 @@ export default {
 
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
-
 h2 {
     color: white;
     margin-top: 20px;

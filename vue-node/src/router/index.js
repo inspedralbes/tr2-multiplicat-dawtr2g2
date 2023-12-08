@@ -6,13 +6,13 @@ import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
 import Login from '../views/Login.vue'
 import Battlemath from '../views/battlemathGame.vue'
+import Rooms from '../views/RoomsView.vue'
 import Register from '../views/RegisterView.vue'
 import Loading from '../views/Loading.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-
     {
       path: '/lleno',
       name: 'lleno',
@@ -52,6 +52,11 @@ const router = createRouter({
       path: '/loading',
       name: 'loading',
       component: Loading
+    },
+    {
+      path: '/rooms',
+      name: 'rooms',
+      component: Rooms
     }
   ]
 })

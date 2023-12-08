@@ -14,10 +14,10 @@ export default {
 <template>
     <div class="landing__container">
         <div class="landing">
-        <h1>BattleMath</h1>
-        <p>Lluita amb els teus coneixements de matemàtiques</p>
-        <button class="pixel-art-button" @click="irARuta()">Go</button>
-    </div>
+          <h1>BattleMath</h1>
+            <p>Lluita amb els teus coneixements de matemàtiques</p>
+          <button class="pixel-art-button" @click="irARuta()">Go</button>
+        </div>
     </div>
 </template>
 
