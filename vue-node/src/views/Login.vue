@@ -14,7 +14,7 @@ export default {
             router.push('/game');
         },
         loginUser() {
-            socket.emit('login', this.email,this.password );
+            socket.emit('login', this.email, this.password);
         }
     }
 };
@@ -41,6 +41,7 @@ export default {
 
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
+
 h2 {
     color: white;
     margin-top: 20px;
@@ -80,9 +81,8 @@ h2 {
     margin-bottom: 20px;
 }
 
-.register-group {
-    margin-bottom: 15px;
-
+.input-group {
+    width: 500px;
 }
 
 .input-group label {
@@ -95,12 +95,12 @@ h2 {
 }
 
 .input-group input {
-    width: 89%;
+    width: calc(100% - 50px);
     padding: 10px;
-    margin-left: 25px;
-    padding-right: 229px;
+    margin: 5px 25px;
     border-radius: 4px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
 
 }
 

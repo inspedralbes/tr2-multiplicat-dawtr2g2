@@ -25,9 +25,9 @@ export default {
             socket.emit('register', this.username, this.email, this.password, this.password_confirmation);
         },
         async registerAndNavigate() {
-
+            this.irARutaload();
             await this.registerUser();
-            
+            this.irARuta();
         },
         recibirerror() {
             socket.on('error400', (errorMessage) => {
@@ -140,14 +140,17 @@ h2 {
 
 }
 
-.input-group input {
-    width: 89%;
-    padding: 10px;
-    margin-left: 25px;
-    padding-right: 229px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+.input-group{
+    width: 500px;
+}
 
+.input-group input {
+  width: calc(100% - 50px);
+  padding: 10px;
+  margin: 5px 25px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 button {
