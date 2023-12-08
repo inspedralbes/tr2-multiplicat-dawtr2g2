@@ -1,5 +1,5 @@
 <template>
-  <div v-if="players === 0">
+  <div>
     <div>{{ quest.pregunta }}</div>
     <button @click="genQuest()">Generar Pregunta</button>
     <div v-for="(answer, index) in ans" :key="index">
@@ -19,24 +19,32 @@
     
     data() {
       return {
-        canvas: null,
-        ctx: null,
-        pelotas: [],
         quest: '',
         ans: [],
         est: '',
-        players: 0
+        room: {},
       };
     },
-    
+    created() {
+      const store = useAppStore();
+      this.room = store.room;
+
+    },
     mounted() {
       const store = useAppStore();
-      watch(() => store.questAct, newVal => {
-        this.quest = newVal;
+      
+      watch(() => store.questAct, request => {
+        this.quest = request;
       });
 
-      watch(() => store.respAct, ss => {
-        this.ans = ss;
+      watch(() => store.room, newRoom => {
+        console.log('mounted');
+        this.room = newRoom;
+      })
+
+
+      watch(() => store.respAct, answers => {
+        this.ans = answers;
       });
 
       socket.on('correct', () => {
@@ -50,12 +58,13 @@
     methods: {
       genQuest(){
         this.est = '';
-        socket.emit('genQuest');
+        console.log(this.room)
+        socket.emit('genQuest',this.room.id);
       },
       compAns(quest, ans){
         this.ans = [];
         this.est = '';
-        socket.emit('compAns',quest,ans);
+        socket.emit('compAns',quest,ans,this.room.id);
       },
       
     },

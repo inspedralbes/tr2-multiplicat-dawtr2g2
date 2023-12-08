@@ -24,8 +24,19 @@ socket.on("roomCreated", (room) => {
   router.push('/partida');
 });
 
+socket.on("joiningGame", (room) => {
+  const store = useAppStore();
+  store.addRoom(room);
+  console.log('Received joiningGame event with room:', room);
+  router.push('/partida');
+});
+
+socket.on("playerJoined", (room) => {
+  const store = useAppStore();
+  store.addRoom(room);
+});
+
 socket.on("viewRooms", (rooms) => {
-  console.log('Received viewRooms event with rooms:', rooms)
   const store = useAppStore();
   store.addRooms(rooms);
 });
