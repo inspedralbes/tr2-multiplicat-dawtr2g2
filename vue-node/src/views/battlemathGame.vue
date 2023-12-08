@@ -317,18 +317,25 @@ export default defineComponent({
         },
         npcCreate(scene, x, y, npc, frame) {
             let accionEnEspera = false;
+            let overlapped = false;
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
-            const NPC_face = '';
+            // const NPC_face = '';
             scene.physics.add.collider(NPC, this.player);
             NPC.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
             NPC.body.setOffset(this.player.width * 0.2, this.player.height * 0.8);
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
 
-
             scene.physics.add.overlap(this.player, NPC, () => {
-                if ((this.tecla(scene, 'SPACE') && this.canMove) && !accionEnEspera) {
+                overlapped = true;
+            });
+
+            scene.input.keyboard.on('keydown-SPACE', () => {
+                if (overlapped && this.canMove && !accionEnEspera) {
                     accionEnEspera = true;
+                    overlapped = false;
+
+
                     const distX = this.player.x - NPC.x;
                     const distY = this.player.y - NPC.y;
 
@@ -349,40 +356,76 @@ export default defineComponent({
                     }
                     switch (npc) {
                         case 'npcWoman':
-                            // console.log('hola soy una mujer');
-                            this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?'], npc);
+                            this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc);
                             break;
                     }
 
-                    scene.time.delayedCall(200, () => {
+                    scene.time.delayedCall(1000, () => {
                         accionEnEspera = false;
+                        overlapped = true;
                     }, [], this);
                 }
             });
+
         },
         mostrarDialogo(scene, dialogo, npc) {
             let index = 0;
+            let dialogoTerminado = false;
             const centerX = scene.cameras.main.worldView.centerX;
             const centerY = scene.cameras.main.worldView.bottom;
             this.canMove = false;
 
-            let fondoTexto = scene.add.image(centerX, centerY - 35, 'dialogBox');
+
+            let container = scene.add.container(centerX, centerY);
+
+            let fondoTexto = scene.add.image(0, 0, 'dialogBox');
             fondoTexto.setVisible(true);
             fondoTexto.setAlpha(1);
             fondoTexto.setDepth(100);
-            let faceset = scene.add.image(centerX - 125, centerY - 30, `${npc}_face`);
+            fondoTexto.setOrigin(0.5, 1);
+            container.add(fondoTexto);
+
+            let faceset = scene.add.image(-125, -5, `${npc}_face`);
             faceset.setVisible(true);
             faceset.setAlpha(1);
             faceset.setDepth(101);
+            faceset.setOrigin(0.5, 1);
+            container.add(faceset);
 
-            let textoDialogo = scene.add.text(centerX, centerY - 35, dialogo[index], {
+            let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
                 fontFamily: 'Arial',
-                fontSize: '12px',
-                color: '#000000'
+                fontSize: '10px',
+                color: '#000000',
+                wordWrap: { width: 200, useAdvancedWrap: true },
+                align: 'left',
             });
             textoDialogo.setDepth(101);
-            textoDialogo.setOrigin(0.5);
+            // textoDialogo.setOrigin(0.5, 1);
             textoDialogo.setVisible(true);
+            container.add(textoDialogo);
+
+            const avanzarDialogo = () => {
+                if (index < dialogo.length && !this.canMove && !dialogoTerminado) {
+                    textoDialogo.setText(dialogo[index]);
+                    index++;
+                } else {
+                    if (!container) return;
+                    container.destroy(); // Cierra el cuadro de diálogo
+                    scene.input.keyboard.off('keydown-SPACE', avanzarDialogo);
+                    this.canMove = true;
+                    dialogoTerminado = true;
+                }
+            };
+
+
+            scene.input.keyboard.on('keydown-SPACE', avanzarDialogo);
+
+            avanzarDialogo();
+
+            container.x = centerX;
+            container.y = centerY;
+
+
         },
         playerCreate(scene, x, y) {
             this.player = scene.physics.add.sprite(x, y, 'player');
