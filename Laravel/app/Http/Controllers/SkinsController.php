@@ -12,7 +12,8 @@ class SkinsController extends Controller
      */
     public function index()
     {
-        //
+        $skins = skins::all();
+        return response()->json($skins);
     }
 
     /**

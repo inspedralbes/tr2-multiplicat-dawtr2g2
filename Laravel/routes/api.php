@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespostaController;
+use App\Http\Controllers\SkinsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,6 @@ Route::put('/respostes/modificar/{id}', [RespostaController::class, 'update']);
 Route::get('/respostes/mostrar/{id}', [RespostaController::class, 'show']);
 Route::post('/respostes/crear', [RespostaController::class, 'store']);
 Route::get('/respostes', [RespostaController::class, 'index']);
+
+///Personatges
+Route::get('/skins', [SkinsController::class, 'index']);
