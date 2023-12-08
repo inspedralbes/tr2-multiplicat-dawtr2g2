@@ -1,13 +1,23 @@
 <script>
 import router from '../router';
+import { socket } from "@/socket";
 
 export default {
+    data() {
+        return {
+            email: '',
+            password: ''
+        };
+    },
     methods: {
         irARuta() {
             router.push('/game');
+        },
+        loginUser() {
+            socket.emit('login', this.email,this.password );
         }
     }
-}
+};
 </script>
 
 <template>
@@ -17,19 +27,20 @@ export default {
                 <h2>BattleMath</h2>
             </div>
             <div class="input-group">
-                <label for="username">Email</label>
-                <input type="email" id="email" name="email" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" v-model="email" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" v-model="password" required>
             </div>
-            <button type="submit">Login</button>
+            <button @click="loginUser()" type="submit">Login</button>
         </form>
     </div>
 </template>
 
 <style scoped>
+@import url('https://fonts.cdnfonts.com/css/minecraft-3');
 h2 {
     color: white;
     margin-top: 20px;

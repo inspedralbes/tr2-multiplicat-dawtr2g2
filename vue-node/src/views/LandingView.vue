@@ -5,7 +5,8 @@ export default {
     methods: {
         irARuta() {
             router.push('/game');
-        }
+        },
+        
     }
 }
 </script>
@@ -13,21 +14,23 @@ export default {
 <template>
     <div class="landing__container">
         <div class="landing">
-            <h1>BattleMath</h1>
-            <p>Lucha con tus conocimientos de mateámticas</p>
-            <button class="pixel-art-button" @click="irARuta()">Go!</button>
+          <h1>BattleMath</h1>
+            <p>Lluita amb els teus coneixements de matemàtiques</p>
+          <button class="pixel-art-button" @click="irARuta()">Go</button>
         </div>
     </div>
 </template>
 
 <style scoped>
-
 @import url('https://fonts.cdnfonts.com/css/minecraft-4');
 
 .landing__container {
+    position: absolute;
     background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/01073865290819.5d61d475f0072.jpg');
     background-repeat: no-repeat;
     background-size: cover;
+    width: 100vw;
+    height: 100vh ;
 
 }
 
