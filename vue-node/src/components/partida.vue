@@ -48,7 +48,7 @@
               </div>
           </main>
 
-          <footer class="cards" v-if="ans.length == 0">
+          <footer class="cards" >
               <!--
                 <div class="card red">
                   <div class="level-bg"></div>
@@ -58,7 +58,7 @@
               </div>
               -->
 
-              <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()">
+              <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="ans.length == 0">
                   <div class="level-bg"></div>
                   <p class="card-level">3</p>
                   <img class="image" src="img/geometry.png" alt="">
@@ -72,11 +72,12 @@
                   <h3 class="title">Calcul</h3>
               </div>
               -->
-              
+              <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id,answer.id)" :value="answer.id">
+                <div class="level-bg"></div>
+                <p class="card-level">{{ index + 1 }}</p>
+                <h3 class="title-ans">{{ answer.resposta }}</h3>
+              </div>
           </footer>
-          <div v-for="(answer, index) in ans" :key="index">
-      <button :value="answer.id" @click="compAns(quest.id,answer.id)">{{ answer.resposta }}</button>
-    </div>
 
       </div>
   </div>
@@ -285,6 +286,10 @@
       font-size: 14px;
   }
 
+  .title{
+    text-align: center;
+  }
+
   /* -------------------------------------------------------------------------- */
   /*                                    MAIN                                    */
   /* -------------------------------------------------------------------------- */
@@ -352,6 +357,8 @@
       flex-direction: column;
       border: 8px solid white;
       overflow: hidden;
+      transition: all .3s ease-in-out;
+
   }
 
   .level-bg {
@@ -372,6 +379,58 @@
       font-size: 16px;
       font-weight: bold;
   }
+
+  .ans {
+    position: relative;
+    width: 150px;
+    height: 200px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+    background-image: url(../public/img/card-background.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 2; 
+    transition: all .3s ease-in-out;
+  }
+
+  .title-ans{
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .card:hover {
+    cursor: pointer;
+    transform: translateY(-30px);
+  }
+
+
+  .ans::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -2;
+    border-radius: 20px;
+  }
+
+
+  .ans:hover {
+    cursor: pointer;
+    transform: translateY(-30px);
+  }
+
 
   .image {
       width: 100%;
