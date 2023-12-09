@@ -12,7 +12,7 @@ INSERT INTO `skins` (`id`,`name`) VALUES
 (11,'eskimoNinja'),
 (12,'maskedNinja'),
 (13,'maskFrog'),
-(14,'darkMage'),
+(14,'blackMage'),
 (15,'orangeMage');
 
 

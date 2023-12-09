@@ -1,4 +1,9 @@
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
+@import url('../node_modules/nes.css/css/nes.css');
+
+* {
+    font-family: 'Minecraft', sans-serif;
+}
 
 /* * {
     cursor: url(../public/img/Kunai.png), auto;

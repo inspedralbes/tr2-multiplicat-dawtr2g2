@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespostaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SkinsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +42,5 @@ Route::post('/login', [AuthController::class,'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class,'logout']);
 });
+///Personatges
+Route::get('/skins', [SkinsController::class, 'index']);
