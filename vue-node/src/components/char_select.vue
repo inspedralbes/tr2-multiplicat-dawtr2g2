@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="char-select">
         <div class="carousel-container">
-            <button @click="scroll('left')">←</button>
+            <button type="button" class="nes-btn" v-if="!loading" @click="scroll('left')">&lt;-</button>
             <div class="carousel">
                 <div v-for="(character, index) in characters" :key="index" class="character"
                     v-if="index === selectedCharacterIndex" @click="selectCharacter(index)">
@@ -9,11 +9,14 @@
                     <p>{{ character.name }}</p>
                 </div>
             </div>
-            <span v-if="loading" class="loader"></span>
-            <div v-if="selectedCharacter && !loading" class="centered-character">
-                <img :src="'/characters/' + selectedCharacter.name + '_face.png'" :alt="selectedCharacter.name">
+            <div class="visible-container">
+                <span v-if="loading" class="loader"></span>
+                <div v-if="selectedCharacter && !loading" class="centered-character">
+                    <img class="nes-avatar" :src="'/characters/' + selectedCharacter.name + '_face.png'"
+                        :alt="selectedCharacter.name">
+                </div>
             </div>
-            <button @click="scroll('right')">→</button>
+            <button class="nes-btn" v-if="!loading" @click="scroll('right')">-&gt;</button>
         </div>
     </div>
 </template>
@@ -78,8 +81,10 @@ export default {
 };
 </script>
 
-<style>
-/* Estilos para el carrusel y los personajes */
+<style scoped>
+.visible-container {
+    margin: 20px;
+}
 
 .carousel-container {
     display: flex;
@@ -92,9 +97,9 @@ export default {
 }
 
 button {
+    width: 100px;
+    height: 50px;
     padding: 8px 12px;
-    background-color: lightgray;
-    border: none;
     cursor: pointer;
     font-size: 18px;
 }
@@ -105,11 +110,13 @@ button {
 
 .centered-character img {
     width: 100px;
+    height: 100px;
+    border-radius: 10px;
 }
 
 .loader {
-    width: 48px;
-    height: 48px;
+    width: 86px;
+    height: 86px;
     border-radius: 50%;
     display: inline-block;
     position: relative;
@@ -125,8 +132,8 @@ button {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 44px;
-    height: 44px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background: #263238;
 }
@@ -139,4 +146,5 @@ button {
     100% {
         transform: rotate(360deg)
     }
-}</style>
+}
+</style>

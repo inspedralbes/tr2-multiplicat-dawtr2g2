@@ -1,9 +1,10 @@
 <template>
     <div class="game-container">
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
-            <div class="modal">
+            <div class="modal nes-container with-title is-rounded">
+                <p class="title">Selecciona el personatge</p>
                 <char_select @selectedCharacter="selectSkin" />
-                <button @click=closeCharSelectModal>Cerrar modal</button>
+                <button class="nes-btn" @click=closeCharSelectModal>Tanca</button>
             </div>
         </div>
         <div class="gameCanvas" ref="gameContainer"></div>
@@ -370,8 +371,8 @@ export default defineComponent({
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
             // const NPC_face = '';
             scene.physics.add.collider(NPC, this.player);
-            NPC.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
-            NPC.body.setOffset(this.player.width * 0.2, this.player.height * 0.8);
+            NPC.body.setSize(this.player.width, this.player.height * .5);
+            NPC.body.setOffset(this.player.width * 0, this.player.height * .5);
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
 
@@ -427,7 +428,11 @@ export default defineComponent({
         npcLogic(scene, npc) {
             switch (npc) {
                 case 'npcWoman':
-                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc);
+                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc)
+                        .then(() => {
+                            this.canMove = true;
+                        });
+
                     break;
                 case 'npcSamurai':
                     this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc)
@@ -658,18 +663,13 @@ export default defineComponent({
   
 <style scoped>
 .game-container {
-    width: 100%;
-    height: 100%;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
     margin: auto;
-}
-
-.game-container {
-    /* Asegúrate de que el canvas ocupe todo el contenedor */
-    width: 100%;
-    height: 100%;
     background-color: #141B1B !important;
 }
 
@@ -679,19 +679,16 @@ export default defineComponent({
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.784);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .modal {
+    display: flex;
     background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-    max-width: 80%;
-    max-height: 80%;
-    overflow: auto;
+    width: 20%;
+    flex-direction: column;
 }
 </style>
