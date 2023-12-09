@@ -435,7 +435,7 @@ export default defineComponent({
 
                     break;
                 case 'npcSamurai':
-                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc)
+                    this.mostrarDialogo(scene, [`Vols canviar d'estil?`], npc)
                         .then(() => {
                             this.navigation_menus.showCharSelectModal = true;
                         });
@@ -467,7 +467,7 @@ export default defineComponent({
                 container.add(faceset);
 
                 let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
-                    // fontFamily: 'Arial',
+                    fontFamily: 'Minecraft-3',
                     fontSize: '10px',
                     color: '#000000',
                     wordWrap: { width: 200, useAdvancedWrap: true },

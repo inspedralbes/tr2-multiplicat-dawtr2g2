@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="visible-container">
-                <span v-if="loading" class="loader"></span>
+                <span v-if="loading">Carregant...</span>
                 <div v-if="selectedCharacter && !loading" class="centered-character">
                     <img class="nes-avatar" :src="'/characters/' + selectedCharacter.name + '_face.png'"
                         :alt="selectedCharacter.name">
@@ -82,6 +82,10 @@ export default {
 </script>
 
 <style scoped>
+span {
+    font-size: 22px;
+}
+
 .visible-container {
     margin: 20px;
 }
@@ -112,39 +116,5 @@ button {
     width: 100px;
     height: 100px;
     border-radius: 10px;
-}
-
-.loader {
-    width: 86px;
-    height: 86px;
-    border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    background: linear-gradient(0deg, rgba(255, 61, 0, 0.2) 33%, #ff3d00 100%);
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-}
-
-.loader::after {
-    content: '';
-    box-sizing: border-box;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: #263238;
-}
-
-@keyframes rotation {
-    0% {
-        transform: rotate(0deg)
-    }
-
-    100% {
-        transform: rotate(360deg)
-    }
 }
 </style>
