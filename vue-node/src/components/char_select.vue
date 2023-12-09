@@ -9,7 +9,8 @@
                     <p>{{ character.name }}</p>
                 </div>
             </div>
-            <div v-if="selectedCharacter" class="centered-character">
+            <span v-if="loading" class="loader"></span>
+            <div v-if="selectedCharacter && !loading" class="centered-character">
                 <img :src="'/characters/' + selectedCharacter.name + '_face.png'" :alt="selectedCharacter.name">
             </div>
             <button @click="scroll('right')">→</button>
@@ -26,17 +27,23 @@ export default {
         return {
             characters: [],
             selectedCharacterIndex: 0,
-            translateValue: 0
+            translateValue: 0,
+            loading: true
         };
     },
     mounted() {
+
         axios.get('http://localhost:8000/api/skins')
             .then(response => {
                 this.characters = response.data;
             })
+            .finally(() => {
+                this.loading = false;
+            })
             .catch(error => {
                 console.error('Error al obtener los datos de la API', error);
             });
+
     },
     computed: {
         selectedCharacter() {
@@ -99,4 +106,37 @@ button {
 .centered-character img {
     width: 100px;
 }
-</style>
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    background: linear-gradient(0deg, rgba(255, 61, 0, 0.2) 33%, #ff3d00 100%);
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+.loader::after {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #263238;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}</style>
