@@ -50,7 +50,7 @@ export default defineComponent({
                 offset: 4.8
             },
             navigation_menus: {
-                showCharSelectModal: false,
+                showCharSelectModal: true,
             },
             firstTime: true,
         }
@@ -467,7 +467,7 @@ export default defineComponent({
                 container.add(faceset);
 
                 let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
-                    fontFamily: 'Minecraft-3',
+                    fontFamily: 'Arial',
                     fontSize: '10px',
                     color: '#000000',
                     wordWrap: { width: 200, useAdvancedWrap: true },
@@ -662,6 +662,14 @@ export default defineComponent({
 </script>
   
 <style scoped>
+.title {
+    background-color: #F2EAF1 !important;
+}
+
+button {
+    border-image-repeat: stretch !important;
+}
+
 .game-container {
     overflow: hidden;
     width: 100vw;
@@ -687,8 +695,10 @@ export default defineComponent({
 
 .modal {
     display: flex;
-    background-color: white;
+    border-image-repeat: stretch !important;
+    background-color: #F2EAF1;
     width: 20%;
     flex-direction: column;
+    border-color: rgb(255, 173, 93);
 }
 </style>

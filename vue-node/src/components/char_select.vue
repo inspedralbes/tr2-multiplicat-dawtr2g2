@@ -12,8 +12,11 @@
             <div class="visible-container">
                 <span v-if="loading">Carregant...</span>
                 <div v-if="selectedCharacter && !loading" class="centered-character">
-                    <img class="nes-avatar" :src="'/characters/' + selectedCharacter.name + '_face.png'"
-                        :alt="selectedCharacter.name">
+                    <div class="faceset-container">
+                        <img class="facesetBox" src="/img/FacesetBox.png" alt="">
+                        <img class="faceset" :src="'/characters/' + selectedCharacter.name + '_face.png'"
+                            :alt="selectedCharacter.name">
+                    </div>
                 </div>
             </div>
             <button class="nes-btn" v-if="!loading" @click="scroll('right')">-&gt;</button>
@@ -106,15 +109,31 @@ button {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 18px;
+    border-image-repeat: stretch !important;
 }
 
 .centered-character {
     text-align: center;
+    position: relative;
 }
 
-.centered-character img {
+
+.faceset-container {
+    position: relative;
+    display: inline-block;
+}
+
+.facesetBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 124px;
+}
+
+.faceset {
+    position: relative;
     width: 100px;
-    height: 100px;
-    border-radius: 10px;
 }
 </style>
