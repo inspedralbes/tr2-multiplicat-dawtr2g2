@@ -5,6 +5,10 @@
         <div class="npc-DialogBox">
             <p>{{ text[currentIndex] }}</p>
         </div>
+        <div v-if="npcImage === 'Woman'">
+            <button class="nes-btn">Si</button>
+            <button class="nes-btn">No</button>
+        </div>
     </div>
 </template>
 
@@ -72,30 +76,53 @@ export default {
 }
 
 .text-box .dialogBox {
-    width: 70vw;
+    width: 50vw;
     z-index: 1;
 }
 
 .text-box .npcFace {
     width: 120px;
+    max-width: 120px;
     position: absolute;
-    top: 106px;
     transform: translateX(-50%) translateY(-50%);
-    left: 285px;
+    left: 29.25vw;
+    top: 11vh;
     z-index: 2;
 }
 
 .text-box .npc-DialogBox {
     position: absolute;
-    top: 8%;
-    left: 28%;
+    top: 6vh;
+    left: 35vw;
     width: 55vw;
     height: 17vh;
     z-index: 3;
     overflow: hidden;
+    font-size: 28px;
 }
 
 .text-box {
     outline: none;
+}
+
+button {
+    border-image-repeat: stretch !important;
+    background-color: #ffad5d !important;
+}
+
+button::after {
+    box-shadow: inset -4px -4px #e46d3a !important;
+}
+
+button:hover {
+    background-color: #ec9e50 !important;
+}
+
+button:hover::after {
+    box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px #e46d3a !important;
 }
 </style>

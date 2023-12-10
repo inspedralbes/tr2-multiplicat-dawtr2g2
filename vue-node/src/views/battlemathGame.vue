@@ -445,7 +445,7 @@ export default defineComponent({
             this.npc.npcImage = splittedNPC;
             switch (splittedNPC) {
                 case ('Woman'):
-                    this.npc.npcText = ['hola, Pedro', 'Paco?', 'Joselito'];
+                    this.npc.npcText = [`Ens coneixem d'abans?`];
                     break;
                 case ('Samurai'):
                     this.npc.npcText = [`Que en vols canviar d'estil?`];

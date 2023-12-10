@@ -2,7 +2,7 @@
 @import url('../node_modules/nes.css/css/nes.css');
 
 * {
-    font-family: 'Minecraft', sans-serif;
+    font-family: 'Minecraft', sans-serif !important;
     cursor: default !important;
 }
 
