@@ -7,6 +7,11 @@
                 <button class="nes-btn" @click=closeCharSelectModal>Tanca</button>
             </div>
         </div>
+        <div class="npc-modal" v-if="npc.interactingWithNPC">
+            <div class="textBox-container">
+                <textBox :text="npc.npcText" :npcImage="npc.npcImage" @closeText="cerrarDialogo" />
+            </div>
+        </div>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -14,12 +19,14 @@
 <script>
 import { defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
+import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 
 export default defineComponent({
     name: 'battlemathGame',
     components: {
-        char_select
+        char_select,
+        textBox
     },
     data() {
         return {
@@ -51,6 +58,11 @@ export default defineComponent({
             },
             navigation_menus: {
                 showCharSelectModal: false,
+            },
+            npc: {
+                interactingWithNPC: false,
+                npcText: '',
+                npcImage: '',
             },
             firstTime: true,
         }
@@ -383,7 +395,7 @@ export default defineComponent({
 
             scene.input.keyboard.on('keydown-SPACE', () => {
                 const playerCloseToNPC = overlappedNPC && Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y) < 16;
-                if (playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
+                if (!this.interactingWithNPC && playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
                     accionEnEspera = true;
                     overlapped = false;
 
@@ -407,7 +419,7 @@ export default defineComponent({
                         }
                     }
 
-                    this.npcLogic(scene, npc);
+                    this.dialogo(npc);
 
                     scene.time.delayedCall(1000, () => {
                         accionEnEspera = false;
@@ -425,83 +437,31 @@ export default defineComponent({
             }
 
         },
-        npcLogic(scene, npc) {
-            switch (npc) {
-                case 'npcWoman':
-                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc)
-                        .then(() => {
-                            this.canMove = true;
-                        });
-
+        dialogo(npc) {
+            let parts = npc.split('npc');
+            let splittedNPC = parts[1];
+            this.canMove = false;
+            this.npc.interactingWithNPC = true;
+            this.npc.npcImage = splittedNPC;
+            switch (splittedNPC) {
+                case ('Woman'):
+                    this.npc.npcText = ['hola, Pedro', 'Paco?', 'Joselito'];
                     break;
-                case 'npcSamurai':
-                    this.mostrarDialogo(scene, [`Vols canviar d'estil?`], npc)
-                        .then(() => {
-                            this.navigation_menus.showCharSelectModal = true;
-                        });
+                case ('Samurai'):
+                    this.npc.npcText = [`Que en vols canviar d'estil?`];
                     break;
             }
+
         },
-        mostrarDialogo(scene, dialogo, npc) {
-            let index = 0;
-            let dialogoTerminado = false;
-            const centerX = scene.cameras.main.worldView.centerX;
-            const centerY = scene.cameras.main.worldView.bottom;
-            this.canMove = false;
-
-            return new Promise((resolve, reject) => {
-                let container = scene.add.container(centerX, centerY);
-
-                let fondoTexto = scene.add.image(0, 0, 'dialogBox');
-                fondoTexto.setVisible(true);
-                fondoTexto.setAlpha(1);
-                fondoTexto.setDepth(100);
-                fondoTexto.setOrigin(0.5, 1);
-                container.add(fondoTexto);
-
-                let faceset = scene.add.image(-125, -5, `${npc}_face`);
-                faceset.setVisible(true);
-                faceset.setAlpha(1);
-                faceset.setDepth(101);
-                faceset.setOrigin(0.5, 1);
-                container.add(faceset);
-
-                let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
-                    fontFamily: 'Arial',
-                    fontSize: '10px',
-                    color: '#000000',
-                    wordWrap: { width: 200, useAdvancedWrap: true },
-                    align: 'left',
-                });
-                textoDialogo.setDepth(101);
-                // textoDialogo.setOrigin(0.5, 1);
-                textoDialogo.setVisible(true);
-                container.add(textoDialogo);
-
-                const avanzarDialogo = () => {
-                    if (index < dialogo.length && !this.canMove && !dialogoTerminado) {
-                        textoDialogo.setText(dialogo[index]);
-                        index++;
-                    } else {
-                        if (!container) return;
-                        container.destroy(); // Cierra el cuadro de diálogo
-                        scene.input.keyboard.off('keydown-SPACE', avanzarDialogo);
-                        dialogoTerminado = true;
-                        resolve();
-                    }
-                };
-
-
-                scene.input.keyboard.on('keydown-SPACE', avanzarDialogo);
-
-                avanzarDialogo();
-
-                container.x = centerX;
-                container.y = centerY;
-
-            });
-
-
+        cerrarDialogo(newVal) {
+            setTimeout(() => {
+                this.npc.interactingWithNPC = newVal;
+                this.navigation_menus.showCharSelectModal = false;
+                this.canMove = true;
+                if (this.npc.npcImage === 'Samurai') {
+                    this.navigation_menus.showCharSelectModal = true;
+                }
+            }, 10);
         },
         playerCreate(scene, x, y, skin) {
             this.createPlayerAnims(scene, skin);
@@ -711,5 +671,13 @@ button:hover::after {
     /* width: 20%; */
     flex-direction: column;
     border-color: rgb(255, 173, 93);
+}
+
+.npc-modal {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
 }
 </style>
