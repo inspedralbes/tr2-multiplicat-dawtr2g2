@@ -3,6 +3,12 @@
 
 * {
     font-family: 'Minecraft', sans-serif;
+    cursor: default !important;
+}
+
+button:hover,
+a:hover {
+    cursor: pointer !important;
 }
 
 /* * {

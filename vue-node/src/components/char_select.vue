@@ -89,6 +89,27 @@ span {
     font-size: 22px;
 }
 
+button {
+    border-image-repeat: stretch !important;
+    background-color: #ffad5d !important;
+}
+
+button::after {
+    box-shadow: inset -4px -4px #e46d3a !important;
+}
+
+button:hover {
+    background-color: #ec9e50 !important;
+}
+
+button:hover::after {
+    box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px #e46d3a !important;
+}
+
 .visible-container {
     margin: 20px;
 }

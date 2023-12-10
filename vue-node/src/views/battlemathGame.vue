@@ -1,7 +1,7 @@
 <template>
     <div class="game-container">
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
-            <div class="modal nes-container with-title is-rounded">
+            <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
                 <char_select @selectedCharacter="selectSkin" />
                 <button class="nes-btn" @click=closeCharSelectModal>Tanca</button>
@@ -11,7 +11,7 @@
     </div>
 </template>
   
-<script scoped>
+<script>
 import { defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
 import Phaser from 'phaser';
@@ -668,6 +668,23 @@ export default defineComponent({
 
 button {
     border-image-repeat: stretch !important;
+    background-color: #ffad5d !important;
+}
+
+button::after {
+    box-shadow: inset -4px -4px #e46d3a !important;
+}
+
+button:hover {
+    background-color: #ec9e50 !important;
+}
+
+button:hover::after {
+    box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px #e46d3a !important;
 }
 
 .game-container {
@@ -696,8 +713,11 @@ button {
 .modal {
     display: flex;
     border-image-repeat: stretch !important;
+    border-image-source: url('../../public/img/border.svg') !important;
+    border-image-slice: 6 !important;
+    border-image-width: 3 !important;
     background-color: #F2EAF1;
-    width: 20%;
+    /* width: 20%; */
     flex-direction: column;
     border-color: rgb(255, 173, 93);
 }
