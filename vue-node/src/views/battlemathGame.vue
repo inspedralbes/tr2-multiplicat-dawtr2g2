@@ -533,15 +533,6 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
-            // console.log(this.player.x, this.player.y)
-            // if (this.tecla(scene, 'M')) {
-            //     if (scene.scene.isActive('lobby')) {
-            //         this.cambiarEscena(scene, 'playerHouse');
-            //     } else {
-            //         this.cambiarEscena(scene, 'lobby');
-            //     }
-            // }
-
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
                     this.player.setVelocity(-currentSpeed, 0);
