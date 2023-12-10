@@ -50,7 +50,7 @@ export default defineComponent({
                 offset: 4.8
             },
             navigation_menus: {
-                showCharSelectModal: true,
+                showCharSelectModal: false,
             },
             firstTime: true,
         }
