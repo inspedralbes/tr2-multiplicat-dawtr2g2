@@ -8,10 +8,10 @@
             </div>
             <div class="rooms" v-if="screen == 0" >
               <div style="width: 100%;" v-for="room in rooms" :key="room">
-                <div class="room"  v-if="room.players < 2">
+                <div class="room"  v-if="room.players.length < 2">
                   <h2 class="title">{{room.name}}</h2>
                   <h3 class="user">Julian</h3>
-                  <h4 class="capacity">{{room.players}}/2</h4>
+                  <h4 class="capacity">{{room.players.length}}/2</h4>
                   <button class="join-btn" value="{{room.id}}" @click="joinRoom(room.id)">Unirse</button>
                 </div>
               </div>

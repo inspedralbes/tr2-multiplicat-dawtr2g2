@@ -23,7 +23,7 @@
                   </div>
               </div>
 
-              <div class="player player2" v-if="room.players == 2">
+              <div class="player player2" v-if="room.players.length == 2">
                   <div class="info">
                       <div class="bar">
                           <div class="progress"></div>
@@ -43,12 +43,12 @@
                   <h2 class="tematica">GEOMETRIA</h2>
                   <H3 class="question">{{ quest.pregunta }}</H3>
               </div>
-              <div class="character" v-if="room.players == 2">
+              <div class="character" v-if="room.players.length == 2">
                   <img src="../../public/img/Skeleton Fight.png" alt="">
               </div>
           </main>
 
-          <footer class="cards" >
+          <footer class="cards" v-if="room.players.length == 2">
               <!--
                 <div class="card red">
                   <div class="level-bg"></div>

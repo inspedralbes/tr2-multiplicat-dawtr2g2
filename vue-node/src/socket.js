@@ -42,11 +42,11 @@ socket.on("viewRooms", (rooms) => {
 });
 
 socket.on("viewQuest", (quest) => {
-  if (router.currentRoute.value.path == '/partida') {
-    console.log('Received viewQuest event with quest:', quest);
-    const store = useAppStore();
-    store.addQuest(quest);
-  }
+  
+  console.log('Received viewQuest event with quest:', quest);
+  const store = useAppStore();
+  store.addQuest(quest);
+  
 });
 
 socket.on("viewResp", (resp) => {

@@ -101,10 +101,16 @@ io.on('connection', (socket) => {
     var room = {
       name: name,
       id: id,
-      players: 0
+      players: []
     };
-    room.players++;
+    var player = {
+      name:"player1", 
+      id: 1,
+      life: 100,
+    }
+    room.players.push(player);
     rooms.push(room);
+    
     socket.join(id);
     socket.emit('roomCreated', room);
     io.emit('viewRooms', rooms);
@@ -118,8 +124,13 @@ io.on('connection', (socket) => {
     while (i < rooms.length && !exist) {
       const element = rooms[i];
       if (id === element.id) {
+        var player = {
+          name:"player2", 
+          id: 2,
+          life: 100,
+        }
         exist = true;
-        element.players++;
+        element.players.push(player);
         room = element;
       }
       i++;
