@@ -1,13 +1,11 @@
 <template>
     <div class="text-box" ref="textBox" @keydown.space="nextText" tabindex="0">
-        <img class="dialogBox" src="../../public/img/DialogBoxFaceset.png" alt="DialogBoxFaceset">
-        <img class="npcFace" :src="`../../public/npc/face_${npcImage}.png`" alt="">
+        <div class="container">
+            <!-- <img class="faceBox" src="../../public/img/FacesetBox.png" alt="DialogBoxFaceset"> -->
+            <img class="npcFace" :src="`../../public/npc/face_${npcImage}.png`" alt="">
+        </div>
         <div class="npc-DialogBox">
             <p>{{ text[currentIndex] }}</p>
-        </div>
-        <div v-if="npcImage === 'Woman'">
-            <button class="nes-btn">Si</button>
-            <button class="nes-btn">No</button>
         </div>
     </div>
 </template>
@@ -67,62 +65,30 @@ export default {
 </script>
 
 <style scoped>
+p {
+    font-size: 24px;
+}
+
 .text-box {
-    position: relative;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 100vh;
-}
-
-.text-box .dialogBox {
-    width: 50vw;
-    z-index: 1;
-}
-
-.text-box .npcFace {
-    width: 120px;
-    max-width: 120px;
-    position: absolute;
-    transform: translateX(-50%) translateY(-50%);
-    left: 29.25vw;
-    top: 11vh;
-    z-index: 2;
-}
-
-.text-box .npc-DialogBox {
-    position: absolute;
-    top: 6vh;
-    left: 35vw;
-    width: 55vw;
-    height: 17vh;
-    z-index: 3;
-    overflow: hidden;
-    font-size: 28px;
-}
-
-.text-box {
+    flex-direction: row;
     outline: none;
 }
 
-button {
-    border-image-repeat: stretch !important;
-    background-color: #ffad5d !important;
+.container {
+    border-width: 10px;
+    border-style: solid;
+    border-image-source: url('../../public/img/FacesetBox.png');
+    border-image-slice: 5;
+    border-image-repeat: stretch;
 }
 
-button::after {
-    box-shadow: inset -4px -4px #e46d3a !important;
+.npcFace {
+    width: 100px;
+    height: 100px;
 }
 
-button:hover {
-    background-color: #ec9e50 !important;
-}
-
-button:hover::after {
-    box-shadow: inset -6px -6px #e46d3a !important;
-}
-
-.nes-btn:active:not(.is-disabled)::after {
-    box-shadow: inset 4px 4px #e46d3a !important;
+.npc-DialogBox {
+    padding-left: 20px;
 }
 </style>

@@ -8,8 +8,12 @@
             </div>
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
-            <div class="textBox-container">
+            <div class="modal nes-container is-rounded textBox">
                 <textBox :text="npc.npcText" :npcImage="npc.npcImage" @closeText="cerrarDialogo" />
+                <div v-if="npc.npcImage === 'Woman'">
+                    <button class="nes-btn">Si</button>
+                    <button class="nes-btn">No</button>
+                </div>
             </div>
         </div>
         <div class="gameCanvas" ref="gameContainer"></div>
@@ -675,9 +679,17 @@ button:hover::after {
 
 .npc-modal {
     position: fixed;
+    /* top: 0; */
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 30%;
+    height: 30vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.textBox {
+    width: 60vw;
 }
 </style>
