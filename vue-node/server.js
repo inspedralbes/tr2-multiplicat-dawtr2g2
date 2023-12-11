@@ -25,15 +25,6 @@ const io = require('socket.io')(server, {
 io.on('connection', (socket) => {
   console.log("connected");
 
-  socket.emit('long', connectedUsers.length);
-
-  socket.on('user', (userId) => {
-    if (connectedUsers.length != 2) {
-      connectedUsers.push(userId);
-      socket.emit('waiting', userId, connectedUsers.length);
-    }
-  });
-
   socket.on('login', async (email, password) => {
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/login', {
@@ -79,7 +70,7 @@ io.on('connection', (socket) => {
     io.emit('GameStart');
   });
 
-  socket.on('genQuest', () => {
+  socket.on('genQuest', (id) => {
     var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
     const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
     var resp = [];
@@ -95,11 +86,11 @@ io.on('connection', (socket) => {
             var urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${data.resposta_correcta_id}`;
           } else {
             randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
-            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;
+            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;    
           }
           promises.push(axios.get(urlResp));
         }
-
+        
         Promise.all(promises)
           .then(responses => {
             resp = responses.map(response => ({
