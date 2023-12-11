@@ -10,10 +10,13 @@ INSERT INTO `skins` (`id`,`name`) VALUES
 (9,'darkNinja'),
 (10,'grayNinja'),
 (11,'eskimoNinja'),
-(12,'maskedNinja'),
-(13,'maskFrog'),
-(14,'blackMage'),
-(15,'orangeMage');
+(12,'maskFrog'),
+(13,'blackMage'),
+(14,'orangeMage'),
+(15,'maskedNinja'),
+(16,'mario'),
+(17,'yayo'),
+(18,'fueguito');
 
 
 INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
