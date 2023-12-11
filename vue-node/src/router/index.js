@@ -4,10 +4,10 @@ import lleno from '../components/lleno.vue'
 import partida from '../components/partida.vue'
 import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
-import Login from '../views/Login.vue'
+import Login from '../components/Login.vue'
 import Battlemath from '../views/battlemathGame.vue'
 import Rooms from '../views/RoomsView.vue'
-import Register from '../views/RegisterView.vue'
+import Register from '../components/Register.vue'
 import Loading from '../views/Loading.vue'
 
 const router = createRouter({

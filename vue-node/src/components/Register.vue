@@ -25,15 +25,16 @@ export default {
             socket.emit('register', this.username, this.email, this.password, this.password_confirmation);
         },
         async registerAndNavigate() {
-            this.irARutaload();
             await this.registerUser();
-            this.irARuta();
+            
+            
         },
         recibirerror() {
             socket.on('error400', (errorMessage) => {
                 this.message = errorMessage;
                 this.error = true;
                 console.log('Mensaje de error recibido:', this.message);
+                
             });
             
         }
@@ -47,9 +48,9 @@ export default {
 
 <template>
     <div class="register-container">
-        <form class="register-form">
+        <form class="register-form" method="POST">
             <div class="titulo">
-                <h2 >BattleMath</h2>
+                <h2>BattleMath</h2>
             </div>
             <h1 v-if="error" class="error-message">{{ message }}</h1>
             <div class="input-group">
@@ -69,7 +70,7 @@ export default {
                 <input type="password" id="password_confirmation" name="password_confirmation"
                     v-model="password_confirmation" required>
             </div>
-            <button @click="registerAndNavigate()" type="submit">Register</button>
+            <button @click="registerAndNavigate()" type="button">Register</button>
         </form>
     </div>
 </template>

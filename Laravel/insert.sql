@@ -40,7 +40,7 @@ INSERT INTO `respostes` (`id`, `resposta`, `tema_id`, `dificultat_id`) VALUES
 (4, '4', 5, 1),
 (5, '6', 5, 1),
 (6, '8', 5, 1),
-(7, 'Línia mediatriz', 5, 1),
+(7, 'Línia mediatriu', 5, 1),
 (8, 'Bisectriu', 5, 1),
 (9, 'Perpendicular', 5, 1),
 (10, '10 unitats quadrades', 5, 1),
