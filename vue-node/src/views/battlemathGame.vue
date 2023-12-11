@@ -19,6 +19,11 @@
                 </div>
             </div>
         </div>
+        <div class="login-modal">
+            <div class="modal nes-container is-rounded">
+                <login />
+            </div>
+        </div>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -26,15 +31,18 @@
 <script>
 import { defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
+import login from '@/components/login.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
+
 
 export default defineComponent({
     name: 'battlemathGame',
     components: {
         char_select,
-        textBox
+        textBox,
+        login
     },
     data() {
         return {
@@ -672,7 +680,7 @@ button:hover::after {
     background-color: #141B1B !important;
 }
 
-.modal-overlay {
+.modal-overlay,.login-modal {
     position: fixed;
     top: 0;
     left: 0;

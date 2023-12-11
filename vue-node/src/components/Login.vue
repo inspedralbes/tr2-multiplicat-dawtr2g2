@@ -28,13 +28,13 @@ export default {
             </div>
             <div class="input-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" v-model="email" required>
+                <input class="nes-input" type="email" id="email" name="email" v-model="email" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" v-model="password" required>
+                <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
             </div>
-            <button @click="loginUser()" type="submit">Login</button>
+            <button class="nes-btn" @click="loginUser()" type="submit">Login</button>
         </form>
     </div>
 </template>
@@ -43,12 +43,12 @@ export default {
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
 
 h2 {
-    color: white;
+    color: black;
     margin-top: 20px;
 }
 
 .titulo {
-    background-color: #007bff;
+    background-color: #ffad5d;
     width: 100%;
     height: 65px;
     display: flex;
@@ -57,21 +57,34 @@ h2 {
 }
 
 .register-container {
-    width: 100vw;
-    height: 75vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Minecraft', sans-serif;
+    width: 50vw;
+    font-family: 'Minecraft', sans-serif !important;
 
 }
 
+button {
+    border-image-repeat: stretch !important;
+    background-color: #ffad5d !important;
+}
 
+button::after {
+    box-shadow: inset -4px -4px #e46d3a !important;
+}
+
+button:hover {
+    background-color: #ec9e50 !important;
+}
+
+button:hover::after {
+    box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px #e46d3a !important;
+}
 .register-form {
     padding: 0 0px 50px 0px;
-    background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
 }
@@ -81,9 +94,6 @@ h2 {
     margin-bottom: 20px;
 }
 
-.input-group {
-    width: 500px;
-}
 
 .input-group label {
     display: block;
@@ -104,22 +114,4 @@ h2 {
 
 }
 
-button {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 20px;
-    margin-left: 25px;
-    margin-right: 25px;
-
-}
-
-button:hover {
-
-    background-color: #0056b3;
-}
 </style>
