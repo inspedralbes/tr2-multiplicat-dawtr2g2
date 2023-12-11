@@ -1,3 +1,21 @@
+INSERT INTO `skins` (`id`,`name`) VALUES
+(1,'eggBoy'),
+(2,'eggGirl'),
+(3,'knight'),
+(4,'goldKnight'),
+(5,'greenNinja'),
+(6,'redNinja'),
+(7,'blueNinja'),
+(8,'yellowNinja'),
+(9,'darkNinja'),
+(10,'grayNinja'),
+(11,'eskimoNinja'),
+(12,'maskedNinja'),
+(13,'maskFrog'),
+(14,'blackMage'),
+(15,'orangeMage');
+
+
 INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
 (1, 'Nombres i operacions'),
 (2, 'Equacions'),

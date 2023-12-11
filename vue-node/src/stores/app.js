@@ -3,9 +3,10 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', {
   state: () => ({
     questAct: {},
-    respAct: {}, 
+    respAct: {},
     room: {},
     rooms: [],
+    user:{}
   }),
   actions: {
     addRoom(room){
@@ -31,5 +32,8 @@ export const useAppStore = defineStore('app', {
       console.log(this.questAct);
       return this.questAct.pregunta;
     },
+    setUser(user){
+      this.user = user;
+    }
   },
 })

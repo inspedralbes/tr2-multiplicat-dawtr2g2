@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespostaController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SkinsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +17,7 @@ use App\Http\Controllers\RespostaController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+//PUBLIC ROUTES
 
 //Preguntes
 Route::get('/preguntes', [PreguntaController::class, 'index']);
@@ -30,3 +33,14 @@ Route::put('/respostes/modificar/{id}', [RespostaController::class, 'update']);
 Route::get('/respostes/mostrar/{id}', [RespostaController::class, 'show']);
 Route::post('/respostes/crear', [RespostaController::class, 'store']);
 Route::get('/respostes', [RespostaController::class, 'index']);
+
+//Auth
+Route::post('/registre', [AuthController::class,'register']);
+Route::post('/login', [AuthController::class,'login']);
+
+//PROTECTED ROUTES
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/logout', [AuthController::class,'logout']);
+});
+///Personatges
+Route::get('/skins', [SkinsController::class, 'index']);
