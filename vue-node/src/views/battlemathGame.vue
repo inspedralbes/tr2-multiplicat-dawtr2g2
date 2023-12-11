@@ -7,6 +7,18 @@
                 <button class="nes-btn" @click=closeCharSelectModal>Tanca</button>
             </div>
         </div>
+        <div class="npc-modal" v-if="npc.interactingWithNPC">
+            <div class="npcFace-container">
+                <img class="npcFace" :src="`../../public/npc/face_${npc.npcImage}.png`" alt="">
+            </div>
+            <div class="modal nes-container is-rounded textBox">
+                <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
+                <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
+                    <button class="nes-btn">Entra</button>
+                    <button class="nes-btn">Registra't</button>
+                </div>
+            </div>
+        </div>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -14,12 +26,15 @@
 <script>
 import { defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
+import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
+import Router from '../router';
 
 export default defineComponent({
     name: 'battlemathGame',
     components: {
-        char_select
+        char_select,
+        textBox
     },
     data() {
         return {
@@ -51,6 +66,11 @@ export default defineComponent({
             },
             navigation_menus: {
                 showCharSelectModal: false,
+            },
+            npc: {
+                interactingWithNPC: false,
+                npcText: '',
+                npcImage: '',
             },
             firstTime: true,
         }
@@ -102,8 +122,19 @@ export default defineComponent({
                     } else {
                         self.playerCreate(this, 793, 856, self.playerSprite);
                     }
+                    const dialogInfo = this.physics.add.sprite(716, 695, 'DialogInfo', 0);
 
-                    self.npcCreate(this, 700, 774, 'npcWoman', 0);
+                    dialogInfo.anims.create({
+                        key: `DialogInfoAnim`,
+                        frames: this.anims.generateFrameNumbers('DialogInfo', {
+                            frames: [0, 1, 2, 3]
+                        }),
+                        repeat: -1,
+                        frameRate: 2,
+                    });
+                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+
+                    self.npcCreate(this, 715, 715, 'npcWoman', 0);
                     self.npcCreate(this, 700, 800, 'npcSamurai', 0);
                     self.addHouseCollisions(this);
 
@@ -218,6 +249,7 @@ export default defineComponent({
             scene.load.spritesheet('npcRyu', 'npc/ss_Ryu.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('npcSamurai', 'npc/ss_Samurai.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('npcBlueSamurai', 'npc/ss_BlueSamurai.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('DialogInfo', 'npc/DialogInfo.png', { frameWidth: 20, frameHeight: 16 });
 
             ///Preload facesets
             scene.load.image('npcWoman_face', 'npc/face_Woman.png');
@@ -246,6 +278,9 @@ export default defineComponent({
             scene.load.spritesheet('orangeMage', 'characters/orangeMage.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('redNinja', 'characters/redNinja.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('yellowNinja', 'characters/yellowNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('mario', 'characters/mario.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('yayo', 'characters/yayo.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('fueguito', 'characters/fueguito.png', { frameWidth: 16, frameHeight: 16 });
         },
         preloadPlayerHouse(scene) {
             scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
@@ -359,7 +394,7 @@ export default defineComponent({
                 if (door.name === 'player_door') {
                     this.cambiarEscena(scene, 'playerHouse', 793, 856);
                 } else {
-                    console.log('aun nada')
+                    Router.push('/rooms');
                 }
             });
         },
@@ -371,7 +406,7 @@ export default defineComponent({
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
             // const NPC_face = '';
             scene.physics.add.collider(NPC, this.player);
-            NPC.body.setSize(this.player.width, this.player.height * .5);
+            NPC.body.setSize(this.player.width, this.player.height * 1.2);
             NPC.body.setOffset(this.player.width * 0, this.player.height * .5);
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
@@ -383,7 +418,7 @@ export default defineComponent({
 
             scene.input.keyboard.on('keydown-SPACE', () => {
                 const playerCloseToNPC = overlappedNPC && Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y) < 16;
-                if (playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
+                if (!this.interactingWithNPC && playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
                     accionEnEspera = true;
                     overlapped = false;
 
@@ -407,7 +442,7 @@ export default defineComponent({
                         }
                     }
 
-                    this.npcLogic(scene, npc);
+                    this.dialogo(npc);
 
                     scene.time.delayedCall(1000, () => {
                         accionEnEspera = false;
@@ -425,83 +460,31 @@ export default defineComponent({
             }
 
         },
-        npcLogic(scene, npc) {
-            switch (npc) {
-                case 'npcWoman':
-                    this.mostrarDialogo(scene, ['hola, Pedro', 'Paco?', 'Joselito'], npc)
-                        .then(() => {
-                            this.canMove = true;
-                        });
-
+        dialogo(npc) {
+            let parts = npc.split('npc');
+            let splittedNPC = parts[1];
+            this.canMove = false;
+            this.npc.interactingWithNPC = true;
+            this.npc.npcImage = splittedNPC;
+            switch (splittedNPC) {
+                case ('Woman'):
+                    this.npc.npcText = [`Ens coneixem d'abans?`];
                     break;
-                case 'npcSamurai':
-                    this.mostrarDialogo(scene, [`Vols canviar d'estil?`], npc)
-                        .then(() => {
-                            this.navigation_menus.showCharSelectModal = true;
-                        });
+                case ('Samurai'):
+                    this.npc.npcText = [`Que en vols canviar d'estil?`];
                     break;
             }
+
         },
-        mostrarDialogo(scene, dialogo, npc) {
-            let index = 0;
-            let dialogoTerminado = false;
-            const centerX = scene.cameras.main.worldView.centerX;
-            const centerY = scene.cameras.main.worldView.bottom;
-            this.canMove = false;
-
-            return new Promise((resolve, reject) => {
-                let container = scene.add.container(centerX, centerY);
-
-                let fondoTexto = scene.add.image(0, 0, 'dialogBox');
-                fondoTexto.setVisible(true);
-                fondoTexto.setAlpha(1);
-                fondoTexto.setDepth(100);
-                fondoTexto.setOrigin(0.5, 1);
-                container.add(fondoTexto);
-
-                let faceset = scene.add.image(-125, -5, `${npc}_face`);
-                faceset.setVisible(true);
-                faceset.setAlpha(1);
-                faceset.setDepth(101);
-                faceset.setOrigin(0.5, 1);
-                container.add(faceset);
-
-                let textoDialogo = scene.add.text(-85, -30, dialogo[index], {
-                    fontFamily: 'Arial',
-                    fontSize: '10px',
-                    color: '#000000',
-                    wordWrap: { width: 200, useAdvancedWrap: true },
-                    align: 'left',
-                });
-                textoDialogo.setDepth(101);
-                // textoDialogo.setOrigin(0.5, 1);
-                textoDialogo.setVisible(true);
-                container.add(textoDialogo);
-
-                const avanzarDialogo = () => {
-                    if (index < dialogo.length && !this.canMove && !dialogoTerminado) {
-                        textoDialogo.setText(dialogo[index]);
-                        index++;
-                    } else {
-                        if (!container) return;
-                        container.destroy(); // Cierra el cuadro de diálogo
-                        scene.input.keyboard.off('keydown-SPACE', avanzarDialogo);
-                        dialogoTerminado = true;
-                        resolve();
-                    }
-                };
-
-
-                scene.input.keyboard.on('keydown-SPACE', avanzarDialogo);
-
-                avanzarDialogo();
-
-                container.x = centerX;
-                container.y = centerY;
-
-            });
-
-
+        cerrarDialogo(newVal) {
+            setTimeout(() => {
+                this.npc.interactingWithNPC = newVal;
+                this.navigation_menus.showCharSelectModal = false;
+                this.canMove = true;
+                if (this.npc.npcImage === 'Samurai') {
+                    this.navigation_menus.showCharSelectModal = true;
+                }
+            }, 10);
         },
         playerCreate(scene, x, y, skin) {
             this.createPlayerAnims(scene, skin);
@@ -651,7 +634,7 @@ export default defineComponent({
     }
 });
 </script>
-  
+
 <style scoped>
 .title {
     background-color: #F2EAF1 !important;
@@ -711,5 +694,41 @@ button:hover::after {
     /* width: 20%; */
     flex-direction: column;
     border-color: rgb(255, 173, 93);
+}
+
+.npc-modal {
+    position: fixed;
+    /* top: 0; */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.textBox {
+    width: 40vw;
+}
+
+.npcFace-container {
+    border-width: 10px;
+    border-style: solid;
+    border-image-source: url('../../public/img/FacesetBox.png');
+    border-image-slice: 5;
+    border-image-repeat: stretch;
+}
+
+.npcFace {
+    width: 120px;
+    height: 120px;
+}
+
+.woman-btn {
+    display: flex;
+    width: 100%;
+    padding-left: 20px;
+    gap: 2rem;
 }
 </style>

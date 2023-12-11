@@ -10,7 +10,10 @@ const { emit } = require('process');
 
 const server = http.createServer(app); // Create an HTTP server using the 'app' instance
 
+
 app.use(cors());
+
+var rooms = [];
 
 const io = require('socket.io')(server, {
   cors: {
@@ -19,20 +22,8 @@ const io = require('socket.io')(server, {
   }
 });
 
-const connectedUsers = [];
-
-
 io.on('connection', (socket) => {
   console.log("connected");
-
-  socket.emit('long', connectedUsers.length);
-
-  socket.on('user', (userId) => {
-    if (connectedUsers.length != 2) {
-      connectedUsers.push(userId);
-      socket.emit('waiting', userId, connectedUsers.length);
-    }
-  });
 
   socket.on('login', async (email, password) => {
     try {
@@ -79,7 +70,7 @@ io.on('connection', (socket) => {
     io.emit('GameStart');
   });
 
-  socket.on('genQuest', () => {
+  socket.on('genQuest', (id) => {
     var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
     const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
     var resp = [];
@@ -95,11 +86,11 @@ io.on('connection', (socket) => {
             var urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${data.resposta_correcta_id}`;
           } else {
             randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
-            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;
+            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;    
           }
           promises.push(axios.get(urlResp));
         }
-
+        
         Promise.all(promises)
           .then(responses => {
             resp = responses.map(response => ({
@@ -111,8 +102,8 @@ io.on('connection', (socket) => {
               id: data.id,
               pregunta: data.pregunta
             };
-            io.emit('viewQuest', quest);
-            socket.broadcast.emit('viewResp', resp);
+            io.to(id).emit('viewQuest', quest);
+            socket.to(id).emit('viewResp', resp);
           })
           .catch(error => {
             console.error(error);
@@ -123,18 +114,19 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('compAns', (quest, resp) => {
+  socket.on('compAns', (quest,resp,id) => { 
     var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
 
     axios.get(url)
       .then(response => {
         var data = response.data.resposta_correcta_id;
         console.log(data);
+
         if (data == resp) {
-          io.emit('correct');
+          io.to(id).emit('correct');
           console.log('Correcte');
-        } else {
-          io.emit('incorrect');
+        }else{
+          io.to(id).emit('incorrect');
           console.log('Incorrecte');
         }
       })
@@ -142,6 +134,58 @@ io.on('connection', (socket) => {
         console.error(error);
       });
   });
+
+  socket.on('getRooms', () => {
+    io.emit('viewRooms', rooms);
+  });
+
+  socket.on('createRoom', (name,id) => {
+    var room = {
+      name: name,
+      id: id,
+      players: []
+    };
+    var player = {
+      name:"player1", 
+      id: 1,
+      life: 100,
+    }
+    room.players.push(player);
+    rooms.push(room);
+    
+    socket.join(id);
+    socket.emit('roomCreated', room);
+    io.emit('viewRooms', rooms);
+  });
+
+  socket.on('joinRoom', (id) => {
+    var exist = false;
+    var i = 0;
+    var room = {};
+
+    while (i < rooms.length && !exist) {
+      const element = rooms[i];
+      if (id === element.id) {
+        var player = {
+          name:"player2", 
+          id: 2,
+          life: 100,
+        }
+        exist = true;
+        element.players.push(player);
+        room = element;
+      }
+      i++;
+    }
+
+    if (exist) {
+      socket.join(id);
+      socket.emit("joiningGame", room);
+      socket.to(id).emit('playerJoined', room);
+      io.emit('viewRooms', rooms);
+    }
+});
+
   socket.on('disconnect', () => {
     console.log('Cliente desconectado');
   });

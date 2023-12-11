@@ -2,20 +2,21 @@ import { defineStore } from 'pinia'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    users: [],
-    usersCon: 0,
     questAct: {},
     respAct: {},
+    room: {},
+    rooms: [],
     user:{}
   }),
   actions: {
-    addUser(users,long) {
-      this.users = users;
-      this.usersCon = long;
-      console.log(users);
+    addRoom(room){
+      this.room = room;
     },
-    getUsers(){
-      console.log(this.users);
+    addRooms(rooms){
+      this.rooms = rooms;
+    },
+    getRoom(){
+      return this.room.players;
     },
     getLong(){
       console.log(this.usersCon);

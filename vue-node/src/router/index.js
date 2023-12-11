@@ -9,6 +9,7 @@ import Battlemath from '../views/battlemathGame.vue'
 import Rooms from '../views/RoomsView.vue'
 import Register from '../components/Register.vue'
 import Loading from '../views/Loading.vue'
+import textBox from '../components/textBox.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,11 @@ const router = createRouter({
       path: '/rooms',
       name: 'rooms',
       component: Rooms
+    },
+    {
+      path: '/text',
+      name: 'text',
+      component: textBox
     }
   ]
 })
