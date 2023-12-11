@@ -51,7 +51,7 @@
                         <option value="2">Privada</option>
                     </select>
                   </div>
-                    <button class="create-btn" @click="createRoom">Crear</button>
+                    <button class="create-btn" @click="createRoom()">Crear</button>
                 </div>
               </div>
             </div>

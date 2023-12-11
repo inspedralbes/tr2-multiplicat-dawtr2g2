@@ -58,7 +58,7 @@
               </div>
               -->
 
-              <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="ans.length == 0">
+              <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="ans.length == 0 && turn">
                   <div class="level-bg"></div>
                   <p class="card-level">3</p>
                   <img class="image" src="img/geometry.png" alt="">
@@ -109,38 +109,41 @@
         ans: [],
         est: '',
         room: {},
-        numQuest:10
+        numQuest:10,
+        turn: true,
       };
     },
     created() {
       const store = useAppStore();
       this.room = store.room;
-
     },
     mounted() {
-      const store = useAppStore();
+        const store = useAppStore();
       
-      watch(() => store.questAct, request => {
-        this.quest = request;
-      });
+        watch(() => store.questAct, request => {
+            this.quest = request;
+        });
 
-      watch(() => store.room, newRoom => {
-        console.log('mounted');
-        this.room = newRoom;
-      })
+        watch(() => store.room, newRoom => {
+            this.room = newRoom;
+        })
 
+        this.turn = store.getTurn();
+        watch(() => store.turn, newTurn => {
+            this.turn = newTurn;
+        });
 
-      watch(() => store.respAct, answers => {
-        this.ans = answers;
-      });
+        watch(() => store.respAct, answers => {
+            this.ans = answers;
+        });
 
-      socket.on('correct', () => {
-          this.est = 'Correcte';
-      });
+        socket.on('correct', () => {
+            this.est = 'Correcte';
+        });
 
-      socket.on('incorrect', () => {
-          this.est = 'Incorrecte';
-      });
+        socket.on('incorrect', () => {
+            this.est = 'Incorrecte';
+        });
     },
     methods: {
       genQuest(){

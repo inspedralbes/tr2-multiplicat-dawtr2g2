@@ -6,7 +6,8 @@ export const useAppStore = defineStore('app', {
     respAct: {},
     room: {},
     rooms: [],
-    user:{}
+    user:{},
+    turn: true,
   }),
   actions: {
     addRoom(room){
@@ -34,6 +35,25 @@ export const useAppStore = defineStore('app', {
     },
     setUser(user){
       this.user = user;
+    },
+    setTurnOn(){
+      
+      this.turn = true;
+      console.log(this.turn);
+    },
+    setTurnOff(){
+      this.turn = false;
+      console.log(this.turn);
+    },
+    getTurn(){
+      return this.turn;
+    },
+    canviarTurn(){
+      if (this.turn === true) {
+        this.turn = !this.turn;
+      }else{
+        this.turn = true
+      }
     }
   },
 })

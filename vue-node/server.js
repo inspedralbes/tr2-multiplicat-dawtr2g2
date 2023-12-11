@@ -66,10 +66,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('startGame', () => {
-    io.emit('GameStart');
-  });
-
   socket.on('genQuest', (id) => {
     var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
     const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;

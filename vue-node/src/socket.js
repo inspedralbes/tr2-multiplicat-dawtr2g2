@@ -9,25 +9,17 @@ const URL = "http://localhost:3000";
 export const socket = io(URL);
 
 
-
-socket.on("GameStart", () => {
-  if (router.currentRoute.value.path == '/esperar') {
-    router.push('/partida');
-  }else{
-    router.push('/lleno');
-  }
-});
-
 socket.on("roomCreated", (room) => {
   const store = useAppStore();
   store.addRoom(room);
+  store.setTurnOn();
   router.push('/partida');
 });
 
 socket.on("joiningGame", (room) => {
   const store = useAppStore();
   store.addRoom(room);
-  console.log('Received joiningGame event with room:', room);
+  store.setTurnOff();
   router.push('/partida');
 });
 
@@ -42,27 +34,18 @@ socket.on("viewRooms", (rooms) => {
 });
 
 socket.on("viewQuest", (quest) => {
-  
-  console.log('Received viewQuest event with quest:', quest);
   const store = useAppStore();
   store.addQuest(quest);
-  
 });
 
 socket.on("viewResp", (resp) => {
-  if (router.currentRoute.value.path == '/partida') {
-    console.log('Received viewResp event with resp:', resp);
-    const store = useAppStore();
-    store.addResp(resp);
-  }
-
-
+  
+  const store = useAppStore();
+  store.addResp(resp);
+  store.canviarTurn();
 });
 
 socket.on("loginParameters", (user) => {
-  
   const store = useAppStore();
   store.setUser(user);
-
-  
 });
