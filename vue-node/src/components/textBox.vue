@@ -1,9 +1,5 @@
 <template>
     <div class="text-box" ref="textBox" @keydown.space="nextText" tabindex="0">
-        <div class="container">
-            <!-- <img class="faceBox" src="../../public/img/FacesetBox.png" alt="DialogBoxFaceset"> -->
-            <img class="npcFace" :src="`../../public/npc/face_${npcImage}.png`" alt="">
-        </div>
         <div class="npc-DialogBox">
             <p>{{ text[currentIndex] }}</p>
         </div>
@@ -16,11 +12,6 @@ export default {
         text: {
             type: Array,
             default: () => ['Hello World', 'Hello', 'World'],
-            required: true,
-        },
-        npcImage: {
-            type: String,
-            default: 'Samurai',
             required: true,
         },
     },
@@ -73,14 +64,6 @@ p {
     display: flex;
     flex-direction: row;
     outline: none;
-}
-
-.container {
-    border-width: 10px;
-    border-style: solid;
-    border-image-source: url('../../public/img/FacesetBox.png');
-    border-image-slice: 5;
-    border-image-repeat: stretch;
 }
 
 .npcFace {

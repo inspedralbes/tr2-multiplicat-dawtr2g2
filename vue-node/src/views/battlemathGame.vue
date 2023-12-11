@@ -8,11 +8,14 @@
             </div>
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
+            <div class="npcFace-container">
+                <img class="npcFace" :src="`../../public/npc/face_${npc.npcImage}.png`" alt="">
+            </div>
             <div class="modal nes-container is-rounded textBox">
-                <textBox :text="npc.npcText" :npcImage="npc.npcImage" @closeText="cerrarDialogo" />
-                <div v-if="npc.npcImage === 'Woman'">
-                    <button class="nes-btn">Si</button>
-                    <button class="nes-btn">No</button>
+                <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
+                <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
+                    <button class="nes-btn">Entra</button>
+                    <button class="nes-btn">Registra't</button>
                 </div>
             </div>
         </div>
@@ -25,6 +28,7 @@ import { defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
+import Router from '../router';
 
 export default defineComponent({
     name: 'battlemathGame',
@@ -118,8 +122,19 @@ export default defineComponent({
                     } else {
                         self.playerCreate(this, 793, 856, self.playerSprite);
                     }
+                    const dialogInfo = this.physics.add.sprite(716, 695, 'DialogInfo', 0);
 
-                    self.npcCreate(this, 700, 774, 'npcWoman', 0);
+                    dialogInfo.anims.create({
+                        key: `DialogInfoAnim`,
+                        frames: this.anims.generateFrameNumbers('DialogInfo', {
+                            frames: [0, 1, 2, 3]
+                        }),
+                        repeat: -1,
+                        frameRate: 2,
+                    });
+                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+
+                    self.npcCreate(this, 715, 715, 'npcWoman', 0);
                     self.npcCreate(this, 700, 800, 'npcSamurai', 0);
                     self.addHouseCollisions(this);
 
@@ -234,6 +249,7 @@ export default defineComponent({
             scene.load.spritesheet('npcRyu', 'npc/ss_Ryu.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('npcSamurai', 'npc/ss_Samurai.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('npcBlueSamurai', 'npc/ss_BlueSamurai.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('DialogInfo', 'npc/DialogInfo.png', { frameWidth: 20, frameHeight: 16 });
 
             ///Preload facesets
             scene.load.image('npcWoman_face', 'npc/face_Woman.png');
@@ -262,6 +278,9 @@ export default defineComponent({
             scene.load.spritesheet('orangeMage', 'characters/orangeMage.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('redNinja', 'characters/redNinja.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.spritesheet('yellowNinja', 'characters/yellowNinja.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('mario', 'characters/mario.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('yayo', 'characters/yayo.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet('fueguito', 'characters/fueguito.png', { frameWidth: 16, frameHeight: 16 });
         },
         preloadPlayerHouse(scene) {
             scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
@@ -375,7 +394,7 @@ export default defineComponent({
                 if (door.name === 'player_door') {
                     this.cambiarEscena(scene, 'playerHouse', 793, 856);
                 } else {
-                    console.log('aun nada')
+                    Router.push('/rooms');
                 }
             });
         },
@@ -387,7 +406,7 @@ export default defineComponent({
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
             // const NPC_face = '';
             scene.physics.add.collider(NPC, this.player);
-            NPC.body.setSize(this.player.width, this.player.height * .5);
+            NPC.body.setSize(this.player.width, this.player.height * 1.2);
             NPC.body.setOffset(this.player.width * 0, this.player.height * .5);
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
@@ -615,7 +634,7 @@ export default defineComponent({
     }
 });
 </script>
-  
+
 <style scoped>
 .title {
     background-color: #F2EAF1 !important;
@@ -690,6 +709,26 @@ button:hover::after {
 }
 
 .textBox {
-    width: 60vw;
+    width: 40vw;
+}
+
+.npcFace-container {
+    border-width: 10px;
+    border-style: solid;
+    border-image-source: url('../../public/img/FacesetBox.png');
+    border-image-slice: 5;
+    border-image-repeat: stretch;
+}
+
+.npcFace {
+    width: 120px;
+    height: 120px;
+}
+
+.woman-btn {
+    display: flex;
+    width: 100%;
+    padding-left: 20px;
+    gap: 2rem;
 }
 </style>
