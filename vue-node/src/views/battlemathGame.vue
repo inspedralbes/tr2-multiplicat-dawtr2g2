@@ -144,7 +144,6 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
-
                 },
                 update: function () {
                     self.playerMovement(this, self.playerSprite);
@@ -396,7 +395,7 @@ export default defineComponent({
                     this.cambiarEscena(scene, 'playerHouse', 793, 856);
                 } else {
                     if (this.game) {
-                        this.game.scene.pause();
+                        this.game.destroy(true);
                     }
                     Router.push('/rooms');
                 }
@@ -520,9 +519,9 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
+
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
-                    console.log('left');
                     this.player.setVelocity(-currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_left`, true);
                 } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
