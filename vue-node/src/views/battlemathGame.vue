@@ -9,48 +9,65 @@
                 </button>
             </div>
         </div>
-        <div class="npc-modal" v-if="npc.interactingWithNPC">
+        <div class="npc-modal" v-if="npc.interactingWithNPC ">
             <div class="npcFace-container">
-                <img
-                    class="npcFace"
-                    :src="`../../public/npc/face_${npc.npcImage}.png`"
-                    alt=""
-                />
+                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
             <div class="modal nes-container is-rounded textBox">
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
-                    <button class="nes-btn">Entra</button>
-                    <button class="nes-btn">Registra't</button>
+                    <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                    <button class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
                 </div>
+            </div>
+        </div>
+
+        <div v-if="navigation_menus.loginModal" class="login-modal">
+            <div class="modal nes-container is-rounded">
+                <button @click="navigation_menus.loginModal=false" class="nes-btn boton-cerrar">X</button>
+                <login @user="loginUser"/>
+            </div>
+        </div>
+
+        <div v-if="navigation_menus.registerModal" class="register-modal">
+            <div class="modal nes-container is-rounded">
+                <button @click="navigation_menus.registerModal=false" class="nes-btn boton-cerrar">X</button>
+                <register @user="registerUser" />
             </div>
         </div>
 
         <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
     <img src="/img/Tuto.png" alt="">
-</div>
+        </div>
 
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import char_select from "@/components/char_select.vue";
-import textBox from "@/components/textBox.vue";
-import Phaser from "phaser";
-import Router from "../router";
+import { defineComponent } from 'vue';
+import char_select from '@/components/char_select.vue';
+import login from '@/components/Login.vue';
+import register from '@/components/Register.vue';
+import textBox from '@/components/textBox.vue';
+import Phaser from 'phaser';
+import Router from '../router';
+
 
 export default defineComponent({
     name: "battlemathGame",
     components: {
         char_select,
         textBox,
+        login,
+        register
     },
     data() {
         return {
+            game: null,
             player: null,
-            playerSprite: "",
+            username: '',
+            playerSprite: '',
             canMove: true,
             speed: 30,
             pHouse_layers: {
@@ -77,6 +94,8 @@ export default defineComponent({
             },
             navigation_menus: {
                 showCharSelectModal: false,
+                loginModal: false,
+                registerModal: false
             },
             npc: {
                 interactingWithNPC: false,
@@ -115,11 +134,8 @@ export default defineComponent({
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
                     self.preloadSkins(this);
-                    this.load.image("door", "public/objects/door.png");
-                    this.load.image(
-                        "dialogBox",
-                        "public/img/DialogBoxFaceset.png"
-                    );
+                    this.load.image('door', '/objects/door.png')
+                    this.load.image('dialogBox', '/img/DialogBoxFaceset.png')
                 },
                 create: function () {
                     self.createPlayerHouse(this);
@@ -225,7 +241,8 @@ export default defineComponent({
                 },
             };
 
-            this.game = new Phaser.Game(config);
+
+            self.game = this.game = new Phaser.Game(config);
             this.game.loop.targetFps = 30;
             this.game.scene.add("playerHouse", playerHouseConfig, false);
             this.game.scene.add("lobby", lobbyConfig, false);
@@ -237,6 +254,20 @@ export default defineComponent({
             } else {
                 this.game.scene.start("lobby");
             }
+
+        },
+        registerUser(user) {
+            this.username = user.username;
+            this.npc.interactingWithNPC = false;
+            this.canMove = true;
+            this.navigation_menus.registerModal = false;
+        },
+        loginUser(user) {
+            this.username = user.username;
+            this.npc.interactingWithNPC = false;
+            this.canMove = true;
+            this.navigation_menus.loginModal = false;
+           
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -465,28 +496,13 @@ export default defineComponent({
             });
         },
         preloadLobby(scene) {
-            scene.load.image(
-                "TilesetLobby",
-                "tiles/lobby_map/TilesetLobby.png"
-            );
-            scene.load.image("TilesetElement", "tiles/TilesetElement.png");
-            scene.load.image(
-                "dojo_door_left",
-                "public/objects/dojo_door_left.png"
-            );
-            scene.load.image(
-                "dojo_door_right",
-                "public/objects/dojo_door_right.png"
-            );
-            scene.load.image("phouse_door", "public/objects/phouse_door.png");
-            scene.load.spritesheet("leaves", "particles/Leaf.png", {
-                frameWidth: 16,
-                frameHeight: 16,
-            });
-            scene.load.tilemapTiledJSON(
-                "lobby",
-                "tiles/lobby_map/lobbyMap.json"
-            );
+            scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
+            scene.load.image('TilesetElement', 'tiles/TilesetElement.png');
+            scene.load.image('dojo_door_left', '/objects/dojo_door_left.png');
+            scene.load.image('dojo_door_right', '/objects/dojo_door_right.png');
+            scene.load.image('phouse_door', '/objects/phouse_door.png');
+            scene.load.spritesheet('leaves', 'particles/Leaf.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
         },
         createLobby(scene) {
             const map = scene.make.tilemap({ key: "lobby" });
@@ -580,17 +596,17 @@ export default defineComponent({
             scene.physics.add.collider(this.player, this.lobby_layers.buildTop);
             scene.physics.add.collider(this.player, this.lobby_layers.furnTop);
 
-            scene.physics.add.overlap(
-                this.player,
-                this.objects.doors,
-                (player, door) => {
-                    if (door.name === "player_door") {
-                        this.cambiarEscena(scene, "playerHouse", 793, 856);
-                    } else {
-                        Router.push("/rooms");
+
+            scene.physics.add.overlap(this.player, this.objects.doors, (player, door) => {
+                if (door.name === 'player_door') {
+                    this.cambiarEscena(scene, 'playerHouse', 793, 856);
+                } else {
+                    if (this.game) {
+                        this.game.destroy(true);
                     }
+                    Router.push('/rooms');
                 }
-            );
+            });
         },
         npcCreate(scene, x, y, npc, frame) {
             let accionEnEspera = false;
@@ -751,22 +767,16 @@ export default defineComponent({
             }
 
             if (this.canMove) {
-                if (this.tecla(scene, "LEFT") || this.tecla(scene, "A")) {
-                    this.player.setVelocity(-currentSpeed, 0);
-                    this.player.anims.play(`${skin}_move_left`, true);
-                } else if (
-                    this.tecla(scene, "RIGHT") ||
-                    this.tecla(scene, "D")
-                ) {
+                if (this.tecla(scene, 'LEFT')) {
+                        this.player.setVelocity(-currentSpeed, 0);
+                        this.player.anims.play(`${skin}_move_left`, true);
+                } else if (this.tecla(scene, 'RIGHT')) {
                     this.player.setVelocity(currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_right`, true);
-                } else if (this.tecla(scene, "UP") || this.tecla(scene, "W")) {
+                } else if (this.tecla(scene, 'UP')) {
                     this.player.setVelocity(0, -currentSpeed);
                     this.player.anims.play(`${skin}_move_up`, true);
-                } else if (
-                    this.tecla(scene, "DOWN") ||
-                    this.tecla(scene, "S")
-                ) {
+                } else if (this.tecla(scene, 'DOWN')) {
                     this.player.setVelocity(0, currentSpeed);
                     this.player.anims.play(`${skin}_move_down`, true);
                 } else {
@@ -901,6 +911,18 @@ button:hover::after {
     box-shadow: inset 4px 4px #e46d3a !important;
 }
 
+.boton-cerrar {
+    position: absolute;
+    font-size: 25px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px;
+    right: 10px;
+}
+
 .game-container {
     overflow: hidden;
     width: 100vw;
@@ -912,7 +934,7 @@ button:hover::after {
     background-color: #141b1b !important;
 }
 
-.modal-overlay {
+.modal-overlay,.login-modal, .register-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -927,7 +949,7 @@ button:hover::after {
 .modal {
     display: flex;
     border-image-repeat: stretch !important;
-    border-image-source: url("../../public/img/border.svg") !important;
+    border-image-source: url('/img/border.svg') !important;
     border-image-slice: 6 !important;
     border-image-width: 3 !important;
     background-color: #f2eaf1;
@@ -955,7 +977,7 @@ button:hover::after {
 .npcFace-container {
     border-width: 10px;
     border-style: solid;
-    border-image-source: url("../../public/img/FacesetBox.png");
+    border-image-source: url('/img/FacesetBox.png');
     border-image-slice: 5;
     border-image-repeat: stretch;
 }
@@ -1009,18 +1031,4 @@ button:hover::after {
     }
 }
 
-/* @keyframes animControls {
-    0%{
-        bottom: -100px;
-    }
-    25% {
-        bottom: 100px;
-    }
-    75% {
-        bottom: 100px;
-    }
-    100%{
-        bottom: -100px;
-    }
-} */
 </style>
