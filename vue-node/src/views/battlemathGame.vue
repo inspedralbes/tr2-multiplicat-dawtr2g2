@@ -38,6 +38,7 @@ export default defineComponent({
     },
     data() {
         return {
+            game: null,
             player: null,
             playerSprite: '',
             canMove: true,
@@ -143,7 +144,6 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
-
                 },
                 update: function () {
                     self.playerMovement(this, self.playerSprite);
@@ -200,7 +200,7 @@ export default defineComponent({
             }
 
 
-            this.game = new Phaser.Game(config);
+            self.game = this.game = new Phaser.Game(config);
             this.game.loop.targetFps = 30;
             this.game.scene.add('playerHouse', playerHouseConfig, false);
             this.game.scene.add('lobby', lobbyConfig, false);
@@ -394,6 +394,9 @@ export default defineComponent({
                 if (door.name === 'player_door') {
                     this.cambiarEscena(scene, 'playerHouse', 793, 856);
                 } else {
+                    if (this.game) {
+                        this.game.destroy(true);
+                    }
                     Router.push('/rooms');
                 }
             });
@@ -515,6 +518,7 @@ export default defineComponent({
             const runSpeedMultiplier = 1.5;
 
             let currentSpeed = speed;
+
 
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
