@@ -36,13 +36,14 @@ socket.on("viewRooms", (rooms) => {
 socket.on("viewQuest", (quest) => {
   const store = useAppStore();
   store.addQuest(quest);
+  store.canviarTurn();
 });
 
 socket.on("viewResp", (resp) => {
   
   const store = useAppStore();
   store.addResp(resp);
-  store.canviarTurn();
+  
 });
 
 socket.on("loginParameters", (user) => {
