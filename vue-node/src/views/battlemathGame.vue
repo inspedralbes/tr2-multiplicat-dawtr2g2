@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="$route.path != '/rooms'" class="gameCanvas" ref="gameContainer"></div>
+        <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
   
@@ -398,7 +398,7 @@ export default defineComponent({
                     if (this.game) {
                         this.game.scene.pause();
                     }
-                    // Router.push('/rooms');
+                    Router.push('/rooms');
                 }
             });
         },
