@@ -194,7 +194,7 @@ export default defineComponent({
                     default: 'arcade',
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
+                        debug: true
                     }
                 },
             }
@@ -405,27 +405,27 @@ export default defineComponent({
             let accionEnEspera = false;
             let overlapped = false;
             let overlappedNPC = null;
+            let playerInTrigger = false;
 
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
-            // const NPC_face = '';
+            const trigger = scene.physics.add.sprite(x, y, null).setAlpha(0);
+            trigger.body.setSize(NPC.width * 1.5, NPC.height * 1.5);
+            trigger.body.setAllowGravity(false);
+
+            scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
+                playerInTrigger = true;
+                console.log(playerInTrigger)
+            });
+
+
             scene.physics.add.collider(NPC, this.player);
-            NPC.body.setSize(this.player.width, this.player.height * 1.2);
-            NPC.body.setOffset(this.player.width * 0, this.player.height * .5);
+            NPC.body.setSize(NPC.width, NPC.height);
+            NPC.body.setOffset(0, 0);
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
 
-            scene.physics.add.overlap(this.player, NPC, (player, npc) => {
-                overlapped = true;
-                overlappedNPC = npc;
-            });
-
             scene.input.keyboard.on('keydown-SPACE', () => {
-                const playerCloseToNPC = overlappedNPC && Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y) < 16;
-                if (!this.interactingWithNPC && playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
-                    accionEnEspera = true;
-                    overlapped = false;
-
-
+                if (!this.interactingWithNPC && playerInTrigger && this.canMove && !accionEnEspera) {
                     const distX = this.player.x - NPC.x;
                     const distY = this.player.y - NPC.y;
 
@@ -451,17 +451,10 @@ export default defineComponent({
                         accionEnEspera = false;
                         overlapped = true;
                         overlappedNPC = null;
+                        playerInTrigger = false;
                     }, [], this);
                 }
             });
-
-            if (overlappedNPC) {
-                const distanceToNPC = Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y);
-                if (distanceToNPC > 16) {
-                    overlappedNPC = null;
-                }
-            }
-
         },
         dialogo(npc) {
             let parts = npc.split('npc');
