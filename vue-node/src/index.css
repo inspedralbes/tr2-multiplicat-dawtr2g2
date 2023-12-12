@@ -1,0 +1,17 @@
+@import url('https://fonts.cdnfonts.com/css/minecraft-3');
+@import url('../node_modules/nes.css/css/nes.css');
+
+* {
+    font-family: 'Minecraft', sans-serif !important;
+    cursor: default !important;
+}
+
+button:hover,
+a:hover {
+    cursor: pointer !important;
+}
+
+/* * {
+    cursor: url(../public/img/Kunai.png), auto;
+    cursor: url(../public/img/Kunai.png), auto, pointer;
+} */
