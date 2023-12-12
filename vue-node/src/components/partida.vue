@@ -44,7 +44,7 @@
                     <H3 class="question">{{ quest.pregunta }}</H3>
                 </div>
                 <div class="character" v-if="room.players.length == 2">
-                    <img src="/img/Skeleton Fight.png" alt="">
+                    <img src="/img/Skeleton fight.png" alt="">
                 </div>
             </main>
 
@@ -61,7 +61,7 @@
                 <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="ans.length == 0 && turn">
                     <div class="level-bg"></div>
                     <p class="card-level">3</p>
-                    <img class="image" src="img/geometry.png" alt="">
+                    <img class="image" src="/img/geometry.png" alt="">
                     <h3 class="title">Geometria</h3>
                 </div>
                 <!--

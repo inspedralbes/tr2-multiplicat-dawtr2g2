@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import test from '../components/test.vue'
 import lleno from '../components/lleno.vue'
 import partida from '../components/partida.vue'
-import Battle from '../views/BattleView.vue'
 import Landing from '../views/LandingView.vue'
 import Login from '../components/Login.vue'
 import Battlemath from '../views/battlemathGame.vue'
@@ -38,11 +37,6 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: Register
-    },
-    {
-      path: '/battle',
-      name: 'battle',
-      component: Battle
     },
     {
       path: '/game',
