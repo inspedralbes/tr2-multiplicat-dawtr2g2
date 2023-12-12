@@ -6,26 +6,69 @@ export default {
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            error: false,
+            success: false,
+            message: ''
         };
     },
     methods: {
         irARuta() {
             router.push('/game');
         },
-        loginUser() {
+        async loginUser() {
             socket.emit('login', this.email, this.password);
+        },
+        async loginAndNavigate() {
+            await this.loginUser();
+            this.error = false;
+            this.irARuta();
+
+        },
+        recibirerror() {
+            socket.on('error400', (errorMessage) => {
+                this.message = errorMessage;
+                this.error = true;
+                console.log('Mensaje de error recibido:', this.message);
+
+            });
+
+        },
+        recibirsucess() {
+
+            socket.on('success', (successMessage) => {
+                this.message = successMessage;
+                this.success = true;
+            });
+
+        }
+    },
+    mounted() {
+        this.recibirerror();
+        this.recibirsucess();
+    },
+    watch: {
+        success(){
+            if (this.success) {
+                this.user = {
+                    username: this.username,
+                    password: this.password
+                }
+                this.$emit('user', this.user);
+            }
         }
     }
 };
 </script>
 
 <template>
-    <div class="register-container">
-        <form class="register-form">
+    <div class="login-container">
+        <form class="login-form" method="POST">
             <div class="titulo">
                 <h2>BattleMath</h2>
             </div>
+            <h1 v-if="error" class="error-message">{{ message }}</h1>
+            <h1 v-if="success" class="success-message">{{ message }}</h1>
             <div class="input-group">
                 <label for="email">Email</label>
                 <input class="nes-input" type="email" id="email" name="email" v-model="email" required>
@@ -34,7 +77,7 @@ export default {
                 <label for="password">Password</label>
                 <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
             </div>
-            <button class="nes-btn" @click="loginUser()" type="submit">Login</button>
+            <button class="nes-btn" @click="loginAndNavigate()" type="button">Login</button>
         </form>
     </div>
 </template>
@@ -47,6 +90,31 @@ h2 {
     margin-top: 20px;
 }
 
+.error-message {
+    background-color: rgb(255, 95, 95);
+    color: white;
+    font-size: 16px;
+    padding: 15px 5px 15px 5px;
+    border-radius: 0 0 5px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+}
+
+.success-message {
+    background-color: rgb(95, 255, 95);
+    color: white;
+    font-size: 16px;
+    padding: 15px 5px 15px 5px;
+    border-radius: 0 0 5px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+
+}
+
 .titulo {
     background-color: #ffad5d;
     width: 100%;
@@ -54,10 +122,11 @@ h2 {
     display: flex;
     justify-content: center;
     align-content: center;
+    margin-top: 20px;
 }
 
-.register-container {
-    width: 50vw;
+.login-container {
+    width: 25vw;
     font-family: 'Minecraft', sans-serif !important;
 
 }
@@ -65,6 +134,7 @@ h2 {
 button {
     border-image-repeat: stretch !important;
     background-color: #ffad5d !important;
+    margin-top: 25px;
 }
 
 button::after {
@@ -82,14 +152,15 @@ button:hover::after {
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
 }
-.register-form {
-    padding: 0 0px 50px 0px;
-    border-radius: 8px;
+
+.login-form {
+    padding: 0 0px 25px 0px;
     display: flex;
     flex-direction: column;
+    margin: 20px 30px 0px 30px;
 }
 
-.register-form h2 {
+.login-form h2 {
     text-align: center;
     margin-bottom: 20px;
 }
@@ -113,5 +184,4 @@ button:hover::after {
     box-sizing: border-box;
 
 }
-
 </style>

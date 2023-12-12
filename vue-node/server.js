@@ -38,8 +38,14 @@ io.on('connection', (socket) => {
       };
 
       socket.emit('loginParameters', user);
+      socket.emit('success', response.data.success);
     } catch (error) {
-      console.error('Error al realizar la solicitud:', error);
+      if (error.response.status === 400) {
+
+        console.error('Error al realizar la solicitud:', error.response.data.message);
+        socket.emit('error400', error.response.data.message);
+
+      }
     }
 
   });
@@ -54,6 +60,7 @@ io.on('connection', (socket) => {
       });
   
       console.log('Respuesta del servidor:', response.data);
+      socket.emit('success', response.data.success);
   
     } catch (error) {
       if (error.response.status === 400) {
