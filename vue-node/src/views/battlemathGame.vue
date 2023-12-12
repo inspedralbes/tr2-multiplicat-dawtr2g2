@@ -9,7 +9,7 @@
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
             <div class="npcFace-container">
-                <img class="npcFace" :src="`../../public/npc/face_${npc.npcImage}.png`" alt="">
+                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
             <div class="modal nes-container is-rounded textBox">
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
@@ -104,8 +104,8 @@ export default defineComponent({
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
                     self.preloadSkins(this);
-                    this.load.image('door', 'public/objects/door.png')
-                    this.load.image('dialogBox', 'public/img/DialogBoxFaceset.png')
+                    this.load.image('door', '/objects/door.png')
+                    this.load.image('dialogBox', '/img/DialogBoxFaceset.png')
                 },
                 create: function () {
                     self.createPlayerHouse(this);
@@ -330,9 +330,9 @@ export default defineComponent({
         preloadLobby(scene) {
             scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
             scene.load.image('TilesetElement', 'tiles/TilesetElement.png');
-            scene.load.image('dojo_door_left', 'public/objects/dojo_door_left.png');
-            scene.load.image('dojo_door_right', 'public/objects/dojo_door_right.png');
-            scene.load.image('phouse_door', 'public/objects/phouse_door.png');
+            scene.load.image('dojo_door_left', '/objects/dojo_door_left.png');
+            scene.load.image('dojo_door_right', '/objects/dojo_door_right.png');
+            scene.load.image('phouse_door', '/objects/phouse_door.png');
             scene.load.spritesheet('leaves', 'particles/Leaf.png', { frameWidth: 16, frameHeight: 16 });
             scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
         },
@@ -691,7 +691,7 @@ button:hover::after {
 .modal {
     display: flex;
     border-image-repeat: stretch !important;
-    border-image-source: url('../../public/img/border.svg') !important;
+    border-image-source: url('/img/border.svg') !important;
     border-image-slice: 6 !important;
     border-image-width: 3 !important;
     background-color: #F2EAF1;
@@ -719,7 +719,7 @@ button:hover::after {
 .npcFace-container {
     border-width: 10px;
     border-style: solid;
-    border-image-source: url('../../public/img/FacesetBox.png');
+    border-image-source: url('/img/FacesetBox.png');
     border-image-slice: 5;
     border-image-repeat: stretch;
 }
