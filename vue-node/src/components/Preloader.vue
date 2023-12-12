@@ -45,7 +45,7 @@
         opacity: 0;
     }
     100% {
-        display: none;
+        visibility: hidden;
     }
 }
 
@@ -67,7 +67,7 @@
         opacity: 0;
     }
     100% {
-        display: none;
+        visibility: hidden;
     }
 }
 
@@ -84,12 +84,8 @@
         transform: translateX(80vw);
         opacity: 1;
     }
-    99.9% {
-        /* transform: translateX(80vw); */
-        opacity: 0;
-    }
     100% {
-        display: none;
+        opacity: 0;
     }
 }
 </style>
