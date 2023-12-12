@@ -13,33 +13,25 @@ class AuthController extends Controller
         $existUser = User::where('email', $request->email)->first();
 
         if ($existUser) {
-            return response()->json(['message' => 'El email ya está en uso'], 400);
+            return response()->json(['message' => 'El email ya está en uso '], 400);
+        } elseif (strcmp($request->password, $request->password_confirmation) !== 0) {
+            return response()->json(['message' => 'La contraseña no coincide '], 400);
+        } else{
+            $user = User::create([
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => bcrypt($request->password_confirmation)
+            ]);
+    
+            $token = $user->createToken('BattleMath')->plainTextToken;
+    
+            $response = [
+                'user' => $user,
+                'token' => $token
+            ];
+    
+            return response($response, 200);
         }
-
-        if ($request->password != $request->password_confirmation) {
-            return response()->json(['message' => 'La contraseña no coincide'], 400);
-        }
-
-        $fields = $request->validate([
-            'username' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|confirmed'
-        ]);
-
-        $user = User::create([
-            'username' => $fields['username'],
-            'email' => $fields['email'],
-            'password' => bcrypt($fields['password'])
-        ]);
-
-        $token = $user->createToken('BattleMath')->plainTextToken;
-
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
-
-        return response($response, 200);
     }
 
     public function login(Request $request)
@@ -77,7 +69,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        //auth()->user()->tokens()->delete();
 
         return [
             'message' => 'S\'ha tancat la sessió',
