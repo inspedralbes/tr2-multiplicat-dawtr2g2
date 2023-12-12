@@ -4,12 +4,18 @@
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
                 <char_select @selectedCharacter="selectSkin" />
-                <button class="nes-btn" @click=closeCharSelectModal>Tanca</button>
+                <button class="nes-btn" @click="closeCharSelectModal">
+                    Tanca
+                </button>
             </div>
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
             <div class="npcFace-container">
-                <img class="npcFace" :src="`../../public/npc/face_${npc.npcImage}.png`" alt="">
+                <img
+                    class="npcFace"
+                    :src="`../../public/npc/face_${npc.npcImage}.png`"
+                    alt=""
+                />
             </div>
             <div class="modal nes-container is-rounded textBox">
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
@@ -19,27 +25,32 @@
                 </div>
             </div>
         </div>
+
+        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+    <img src="/img/Tuto.png" alt="">
+</div>
+
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
-  
+
 <script>
-import { defineComponent } from 'vue';
-import char_select from '@/components/char_select.vue';
-import textBox from '@/components/textBox.vue';
-import Phaser from 'phaser';
-import Router from '../router';
+import { defineComponent } from "vue";
+import char_select from "@/components/char_select.vue";
+import textBox from "@/components/textBox.vue";
+import Phaser from "phaser";
+import Router from "../router";
 
 export default defineComponent({
-    name: 'battlemathGame',
+    name: "battlemathGame",
     components: {
         char_select,
-        textBox
+        textBox,
     },
     data() {
         return {
             player: null,
-            playerSprite: '',
+            playerSprite: "",
             canMove: true,
             speed: 30,
             pHouse_layers: {
@@ -62,18 +73,19 @@ export default defineComponent({
             },
             cameraConfig: {
                 zoom: this.rescaleCamera(),
-                offset: 4.8
+                offset: 4.8,
             },
             navigation_menus: {
                 showCharSelectModal: false,
             },
             npc: {
                 interactingWithNPC: false,
-                npcText: '',
-                npcImage: '',
+                npcText: "",
+                npcImage: "",
             },
             firstTime: true,
-        }
+            controlsHidden: false,
+        };
     },
     mounted() {
         this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
@@ -85,26 +97,29 @@ export default defineComponent({
                 this.createPlayerAnims(this.game.scene.scenes[0], newSkin);
                 this.player.setTexture(newSkin);
                 const currentAnimKey = this.player.anims.currentAnim.key; // Obtiene el nombre de la animación actual
-                const parts = currentAnimKey.split('_'); // Divide el nombre actual por el guión bajo
+                const parts = currentAnimKey.split("_"); // Divide el nombre actual por el guión bajo
 
                 parts[0] = newSkin;
-                this.player.anims.play(parts.join('_'));
+                this.player.anims.play(parts.join("_"));
             }
-        }
+        },
     },
     methods: {
         initializeGame() {
             const self = this;
 
             const playerHouseConfig = {
-                key: 'playerHouse',
+                key: "playerHouse",
                 preload: function () {
                     self.player = null;
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
                     self.preloadSkins(this);
-                    this.load.image('door', 'public/objects/door.png')
-                    this.load.image('dialogBox', 'public/img/DialogBoxFaceset.png')
+                    this.load.image("door", "public/objects/door.png");
+                    this.load.image(
+                        "dialogBox",
+                        "public/img/DialogBoxFaceset.png"
+                    );
                 },
                 create: function () {
                     self.createPlayerHouse(this);
@@ -114,7 +129,6 @@ export default defineComponent({
 
                     // self.createPlayerAnims(this, self.playerSprite);
 
-
                     ///Create player
                     if (self.firstTime) {
                         self.firstTime = false;
@@ -122,20 +136,25 @@ export default defineComponent({
                     } else {
                         self.playerCreate(this, 793, 856, self.playerSprite);
                     }
-                    const dialogInfo = this.physics.add.sprite(716, 695, 'DialogInfo', 0);
+                    const dialogInfo = this.physics.add.sprite(
+                        716,
+                        695,
+                        "DialogInfo",
+                        0
+                    );
 
                     dialogInfo.anims.create({
                         key: `DialogInfoAnim`,
-                        frames: this.anims.generateFrameNumbers('DialogInfo', {
-                            frames: [0, 1, 2, 3]
+                        frames: this.anims.generateFrameNumbers("DialogInfo", {
+                            frames: [0, 1, 2, 3],
                         }),
                         repeat: -1,
                         frameRate: 2,
                     });
                     dialogInfo.anims.play(`DialogInfoAnim`, true);
 
-                    self.npcCreate(this, 715, 715, 'npcWoman', 0);
-                    self.npcCreate(this, 700, 800, 'npcSamurai', 0);
+                    self.npcCreate(this, 715, 715, "npcWoman", 0);
+                    self.npcCreate(this, 700, 800, "npcSamurai", 0);
                     self.addHouseCollisions(this);
 
                     this.cameras.main.centerOn(780, 774);
@@ -143,20 +162,22 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
-
                 },
                 update: function () {
                     self.playerMovement(this, self.playerSprite);
-                }
-
+                },
             };
 
             const lobbyConfig = {
-                key: 'lobby',
+                key: "lobby",
                 preload: function () {
                     self.player = null;
                     self.preloadLobby(this);
-                    this.load.spritesheet('player', `characters/${self.playerSprite}.png`, { frameWidth: 16, frameHeight: 16 });
+                    this.load.spritesheet(
+                        "player",
+                        `characters/${self.playerSprite}.png`,
+                        { frameWidth: 16, frameHeight: 16 }
+                    );
                 },
                 create: function () {
                     self.createLobby(this);
@@ -170,19 +191,24 @@ export default defineComponent({
                     self.addLobbyCollisions(this);
                     this.cameras.main.startFollow(self.player, true);
                     self.createLobby_foreground(this);
-                    this.physics.add.collider(self.player, self.lobby_layers.fg);
-
-
+                    this.physics.add.collider(
+                        self.player,
+                        self.lobby_layers.fg
+                    );
                 },
                 update: function () {
                     self.playerMovement(this, self.playerSprite);
-                }
-            }
+                },
+            };
 
             const config = {
                 type: Phaser.AUTO,
-                width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
-                height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
+                width:
+                    (window.innerWidth - self.cameraConfig.offset) /
+                    self.cameraConfig.zoom,
+                height:
+                    (window.innerHeight - self.cameraConfig.offset) /
+                    self.cameraConfig.zoom,
                 zoom: self.cameraConfig.zoom,
                 // zoom: 1,
                 scale: {
@@ -191,28 +217,26 @@ export default defineComponent({
                 },
                 parent: this.$refs.gameContainer,
                 physics: {
-                    default: 'arcade',
+                    default: "arcade",
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
-                    }
+                        debug: false,
+                    },
                 },
-            }
-
+            };
 
             this.game = new Phaser.Game(config);
             this.game.loop.targetFps = 30;
-            this.game.scene.add('playerHouse', playerHouseConfig, false);
-            this.game.scene.add('lobby', lobbyConfig, false);
+            this.game.scene.add("playerHouse", playerHouseConfig, false);
+            this.game.scene.add("lobby", lobbyConfig, false);
 
             const sceneStart = 1;
 
             if (sceneStart === 1) {
-                this.game.scene.start('playerHouse');
+                this.game.scene.start("playerHouse");
             } else {
-                this.game.scene.start('lobby');
+                this.game.scene.start("lobby");
             }
-
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -238,165 +262,335 @@ export default defineComponent({
             }
         },
         preloadNPC(scene) {
-
             ///Preload spritesheets
-            scene.load.spritesheet('npcWoman', 'npc/ss_Woman.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcVillager1', 'npc/ss_Villager1.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcVillager2', 'npc/ss_Villager2.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcVillager3', 'npc/ss_Villager3.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcVillager4', 'npc/ss_Villager4.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcMaster', 'npc/ss_Master.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcRyu', 'npc/ss_Ryu.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcSamurai', 'npc/ss_Samurai.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('npcBlueSamurai', 'npc/ss_BlueSamurai.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('DialogInfo', 'npc/DialogInfo.png', { frameWidth: 20, frameHeight: 16 });
+            scene.load.spritesheet("npcWoman", "npc/ss_Woman.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcVillager1", "npc/ss_Villager1.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcVillager2", "npc/ss_Villager2.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcVillager3", "npc/ss_Villager3.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcVillager4", "npc/ss_Villager4.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcMaster", "npc/ss_Master.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcRyu", "npc/ss_Ryu.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcSamurai", "npc/ss_Samurai.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("npcBlueSamurai", "npc/ss_BlueSamurai.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("DialogInfo", "npc/DialogInfo.png", {
+                frameWidth: 20,
+                frameHeight: 16,
+            });
 
             ///Preload facesets
-            scene.load.image('npcWoman_face', 'npc/face_Woman.png');
-            scene.load.image('npcVillager1_face', 'npc/face_Villager1.png');
-            scene.load.image('npcVillager2_face', 'npc/face_Villager2.png');
-            scene.load.image('npcVillager3_face', 'npc/face_Villager3.png');
-            scene.load.image('npcVillager4_face', 'npc/face_Villager4.png');
-            scene.load.image('npcMaster_face', 'npc/face_Master.png');
-            scene.load.image('npcRyu_face', 'npc/face_Ryu.png');
-            scene.load.image('npcSamurai_face', 'npc/face_Samurai.png');
-            scene.load.image('npcBlueSamurai_face', 'npc/face_BlueSamurai.png');
+            scene.load.image("npcWoman_face", "npc/face_Woman.png");
+            scene.load.image("npcVillager1_face", "npc/face_Villager1.png");
+            scene.load.image("npcVillager2_face", "npc/face_Villager2.png");
+            scene.load.image("npcVillager3_face", "npc/face_Villager3.png");
+            scene.load.image("npcVillager4_face", "npc/face_Villager4.png");
+            scene.load.image("npcMaster_face", "npc/face_Master.png");
+            scene.load.image("npcRyu_face", "npc/face_Ryu.png");
+            scene.load.image("npcSamurai_face", "npc/face_Samurai.png");
+            scene.load.image("npcBlueSamurai_face", "npc/face_BlueSamurai.png");
         },
         preloadSkins(scene) {
-            scene.load.spritesheet('eggBoy', 'characters/eggBoy.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('eggGirl', 'characters/eggGirl.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('blackMage', 'characters/blackMage.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('blueNinja', 'characters/blueNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('darkNinja', 'characters/darkNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('eskimoNinja', 'characters/eskimoNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('goldKnight', 'characters/goldKnight.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('grayNinja', 'characters/grayNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('greenNinja', 'characters/greenNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('knight', 'characters/knight.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('maskedNinja', 'characters/maskedNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('maskFrog', 'characters/maskFrog.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('orangeMage', 'characters/orangeMage.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('redNinja', 'characters/redNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('yellowNinja', 'characters/yellowNinja.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('mario', 'characters/mario.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('yayo', 'characters/yayo.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.spritesheet('fueguito', 'characters/fueguito.png', { frameWidth: 16, frameHeight: 16 });
+            scene.load.spritesheet("eggBoy", "characters/eggBoy.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("eggGirl", "characters/eggGirl.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("blackMage", "characters/blackMage.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("blueNinja", "characters/blueNinja.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("darkNinja", "characters/darkNinja.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet(
+                "eskimoNinja",
+                "characters/eskimoNinja.png",
+                { frameWidth: 16, frameHeight: 16 }
+            );
+            scene.load.spritesheet("goldKnight", "characters/goldKnight.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("grayNinja", "characters/grayNinja.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("greenNinja", "characters/greenNinja.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("knight", "characters/knight.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet(
+                "maskedNinja",
+                "characters/maskedNinja.png",
+                { frameWidth: 16, frameHeight: 16 }
+            );
+            scene.load.spritesheet("maskFrog", "characters/maskFrog.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("orangeMage", "characters/orangeMage.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("redNinja", "characters/redNinja.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet(
+                "yellowNinja",
+                "characters/yellowNinja.png",
+                { frameWidth: 16, frameHeight: 16 }
+            );
+            scene.load.spritesheet("mario", "characters/mario.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("yayo", "characters/yayo.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.spritesheet("fueguito", "characters/fueguito.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
         },
         preloadPlayerHouse(scene) {
-            scene.load.image('pHouse_Furniture', 'tiles/TilesetElement.png');
-            scene.load.image('pHouse_Walls', 'tiles/player_house/TilesetWallSimple.png');
-            scene.load.image('pHouse_Floor', 'tiles/player_house/TilesetInteriorFloor.png');
-            scene.load.image('fire', 'particles/Fire.png')
-            scene.load.tilemapTiledJSON('playerHouse', 'tiles/player_house/playerHouse.json');
+            scene.load.image("pHouse_Furniture", "tiles/TilesetElement.png");
+            scene.load.image(
+                "pHouse_Walls",
+                "tiles/player_house/TilesetWallSimple.png"
+            );
+            scene.load.image(
+                "pHouse_Floor",
+                "tiles/player_house/TilesetInteriorFloor.png"
+            );
+            scene.load.image("fire", "particles/Fire.png");
+            scene.load.tilemapTiledJSON(
+                "playerHouse",
+                "tiles/player_house/playerHouse.json"
+            );
         },
         createPlayerHouse(scene) {
-            const map = scene.make.tilemap({ key: 'playerHouse' });
-            const floorTileset = map.addTilesetImage('phFloor', 'pHouse_Floor');
-            const wallTileset = map.addTilesetImage('phWall', 'pHouse_Walls');
-            const furnitureTileset = map.addTilesetImage('phFurniture', 'pHouse_Furniture');
+            const map = scene.make.tilemap({ key: "playerHouse" });
+            const floorTileset = map.addTilesetImage("phFloor", "pHouse_Floor");
+            const wallTileset = map.addTilesetImage("phWall", "pHouse_Walls");
+            const furnitureTileset = map.addTilesetImage(
+                "phFurniture",
+                "pHouse_Furniture"
+            );
 
-            map.createLayer('Background', wallTileset);
-            map.createLayer('FloorGroup/Floor', floorTileset);
-            map.createLayer('FloorGroup/Carpet', furnitureTileset);
-            this.pHouse_layers.walls = map.createLayer('Walls', wallTileset);
-            this.pHouse_layers.furniture = map.createLayer('Furniture', furnitureTileset);
+            map.createLayer("Background", wallTileset);
+            map.createLayer("FloorGroup/Floor", floorTileset);
+            map.createLayer("FloorGroup/Carpet", furnitureTileset);
+            this.pHouse_layers.walls = map.createLayer("Walls", wallTileset);
+            this.pHouse_layers.furniture = map.createLayer(
+                "Furniture",
+                furnitureTileset
+            );
 
             this.pHouse_layers.walls.setCollisionByProperty({ collides: true });
-            this.pHouse_layers.furniture.setCollisionByProperty({ collides: true });
+            this.pHouse_layers.furniture.setCollisionByProperty({
+                collides: true,
+            });
 
             this.objects.doors = scene.physics.add.staticGroup();
-            const doorLayer = map.getObjectLayer('Doors');
-            doorLayer.objects.forEach(doorsObj => {
-                this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'door');
+            const doorLayer = map.getObjectLayer("Doors");
+            doorLayer.objects.forEach((doorsObj) => {
+                this.objects.doors.create(
+                    doorsObj.x + doorsObj.width / 2,
+                    doorsObj.y - doorsObj.height / 1.99,
+                    "door"
+                );
             });
             // this.debugCollision(scene);
         },
         createPlayerHouse_foreground(scene) {
-            const map = scene.make.tilemap({ key: 'playerHouse' });
-            const furnitureTileset = map.addTilesetImage('phFurniture', 'pHouse_Furniture');
-            map.createLayer('foreground', furnitureTileset);
+            const map = scene.make.tilemap({ key: "playerHouse" });
+            const furnitureTileset = map.addTilesetImage(
+                "phFurniture",
+                "pHouse_Furniture"
+            );
+            map.createLayer("foreground", furnitureTileset);
         },
         addHouseCollisions(scene) {
             scene.physics.add.collider(this.player, this.pHouse_layers.walls);
-            scene.physics.add.collider(this.player, this.pHouse_layers.furniture);
+            scene.physics.add.collider(
+                this.player,
+                this.pHouse_layers.furniture
+            );
             scene.physics.add.collider(this.player, this.objects.doors);
 
             scene.physics.add.overlap(this.player, this.objects.doors, () => {
-                if (this.tecla(scene, 'E')) {
-                    this.cambiarEscena(scene, 'lobby', 793, 856);
+                if (this.tecla(scene, "E")) {
+                    this.cambiarEscena(scene, "lobby", 793, 856);
                 }
             });
         },
         preloadLobby(scene) {
-            scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
-            scene.load.image('TilesetElement', 'tiles/TilesetElement.png');
-            scene.load.image('dojo_door_left', 'public/objects/dojo_door_left.png');
-            scene.load.image('dojo_door_right', 'public/objects/dojo_door_right.png');
-            scene.load.image('phouse_door', 'public/objects/phouse_door.png');
-            scene.load.spritesheet('leaves', 'particles/Leaf.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
+            scene.load.image(
+                "TilesetLobby",
+                "tiles/lobby_map/TilesetLobby.png"
+            );
+            scene.load.image("TilesetElement", "tiles/TilesetElement.png");
+            scene.load.image(
+                "dojo_door_left",
+                "public/objects/dojo_door_left.png"
+            );
+            scene.load.image(
+                "dojo_door_right",
+                "public/objects/dojo_door_right.png"
+            );
+            scene.load.image("phouse_door", "public/objects/phouse_door.png");
+            scene.load.spritesheet("leaves", "particles/Leaf.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.tilemapTiledJSON(
+                "lobby",
+                "tiles/lobby_map/lobbyMap.json"
+            );
         },
         createLobby(scene) {
-            const map = scene.make.tilemap({ key: 'lobby' });
-            const tileset = map.addTilesetImage('TilesetLobby', 'TilesetLobby');
-            const furniture = map.addTilesetImage('TilesetElement', 'TilesetElement');
+            const map = scene.make.tilemap({ key: "lobby" });
+            const tileset = map.addTilesetImage("TilesetLobby", "TilesetLobby");
+            const furniture = map.addTilesetImage(
+                "TilesetElement",
+                "TilesetElement"
+            );
 
-            this.lobby_layers.bg = map.createLayer('bg', tileset);
-            this.lobby_layers.floor = map.createLayer('floor', tileset);
-            this.lobby_layers.buildBottom2 = map.createLayer('buildings-bottom_2', tileset);
-            this.lobby_layers.buildBottom = map.createLayer('buildings-bottom', tileset);
-            this.lobby_layers.build = map.createLayer('buildings', tileset);
-            this.lobby_layers.buildTop = map.createLayer('buildings-top', tileset);
-            this.lobby_layers.furnTop = map.createLayer('furniture-top', tileset);
+            this.lobby_layers.bg = map.createLayer("bg", tileset);
+            this.lobby_layers.floor = map.createLayer("floor", tileset);
+            this.lobby_layers.buildBottom2 = map.createLayer(
+                "buildings-bottom_2",
+                tileset
+            );
+            this.lobby_layers.buildBottom = map.createLayer(
+                "buildings-bottom",
+                tileset
+            );
+            this.lobby_layers.build = map.createLayer("buildings", tileset);
+            this.lobby_layers.buildTop = map.createLayer(
+                "buildings-top",
+                tileset
+            );
+            this.lobby_layers.furnTop = map.createLayer(
+                "furniture-top",
+                tileset
+            );
 
-            this.lobby_layers.buildBottom2.setCollisionByProperty({ collides: true });
-            this.lobby_layers.buildBottom.setCollisionByProperty({ collides: true });
+            this.lobby_layers.buildBottom2.setCollisionByProperty({
+                collides: true,
+            });
+            this.lobby_layers.buildBottom.setCollisionByProperty({
+                collides: true,
+            });
             this.lobby_layers.build.setCollisionByProperty({ collides: true });
-            this.lobby_layers.buildTop.setCollisionByProperty({ collides: true });
-            this.lobby_layers.furnTop.setCollisionByProperty({ collides: true });
+            this.lobby_layers.buildTop.setCollisionByProperty({
+                collides: true,
+            });
+            this.lobby_layers.furnTop.setCollisionByProperty({
+                collides: true,
+            });
             this.lobby_layers.floor.setCollisionByProperty({ collides: true });
             this.lobby_layers.bg.setCollisionByProperty({ collides: true });
 
             this.objects.doors = scene.physics.add.staticGroup();
-            const doorLayer = map.getObjectLayer('Doors');
+            const doorLayer = map.getObjectLayer("Doors");
             let door = null;
-            doorLayer.objects.forEach(doorsObj => {
-                if (doorsObj.name === 'player_door') {
-                    door = this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'phouse_door');
-                } else if (doorsObj.name === 'dojo_door_right') {
-                    door = this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'dojo_door_right');
+            doorLayer.objects.forEach((doorsObj) => {
+                if (doorsObj.name === "player_door") {
+                    door = this.objects.doors.create(
+                        doorsObj.x + doorsObj.width / 2,
+                        doorsObj.y - doorsObj.height / 1.99,
+                        "phouse_door"
+                    );
+                } else if (doorsObj.name === "dojo_door_right") {
+                    door = this.objects.doors.create(
+                        doorsObj.x + doorsObj.width / 2,
+                        doorsObj.y - doorsObj.height / 1.99,
+                        "dojo_door_right"
+                    );
                 } else {
-                    door = this.objects.doors.create(doorsObj.x + doorsObj.width / 2, doorsObj.y - doorsObj.height / 1.99, 'dojo_door_left');
+                    door = this.objects.doors.create(
+                        doorsObj.x + doorsObj.width / 2,
+                        doorsObj.y - doorsObj.height / 1.99,
+                        "dojo_door_left"
+                    );
                 }
                 door.name = doorsObj.name;
             });
-
         },
         createLobby_foreground(scene) {
-            const map = scene.make.tilemap({ key: 'lobby' });
-            const tileset = map.addTilesetImage('TilesetLobby', 'TilesetLobby');
+            const map = scene.make.tilemap({ key: "lobby" });
+            const tileset = map.addTilesetImage("TilesetLobby", "TilesetLobby");
 
-            this.lobby_layers.fg = map.createLayer('foreground', tileset);
+            this.lobby_layers.fg = map.createLayer("foreground", tileset);
             this.lobby_layers.fg.setCollisionByProperty({ collides: true });
-
         },
         addLobbyCollisions(scene) {
             scene.physics.add.collider(this.player, this.lobby_layers.bg);
             scene.physics.add.collider(this.player, this.lobby_layers.floor);
-            scene.physics.add.collider(this.player, this.lobby_layers.buildBottom2);
-            scene.physics.add.collider(this.player, this.lobby_layers.buildBottom);
+            scene.physics.add.collider(
+                this.player,
+                this.lobby_layers.buildBottom2
+            );
+            scene.physics.add.collider(
+                this.player,
+                this.lobby_layers.buildBottom
+            );
             scene.physics.add.collider(this.player, this.lobby_layers.build);
             scene.physics.add.collider(this.player, this.lobby_layers.buildTop);
             scene.physics.add.collider(this.player, this.lobby_layers.furnTop);
 
-
-            scene.physics.add.overlap(this.player, this.objects.doors, (player, door) => {
-                if (door.name === 'player_door') {
-                    this.cambiarEscena(scene, 'playerHouse', 793, 856);
-                } else {
-                    Router.push('/rooms');
+            scene.physics.add.overlap(
+                this.player,
+                this.objects.doors,
+                (player, door) => {
+                    if (door.name === "player_door") {
+                        this.cambiarEscena(scene, "playerHouse", 793, 856);
+                    } else {
+                        Router.push("/rooms");
+                    }
                 }
-            });
+            );
         },
         npcCreate(scene, x, y, npc, frame) {
             let accionEnEspera = false;
@@ -407,7 +601,7 @@ export default defineComponent({
             // const NPC_face = '';
             scene.physics.add.collider(NPC, this.player);
             NPC.body.setSize(this.player.width, this.player.height * 1.2);
-            NPC.body.setOffset(this.player.width * 0, this.player.height * .5);
+            NPC.body.setOffset(this.player.width * 0, this.player.height * 0.5);
             NPC.setVelocity(0, 0);
             NPC.body.immovable = true;
 
@@ -416,12 +610,24 @@ export default defineComponent({
                 overlappedNPC = npc;
             });
 
-            scene.input.keyboard.on('keydown-SPACE', () => {
-                const playerCloseToNPC = overlappedNPC && Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y) < 16;
-                if (!this.interactingWithNPC && playerCloseToNPC && overlapped && this.canMove && !accionEnEspera) {
+            scene.input.keyboard.on("keydown-SPACE", () => {
+                const playerCloseToNPC =
+                    overlappedNPC &&
+                    Phaser.Math.Distance.Between(
+                        this.player.x,
+                        this.player.y,
+                        overlappedNPC.x,
+                        overlappedNPC.y
+                    ) < 16;
+                if (
+                    !this.interactingWithNPC &&
+                    playerCloseToNPC &&
+                    overlapped &&
+                    this.canMove &&
+                    !accionEnEspera
+                ) {
                     accionEnEspera = true;
                     overlapped = false;
-
 
                     const distX = this.player.x - NPC.x;
                     const distY = this.player.y - NPC.y;
@@ -444,44 +650,52 @@ export default defineComponent({
 
                     this.dialogo(npc);
 
-                    scene.time.delayedCall(1000, () => {
-                        accionEnEspera = false;
-                        overlapped = true;
-                        overlappedNPC = null;
-                    }, [], this);
+                    scene.time.delayedCall(
+                        1000,
+                        () => {
+                            accionEnEspera = false;
+                            overlapped = true;
+                            overlappedNPC = null;
+                        },
+                        [],
+                        this
+                    );
                 }
             });
 
             if (overlappedNPC) {
-                const distanceToNPC = Phaser.Math.Distance.Between(this.player.x, this.player.y, overlappedNPC.x, overlappedNPC.y);
+                const distanceToNPC = Phaser.Math.Distance.Between(
+                    this.player.x,
+                    this.player.y,
+                    overlappedNPC.x,
+                    overlappedNPC.y
+                );
                 if (distanceToNPC > 16) {
                     overlappedNPC = null;
                 }
             }
-
         },
         dialogo(npc) {
-            let parts = npc.split('npc');
+            let parts = npc.split("npc");
             let splittedNPC = parts[1];
             this.canMove = false;
             this.npc.interactingWithNPC = true;
             this.npc.npcImage = splittedNPC;
             switch (splittedNPC) {
-                case ('Woman'):
+                case "Woman":
                     this.npc.npcText = [`Ens coneixem d'abans?`];
                     break;
-                case ('Samurai'):
+                case "Samurai":
                     this.npc.npcText = [`Que en vols canviar d'estil?`];
                     break;
             }
-
         },
         cerrarDialogo(newVal) {
             setTimeout(() => {
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                if (this.npc.npcImage === 'Samurai') {
+                if (this.npc.npcImage === "Samurai") {
                     this.navigation_menus.showCharSelectModal = true;
                 }
             }, 10);
@@ -491,10 +705,15 @@ export default defineComponent({
             this.player = scene.physics.add.sprite(x, y, skin);
 
             this.player.anims.play(`${skin}_idle_down`);
-            this.player.body.setSize(this.player.width * 0.6, this.player.height * 0.2);
-            this.player.body.setOffset(this.player.width * .2, this.player.height * .8);
+            this.player.body.setSize(
+                this.player.width * 0.6,
+                this.player.height * 0.2
+            );
+            this.player.body.setOffset(
+                this.player.width * 0.2,
+                this.player.height * 0.8
+            );
             scene.physics.world.enable(this.player);
-
         },
         debugCollision(scene) {
             const debugGraphics = scene.add.graphics().setAlpha(0.75);
@@ -506,8 +725,13 @@ export default defineComponent({
                 tileColor: null,
                 collidingTileColor: new Phaser.Display.Color(100, 134, 48, 255),
             });
-            this.objects.doors.children.iterate(door => {
-                debugGraphics.fillRect(door.x - door.width / 2, door.y - door.height / 2, door.width, door.height);
+            this.objects.doors.children.iterate((door) => {
+                debugGraphics.fillRect(
+                    door.x - door.width / 2,
+                    door.y - door.height / 2,
+                    door.width,
+                    door.height
+                );
             });
         },
         playerMovement(scene, skin) {
@@ -516,23 +740,39 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
+            if (
+                !this.playerMoved &&
+                (this.tecla(scene, "LEFT") ||
+                    this.tecla(scene, "RIGHT") ||
+                    this.tecla(scene, "UP") ||
+                    this.tecla(scene, "DOWN"))
+            ) {
+                this.controlsHidden = true;
+            }
+
             if (this.canMove) {
-                if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
+                if (this.tecla(scene, "LEFT") || this.tecla(scene, "A")) {
                     this.player.setVelocity(-currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_left`, true);
-                } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
+                } else if (
+                    this.tecla(scene, "RIGHT") ||
+                    this.tecla(scene, "D")
+                ) {
                     this.player.setVelocity(currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_right`, true);
-                } else if (this.tecla(scene, 'UP') || this.tecla(scene, 'W')) {
+                } else if (this.tecla(scene, "UP") || this.tecla(scene, "W")) {
                     this.player.setVelocity(0, -currentSpeed);
                     this.player.anims.play(`${skin}_move_up`, true);
-                } else if (this.tecla(scene, 'DOWN') || this.tecla(scene, 'S')) {
+                } else if (
+                    this.tecla(scene, "DOWN") ||
+                    this.tecla(scene, "S")
+                ) {
                     this.player.setVelocity(0, currentSpeed);
                     this.player.anims.play(`${skin}_move_down`, true);
                 } else {
-                    const parts = this.player.anims.currentAnim.key.split('_');
-                    parts[1] = 'idle';
-                    this.player.anims.play(parts.join('_'));
+                    const parts = this.player.anims.currentAnim.key.split("_");
+                    parts[1] = "idle";
+                    this.player.anims.play(parts.join("_"));
                     this.player.setVelocity(0, 0);
                 }
             }
@@ -573,7 +813,7 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_move_up`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [1, 5, 9, 13]
+                    frames: [1, 5, 9, 13],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
@@ -589,7 +829,7 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_move_left`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [2, 6, 10, 14]
+                    frames: [2, 6, 10, 14],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
@@ -597,47 +837,47 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_move_right`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [3, 7, 11, 15]
+                    frames: [3, 7, 11, 15],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
             });
-
         },
         tecla(scene, key) {
-            return scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[key]).isDown;
+            return scene.input.keyboard.addKey(
+                Phaser.Input.Keyboard.KeyCodes[key]
+            ).isDown;
         },
         cambiarEscena(scene, escena, x, y) {
             this.player.setPosition(x, y);
-            if (escena === 'lobby') {
-                scene.scene.stop('playerHouse');
-                scene.scene.start('lobby');
-            } else if (escena === 'playerHouse') {
-                scene.scene.stop('lobby');
-                scene.scene.start('playerHouse');
+            if (escena === "lobby") {
+                scene.scene.stop("playerHouse");
+                scene.scene.start("lobby");
+            } else if (escena === "playerHouse") {
+                scene.scene.stop("lobby");
+                scene.scene.start("playerHouse");
             }
         },
         createParticleHouse(scene, x, y) {
-            const emitter = scene.add.particles(x, y, 'fire',
-                {
-                    color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
-                    colorEase: 'quad.out',
-                    lifespan: 1600,
-                    angle: { min: -100, max: -80 },
-                    scale: { start: 0.70, end: 0, ease: 'sine.out' },
-                    speed: 10,
-                    advance: 2000,
-                });
+            const emitter = scene.add.particles(x, y, "fire", {
+                color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
+                colorEase: "quad.out",
+                lifespan: 1600,
+                angle: { min: -100, max: -80 },
+                scale: { start: 0.7, end: 0, ease: "sine.out" },
+                speed: 10,
+                advance: 2000,
+            });
 
             return emitter;
-        }
-    }
+        },
+    },
 });
 </script>
 
 <style scoped>
 .title {
-    background-color: #F2EAF1 !important;
+    background-color: #f2eaf1 !important;
 }
 
 button {
@@ -669,7 +909,7 @@ button:hover::after {
     top: 0;
     left: 0;
     margin: auto;
-    background-color: #141B1B !important;
+    background-color: #141b1b !important;
 }
 
 .modal-overlay {
@@ -687,10 +927,10 @@ button:hover::after {
 .modal {
     display: flex;
     border-image-repeat: stretch !important;
-    border-image-source: url('../../public/img/border.svg') !important;
+    border-image-source: url("../../public/img/border.svg") !important;
     border-image-slice: 6 !important;
     border-image-width: 3 !important;
-    background-color: #F2EAF1;
+    background-color: #f2eaf1;
     /* width: 20%; */
     flex-direction: column;
     border-color: rgb(255, 173, 93);
@@ -715,7 +955,7 @@ button:hover::after {
 .npcFace-container {
     border-width: 10px;
     border-style: solid;
-    border-image-source: url('../../public/img/FacesetBox.png');
+    border-image-source: url("../../public/img/FacesetBox.png");
     border-image-slice: 5;
     border-image-repeat: stretch;
 }
@@ -731,4 +971,56 @@ button:hover::after {
     padding-left: 20px;
     gap: 2rem;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  CONTROLS                                  */
+/* -------------------------------------------------------------------------- */
+.controls {
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: -100px;
+    animation: animControlsUp 1s ease-in-out 1s both;
+    background-color: #141b1ba4;
+}
+.controlsHide{
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    background-color: #141b1ba4;
+    animation: animControlsDown 1s ease-in-out both;
+}
+.controls img , .controlsHide img{
+    width: 50%;
+    height: auto;
+}
+
+@keyframes animControlsUp {
+    100% {
+        bottom: 100px;
+    }
+}
+@keyframes animControlsDown {
+    0%{
+        bottom: 100px;
+    }
+    100% {
+        bottom: -100px;
+    }
+}
+
+/* @keyframes animControls {
+    0%{
+        bottom: -100px;
+    }
+    25% {
+        bottom: 100px;
+    }
+    75% {
+        bottom: 100px;
+    }
+    100%{
+        bottom: -100px;
+    }
+} */
 </style>
