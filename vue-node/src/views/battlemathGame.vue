@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div class="gameCanvas" ref="gameContainer"></div>
+        <div v-if="$route.path != '/rooms'" class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
   
@@ -38,6 +38,7 @@ export default defineComponent({
     },
     data() {
         return {
+            game: null,
             player: null,
             playerSprite: '',
             canMove: true,
@@ -200,7 +201,7 @@ export default defineComponent({
             }
 
 
-            this.game = new Phaser.Game(config);
+            self.game = this.game = new Phaser.Game(config);
             this.game.loop.targetFps = 30;
             this.game.scene.add('playerHouse', playerHouseConfig, false);
             this.game.scene.add('lobby', lobbyConfig, false);
@@ -394,7 +395,10 @@ export default defineComponent({
                 if (door.name === 'player_door') {
                     this.cambiarEscena(scene, 'playerHouse', 793, 856);
                 } else {
-                    Router.push('/rooms');
+                    if (this.game) {
+                        this.game.scene.pause();
+                    }
+                    // Router.push('/rooms');
                 }
             });
         },
@@ -518,6 +522,7 @@ export default defineComponent({
 
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
+                    console.log('left');
                     this.player.setVelocity(-currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_left`, true);
                 } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
