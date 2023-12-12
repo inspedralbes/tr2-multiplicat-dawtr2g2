@@ -7,16 +7,30 @@
                 <button class="nes-btn" @click=closeCharSelectModal>Tanca</button>
             </div>
         </div>
-        <div class="npc-modal" v-if="npc.interactingWithNPC">
+        <div class="npc-modal" v-if="npc.interactingWithNPC ">
             <div class="npcFace-container">
                 <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
             <div class="modal nes-container is-rounded textBox">
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
-                    <button class="nes-btn">Entra</button>
-                    <button class="nes-btn">Registra't</button>
+                    <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                    <button class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
                 </div>
+            </div>
+        </div>
+
+        <div v-if="navigation_menus.loginModal" class="login-modal">
+            <div class="modal nes-container is-rounded">
+                <button @click="navigation_menus.loginModal=false" class="nes-btn boton-cerrar">X</button>
+                <login @user="loginUser"/>
+            </div>
+        </div>
+
+        <div v-if="navigation_menus.registerModal" class="register-modal">
+            <div class="modal nes-container is-rounded">
+                <button @click="navigation_menus.registerModal=false" class="nes-btn boton-cerrar">X</button>
+                <register @user="registerUser" />
             </div>
         </div>
         <div class="gameCanvas" ref="gameContainer"></div>
@@ -26,20 +40,26 @@
 <script>
 import { defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
+import login from '@/components/Login.vue';
+import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
+
 
 export default defineComponent({
     name: 'battlemathGame',
     components: {
         char_select,
-        textBox
+        textBox,
+        login,
+        register
     },
     data() {
         return {
             game: null,
             player: null,
+            username: '',
             playerSprite: '',
             canMove: true,
             speed: 30,
@@ -67,6 +87,8 @@ export default defineComponent({
             },
             navigation_menus: {
                 showCharSelectModal: false,
+                loginModal: false,
+                registerModal: false
             },
             npc: {
                 interactingWithNPC: false,
@@ -213,6 +235,19 @@ export default defineComponent({
                 this.game.scene.start('lobby');
             }
 
+        },
+        registerUser(user) {
+            this.username = user.username;
+            this.npc.interactingWithNPC = false;
+            this.canMove = true;
+            this.navigation_menus.registerModal = false;
+        },
+        loginUser(user) {
+            this.username = user.username;
+            this.npc.interactingWithNPC = false;
+            this.canMove = true;
+            this.navigation_menus.loginModal = false;
+           
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -521,16 +556,16 @@ export default defineComponent({
 
 
             if (this.canMove) {
-                if (this.tecla(scene, 'LEFT') || this.tecla(scene, 'A')) {
-                    this.player.setVelocity(-currentSpeed, 0);
-                    this.player.anims.play(`${skin}_move_left`, true);
-                } else if (this.tecla(scene, 'RIGHT') || this.tecla(scene, 'D')) {
+                if (this.tecla(scene, 'LEFT')) {
+                        this.player.setVelocity(-currentSpeed, 0);
+                        this.player.anims.play(`${skin}_move_left`, true);
+                } else if (this.tecla(scene, 'RIGHT')) {
                     this.player.setVelocity(currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_right`, true);
-                } else if (this.tecla(scene, 'UP') || this.tecla(scene, 'W')) {
+                } else if (this.tecla(scene, 'UP')) {
                     this.player.setVelocity(0, -currentSpeed);
                     this.player.anims.play(`${skin}_move_up`, true);
-                } else if (this.tecla(scene, 'DOWN') || this.tecla(scene, 'S')) {
+                } else if (this.tecla(scene, 'DOWN')) {
                     this.player.setVelocity(0, currentSpeed);
                     this.player.anims.play(`${skin}_move_down`, true);
                 } else {
@@ -665,6 +700,18 @@ button:hover::after {
     box-shadow: inset 4px 4px #e46d3a !important;
 }
 
+.boton-cerrar {
+    position: absolute;
+    font-size: 25px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px;
+    right: 10px;
+}
+
 .game-container {
     overflow: hidden;
     width: 100vw;
@@ -676,7 +723,7 @@ button:hover::after {
     background-color: #141B1B !important;
 }
 
-.modal-overlay {
+.modal-overlay,.login-modal, .register-modal {
     position: fixed;
     top: 0;
     left: 0;
