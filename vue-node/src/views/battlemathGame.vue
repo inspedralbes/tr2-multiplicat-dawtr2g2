@@ -402,9 +402,6 @@ export default defineComponent({
             });
         },
         npcCreate(scene, x, y, npc, frame) {
-            let accionEnEspera = false;
-            let overlapped = false;
-            let overlappedNPC = null;
             let playerInTrigger = false;
 
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
@@ -414,7 +411,9 @@ export default defineComponent({
 
             scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
                 playerInTrigger = true;
-                console.log(playerInTrigger)
+                if (!trigger.body.touching.none) {
+                    playerInTrigger = false;
+                }
             });
 
 
@@ -425,7 +424,7 @@ export default defineComponent({
             NPC.body.immovable = true;
 
             scene.input.keyboard.on('keydown-SPACE', () => {
-                if (!this.interactingWithNPC && playerInTrigger && this.canMove && !accionEnEspera) {
+                if (!this.interactingWithNPC && this.canMove && playerInTrigger) {
                     const distX = this.player.x - NPC.x;
                     const distY = this.player.y - NPC.y;
 
@@ -448,10 +447,6 @@ export default defineComponent({
                     this.dialogo(npc);
 
                     scene.time.delayedCall(1000, () => {
-                        accionEnEspera = false;
-                        overlapped = true;
-                        overlappedNPC = null;
-                        playerInTrigger = false;
                     }, [], this);
                 }
             });
@@ -478,6 +473,7 @@ export default defineComponent({
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
                 if (this.npc.npcImage === 'Samurai') {
+                    this.canMove = false;
                     this.navigation_menus.showCharSelectModal = true;
                 }
             }, 10);
