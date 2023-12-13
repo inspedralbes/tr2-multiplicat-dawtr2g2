@@ -9,7 +9,7 @@
                 </button>
             </div>
         </div>
-        <div class="npc-modal" v-if="npc.interactingWithNPC ">
+        <div class="npc-modal" v-if="npc.interactingWithNPC">
             <div class="npcFace-container">
                 <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
@@ -24,20 +24,20 @@
 
         <div v-if="navigation_menus.loginModal" class="login-modal">
             <div class="modal nes-container is-rounded">
-                <button @click="navigation_menus.loginModal=false" class="nes-btn boton-cerrar">X</button>
-                <login @user="loginUser"/>
+                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">X</button>
+                <login @user="loginUser" />
             </div>
         </div>
 
         <div v-if="navigation_menus.registerModal" class="register-modal">
             <div class="modal nes-container is-rounded">
-                <button @click="navigation_menus.registerModal=false" class="nes-btn boton-cerrar">X</button>
+                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar">X</button>
                 <register @user="registerUser" />
             </div>
         </div>
 
         <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
-    <img src="/img/Tuto.png" alt="">
+            <img src="/img/Tuto.png" alt="">
         </div>
 
         <div class="gameCanvas" ref="gameContainer"></div>
@@ -98,9 +98,11 @@ export default defineComponent({
                 registerModal: false
             },
             npc: {
+                npcs: [],
                 interactingWithNPC: false,
-                npcText: "",
-                npcImage: "",
+                npcText: '',
+                npcImage: '',
+                playerInTrigger: false,
             },
             firstTime: true,
             controlsHidden: false,
@@ -115,8 +117,8 @@ export default defineComponent({
             if (this.player) {
                 this.createPlayerAnims(this.game.scene.scenes[0], newSkin);
                 this.player.setTexture(newSkin);
-                const currentAnimKey = this.player.anims.currentAnim.key; // Obtiene el nombre de la animación actual
-                const parts = currentAnimKey.split("_"); // Divide el nombre actual por el guión bajo
+                const currentAnimKey = this.player.anims.currentAnim.key;
+                const parts = currentAnimKey.split('_');
 
                 parts[0] = newSkin;
                 this.player.anims.play(parts.join("_"));
@@ -143,7 +145,8 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 723);
                     self.createParticleHouse(this, 920, 723);
 
-                    // self.createPlayerAnims(this, self.playerSprite);
+                    self.npcCreate(this, 715, 715, 'npcSamurai', 0);
+                    self.npcCreate(this, 700, 800, 'npcWoman', 0);
 
                     ///Create player
                     if (self.firstTime) {
@@ -152,25 +155,10 @@ export default defineComponent({
                     } else {
                         self.playerCreate(this, 793, 856, self.playerSprite);
                     }
-                    const dialogInfo = this.physics.add.sprite(
-                        716,
-                        695,
-                        "DialogInfo",
-                        0
-                    );
 
-                    dialogInfo.anims.create({
-                        key: `DialogInfoAnim`,
-                        frames: this.anims.generateFrameNumbers("DialogInfo", {
-                            frames: [0, 1, 2, 3],
-                        }),
-                        repeat: -1,
-                        frameRate: 2,
-                    });
-                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+                    self.triggerWithNPC(this);
 
-                    self.npcCreate(this, 715, 715, "npcWoman", 0);
-                    self.npcCreate(this, 700, 800, "npcSamurai", 0);
+
                     self.addHouseCollisions(this);
 
                     this.cameras.main.centerOn(780, 774);
@@ -226,7 +214,6 @@ export default defineComponent({
                     (window.innerHeight - self.cameraConfig.offset) /
                     self.cameraConfig.zoom,
                 zoom: self.cameraConfig.zoom,
-                // zoom: 1,
                 scale: {
                     autoCenter: Phaser.Scale.RESIZE,
                     mode: Phaser.Scale.NONE,
@@ -267,7 +254,7 @@ export default defineComponent({
             this.npc.interactingWithNPC = false;
             this.canMove = true;
             this.navigation_menus.loginModal = false;
-           
+
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -609,86 +596,77 @@ export default defineComponent({
             });
         },
         npcCreate(scene, x, y, npc, frame) {
-            let accionEnEspera = false;
-            let overlapped = false;
-            let overlappedNPC = null;
+            this.npc.playerInTrigger = false;
 
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
-            // const NPC_face = '';
-            scene.physics.add.collider(NPC, this.player);
-            NPC.body.setSize(this.player.width, this.player.height * 1.2);
-            NPC.body.setOffset(this.player.width * 0, this.player.height * 0.5);
-            NPC.setVelocity(0, 0);
-            NPC.body.immovable = true;
+            this.npc.npcs.push(NPC);
+        },
+        triggerWithNPC(scene) {
+            for (let i = 0; i < this.npc.npcs.length; i++) {
+                let npc = this.npc.npcs[i];
+                let npcName = npc.texture.key;
 
-            scene.physics.add.overlap(this.player, NPC, (player, npc) => {
-                overlapped = true;
-                overlappedNPC = npc;
-            });
+                scene.physics.add.collider(npc, this.player);
+                npc.body.setSize(npc.width, npc.height);
+                npc.body.setOffset(0, 0);
+                npc.setVelocity(0, 0);
+                npc.body.immovable = true;
 
-            scene.input.keyboard.on("keydown-SPACE", () => {
-                const playerCloseToNPC =
-                    overlappedNPC &&
-                    Phaser.Math.Distance.Between(
-                        this.player.x,
-                        this.player.y,
-                        overlappedNPC.x,
-                        overlappedNPC.y
-                    ) < 16;
-                if (
-                    !this.interactingWithNPC &&
-                    playerCloseToNPC &&
-                    overlapped &&
-                    this.canMove &&
-                    !accionEnEspera
-                ) {
-                    accionEnEspera = true;
-                    overlapped = false;
+                const trigger = scene.physics.add.sprite(npc.x, npc.y, null).setAlpha(0);
+                trigger.body.setSize(npc.width * 1.8, npc.height * 1.8);
+                trigger.body.setAllowGravity(false);
 
-                    const distX = this.player.x - NPC.x;
-                    const distY = this.player.y - NPC.y;
+                const dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
 
-                    if (Math.abs(distX) > Math.abs(distY)) {
-                        if (distX > 0) {
-                            NPC.setFrame(3);
-                        } else {
-                            NPC.setFrame(2);
-                        }
-                    } else {
-                        if (distY > 0) {
-                            NPC.setFrame(0);
-                        } else if (distY < 0) {
-                            NPC.setFrame(1);
-                        } else {
-                            NPC.setFrame(0);
-                        }
+                dialogInfo.anims.create({
+                    key: `DialogInfoAnim`,
+                    frames: scene.anims.generateFrameNumbers('DialogInfo', {
+                        frames: [0, 1, 2, 3]
+                    }),
+                    repeat: -1,
+                    frameRate: 2,
+                });
+                dialogInfo.setAlpha(0);
+
+                dialogInfo.anims.play(`DialogInfoAnim`, true);
+
+                scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
+                    this.npc.playerInTrigger = true;
+                    dialogInfo.setAlpha(1);
+
+                    if (!trigger.body.touching.none) {
+                        dialogInfo.setAlpha(0);
+                        this.npc.playerInTrigger = false;
                     }
+                });
 
-                    this.dialogo(npc);
+                scene.input.keyboard.on('keydown-SPACE', () => {
+                    if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
+                        const distX = this.player.x - npc.x;
+                        const distY = this.player.y - npc.y;
 
-                    scene.time.delayedCall(
-                        1000,
-                        () => {
-                            accionEnEspera = false;
-                            overlapped = true;
-                            overlappedNPC = null;
-                        },
-                        [],
-                        this
-                    );
-                }
-            });
+                        if (Math.abs(distX) > Math.abs(distY)) {
+                            if (distX > 0) {
+                                npc.setFrame(3);
+                            } else {
+                                npc.setFrame(2);
+                            }
+                        } else {
+                            if (distY > 0) {
+                                npc.setFrame(0);
+                            } else if (distY < 0) {
+                                npc.setFrame(1);
+                            } else {
+                                npc.setFrame(0);
+                            }
+                        }
 
-            if (overlappedNPC) {
-                const distanceToNPC = Phaser.Math.Distance.Between(
-                    this.player.x,
-                    this.player.y,
-                    overlappedNPC.x,
-                    overlappedNPC.y
-                );
-                if (distanceToNPC > 16) {
-                    overlappedNPC = null;
-                }
+                        setTimeout(() => {
+                            this.dialogo(npcName);
+                        }, 10);
+                    }
+                });
+
             }
         },
         dialogo(npc) {
@@ -711,7 +689,8 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                if (this.npc.npcImage === "Samurai") {
+                if (this.npc.npcImage === 'Samurai') {
+                    this.canMove = false;
                     this.navigation_menus.showCharSelectModal = true;
                 }
             }, 10);
@@ -768,8 +747,8 @@ export default defineComponent({
 
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT')) {
-                        this.player.setVelocity(-currentSpeed, 0);
-                        this.player.anims.play(`${skin}_move_left`, true);
+                    this.player.setVelocity(-currentSpeed, 0);
+                    this.player.anims.play(`${skin}_move_left`, true);
                 } else if (this.tecla(scene, 'RIGHT')) {
                     this.player.setVelocity(currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_right`, true);
@@ -793,7 +772,7 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_idle_down`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [0], // Especifica los números de las columnas que quieres
+                    frames: [0],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
@@ -831,7 +810,7 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_move_down`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [0, 4, 8, 12], // Especifica los números de las columnas que quieres
+                    frames: [0, 4, 8, 12],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
@@ -934,7 +913,9 @@ button:hover::after {
     background-color: #141b1b !important;
 }
 
-.modal-overlay,.login-modal, .register-modal {
+.modal-overlay,
+.login-modal,
+.register-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -1005,14 +986,17 @@ button:hover::after {
     animation: animControlsUp 1s ease-in-out 1s both;
     background-color: #141b1ba4;
 }
-.controlsHide{
+
+.controlsHide {
     width: 100%;
     text-align: center;
     position: absolute;
     background-color: #141b1ba4;
     animation: animControlsDown 1s ease-in-out both;
 }
-.controls img , .controlsHide img{
+
+.controls img,
+.controlsHide img {
     width: 50%;
     height: auto;
 }
@@ -1022,13 +1006,13 @@ button:hover::after {
         bottom: 100px;
     }
 }
+
 @keyframes animControlsDown {
-    0%{
+    0% {
         bottom: 100px;
     }
+
     100% {
         bottom: -100px;
     }
-}
-
-</style>
+}</style>
