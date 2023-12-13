@@ -10,8 +10,8 @@
                 <input type="text" name="pregunta" class="input">
             </div>
             <div class="field">
-                <label for="resposta_correcta_id" class="label">Resposta correcta</label>
-                <input type="text" name="resposta_correcta_id" class="input">
+                <label for="resposta" class="label">Resposta text</label>
+                <input type="text" name="resposta" class="input">
             </div>
             <div class="field">
                 <label for="tema_id" class="label">Tema_id</label>

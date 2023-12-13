@@ -11,7 +11,9 @@
     <form class="p-4 mb-4" action="{{ route('view-afegir-pregunta') }}" method="POST">
         @method('GET')
         @csrf
-        <button class="button button--icon is-success is-rounded is-responsive"><p>Afegir Pregunta</p></button>
+        <button class="button button--icon is-success is-rounded is-responsive">
+            <p>Afegir Pregunta</p>
+        </button>
     </form>
 
     <table class="table is-striped is-hoverable is-fullwidth">
@@ -19,6 +21,7 @@
             <th>ID</th>
             <th>Pregunta</th>
             <th>resposta_correcta_id</th>
+            <th>resposta</th>
             <th>dificultat_id</th>
             <th>tema_id</th>
             <th></th>
@@ -28,15 +31,16 @@
             <td>{{ $pregunta->id }}</td>
             <td><a href="{{ route('view-modificar-pregunta', ['id' => $pregunta->id]) }}">{{ $pregunta->pregunta }}</a></td>
             <td>{{ $pregunta->resposta_correcta_id}}</td>
+            <td> {{ $pregunta->resposta }}</td>
             <td>{{ $pregunta->dificultat_id }}</td>
             <td>{{ $pregunta->tema_id }}</td>
             <td>
-                    <form action="{{ route('eliminar-pregunta', ['id' => $pregunta->id]) }}" method="POST">
-                        @method('DELETE')
-                        @csrf
-                        <button class="button is-danger is-small is-centered eliminar">Eliminar</button>
-                    </form>
-                </td>
+                <form action="{{ route('eliminar-pregunta', ['id' => $pregunta->id]) }}" method="POST">
+                    @method('DELETE')
+                    @csrf
+                    <button class="button is-danger is-small is-centered eliminar">Eliminar</button>
+                </form>
+            </td>
         </tr>
         @endforeach
     </table>
