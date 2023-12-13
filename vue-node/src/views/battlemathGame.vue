@@ -26,9 +26,11 @@
             </div>
         </div>
 
-        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
-    <img src="/img/Tuto.png" alt="">
-</div>
+        <div
+            :class="{ controls: !controlsHidden, controlsHide: controlsHidden }"
+        >
+            <img src="/img/Tuto.png" alt="" />
+        </div>
 
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
@@ -983,14 +985,15 @@ button:hover::after {
     animation: animControlsUp 1s ease-in-out 1s both;
     background-color: #141b1ba4;
 }
-.controlsHide{
+.controlsHide {
     width: 100%;
     text-align: center;
     position: absolute;
     background-color: #141b1ba4;
     animation: animControlsDown 1s ease-in-out both;
 }
-.controls img , .controlsHide img{
+.controls img,
+.controlsHide img {
     width: 50%;
     height: auto;
 }
@@ -1001,26 +1004,35 @@ button:hover::after {
     }
 }
 @keyframes animControlsDown {
-    0%{
+    0% {
         bottom: 100px;
     }
-    100% {
+    99.9% {
         bottom: -100px;
+    }
+    100% {
+        visibility: hidden;
     }
 }
 
-/* @keyframes animControls {
-    0%{
-        bottom: -100px;
+@media screen and (min-width: 1150px) {
+    .controls img,
+    .controlsHide img {
+        width: 40%;
     }
-    25% {
-        bottom: 100px;
+
+}
+
+@media screen and (min-width: 1440px) {
+    .controls img,
+    .controlsHide img {
+        width: 35%;
     }
-    75% {
-        bottom: 100px;
-    }
-    100%{
-        bottom: -100px;
-    }
-} */
+
+    .controls {
+    bottom: -150px;
+
+}
+    
+}
 </style>
