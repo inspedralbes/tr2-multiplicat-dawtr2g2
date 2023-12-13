@@ -249,6 +249,7 @@ export default defineComponent({
             this.npc.interactingWithNPC = false;
             this.canMove = true;
             this.navigation_menus.registerModal = false;
+            this.navigation_menus.loginModal = true;
         },
         loginUser(user) {
             this.username = user.user.username;

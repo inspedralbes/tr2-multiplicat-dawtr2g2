@@ -27,6 +27,7 @@ io.on('connection', (socket) => {
     comsManager.login(email, password)
       .then(response => {
         const user = {
+          userId: response.data.user.id,
           username: response.data.user.username,
           token: response.data.token,
           skin: response.data.skin

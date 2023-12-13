@@ -77,7 +77,6 @@ export default {
         },
         recibirsuccess() {
             socket.on("success", (successMessage) => {
-                console.log('Mensaje de success recibido:', successMessage.success);
                 this.message = successMessage.success;
                 this.success = true;
                 this.toastNotification();

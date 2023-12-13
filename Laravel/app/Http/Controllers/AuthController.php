@@ -70,6 +70,18 @@ class AuthController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        if ($user) {
+            $user->update($request->all());
+            return response()->json(['success' => 'Usuari modificat correctament', 'data' => $user], 200);
+        } else {
+            return response()->json(['message' => 'Usuari no trobat'], 404);
+        }
+    }
+
     public function logout(Request $request)
     {
         //auth()->user()->tokens()->delete();
