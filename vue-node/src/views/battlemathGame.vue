@@ -69,9 +69,11 @@ export default defineComponent({
                 showCharSelectModal: false,
             },
             npc: {
+                npcs: [],
                 interactingWithNPC: false,
                 npcText: '',
                 npcImage: '',
+                playerInTrigger: false,
             },
             firstTime: true,
         }
@@ -85,8 +87,8 @@ export default defineComponent({
             if (this.player) {
                 this.createPlayerAnims(this.game.scene.scenes[0], newSkin);
                 this.player.setTexture(newSkin);
-                const currentAnimKey = this.player.anims.currentAnim.key; // Obtiene el nombre de la animación actual
-                const parts = currentAnimKey.split('_'); // Divide el nombre actual por el guión bajo
+                const currentAnimKey = this.player.anims.currentAnim.key;
+                const parts = currentAnimKey.split('_');
 
                 parts[0] = newSkin;
                 this.player.anims.play(parts.join('_'));
@@ -113,8 +115,8 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 723);
                     self.createParticleHouse(this, 920, 723);
 
-                    // self.createPlayerAnims(this, self.playerSprite);
-
+                    self.npcCreate(this, 715, 715, 'npcSamurai', 0);
+                    self.npcCreate(this, 700, 800, 'npcWoman', 0);
 
                     ///Create player
                     if (self.firstTime) {
@@ -123,20 +125,10 @@ export default defineComponent({
                     } else {
                         self.playerCreate(this, 793, 856, self.playerSprite);
                     }
-                    const dialogInfo = this.physics.add.sprite(716, 695, 'DialogInfo', 0);
 
-                    dialogInfo.anims.create({
-                        key: `DialogInfoAnim`,
-                        frames: this.anims.generateFrameNumbers('DialogInfo', {
-                            frames: [0, 1, 2, 3]
-                        }),
-                        repeat: -1,
-                        frameRate: 2,
-                    });
-                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+                    self.triggerWithNPC(this);
 
-                    self.npcCreate(this, 715, 715, 'npcWoman', 0);
-                    self.npcCreate(this, 700, 800, 'npcSamurai', 0);
+
                     self.addHouseCollisions(this);
 
                     this.cameras.main.centerOn(780, 774);
@@ -184,7 +176,6 @@ export default defineComponent({
                 width: (window.innerWidth - self.cameraConfig.offset) / self.cameraConfig.zoom,
                 height: (window.innerHeight - self.cameraConfig.offset) / self.cameraConfig.zoom,
                 zoom: self.cameraConfig.zoom,
-                // zoom: 1,
                 scale: {
                     autoCenter: Phaser.Scale.RESIZE,
                     mode: Phaser.Scale.NONE,
@@ -194,7 +185,7 @@ export default defineComponent({
                     default: 'arcade',
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
+                        debug: true
                     }
                 },
             }
@@ -402,54 +393,78 @@ export default defineComponent({
             });
         },
         npcCreate(scene, x, y, npc, frame) {
-            let playerInTrigger = false;
+            this.npc.playerInTrigger = false;
 
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
-            const trigger = scene.physics.add.sprite(x, y, null).setAlpha(0);
-            trigger.body.setSize(NPC.width * 1.5, NPC.height * 1.5);
-            trigger.body.setAllowGravity(false);
+            this.npc.npcs.push(NPC);
+        },
+        triggerWithNPC(scene) {
+            for (let i = 0; i < this.npc.npcs.length; i++) {
+                let npc = this.npc.npcs[i];
+                let npcName = npc.texture.key;
 
-            scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
-                playerInTrigger = true;
-                if (!trigger.body.touching.none) {
-                    playerInTrigger = false;
-                }
-            });
+                scene.physics.add.collider(npc, this.player);
+                npc.body.setSize(npc.width, npc.height);
+                npc.body.setOffset(0, 0);
+                npc.setVelocity(0, 0);
+                npc.body.immovable = true;
 
+                const trigger = scene.physics.add.sprite(npc.x, npc.y, null).setAlpha(0);
+                trigger.body.setSize(npc.width * 1.8, npc.height * 1.8);
+                trigger.body.setAllowGravity(false);
 
-            scene.physics.add.collider(NPC, this.player);
-            NPC.body.setSize(NPC.width, NPC.height);
-            NPC.body.setOffset(0, 0);
-            NPC.setVelocity(0, 0);
-            NPC.body.immovable = true;
+                const dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
 
-            scene.input.keyboard.on('keydown-SPACE', () => {
-                if (!this.interactingWithNPC && this.canMove && playerInTrigger) {
-                    const distX = this.player.x - NPC.x;
-                    const distY = this.player.y - NPC.y;
+                dialogInfo.anims.create({
+                    key: `DialogInfoAnim`,
+                    frames: scene.anims.generateFrameNumbers('DialogInfo', {
+                        frames: [0, 1, 2, 3]
+                    }),
+                    repeat: -1,
+                    frameRate: 2,
+                });
+                dialogInfo.setAlpha(0);
 
-                    if (Math.abs(distX) > Math.abs(distY)) {
-                        if (distX > 0) {
-                            NPC.setFrame(3);
-                        } else {
-                            NPC.setFrame(2);
-                        }
-                    } else {
-                        if (distY > 0) {
-                            NPC.setFrame(0);
-                        } else if (distY < 0) {
-                            NPC.setFrame(1);
-                        } else {
-                            NPC.setFrame(0);
-                        }
+                dialogInfo.anims.play(`DialogInfoAnim`, true);
+
+                scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
+                    this.npc.playerInTrigger = true;
+                    dialogInfo.setAlpha(1);
+
+                    if (!trigger.body.touching.none) {
+                        dialogInfo.setAlpha(0);
+                        this.npc.playerInTrigger = false;
                     }
+                });
 
-                    this.dialogo(npc);
+                scene.input.keyboard.on('keydown-SPACE', () => {
+                    if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
+                        const distX = this.player.x - npc.x;
+                        const distY = this.player.y - npc.y;
 
-                    scene.time.delayedCall(1000, () => {
-                    }, [], this);
-                }
-            });
+                        if (Math.abs(distX) > Math.abs(distY)) {
+                            if (distX > 0) {
+                                npc.setFrame(3);
+                            } else {
+                                npc.setFrame(2);
+                            }
+                        } else {
+                            if (distY > 0) {
+                                npc.setFrame(0);
+                            } else if (distY < 0) {
+                                npc.setFrame(1);
+                            } else {
+                                npc.setFrame(0);
+                            }
+                        }
+
+                        setTimeout(() => {
+                            this.dialogo(npcName);
+                        }, 10);
+                    }
+                });
+
+            }
         },
         dialogo(npc) {
             let parts = npc.split('npc');
@@ -536,7 +551,7 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_idle_down`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [0], // Especifica los números de las columnas que quieres
+                    frames: [0],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
@@ -574,7 +589,7 @@ export default defineComponent({
             scene.anims.create({
                 key: `${skin}_move_down`,
                 frames: scene.anims.generateFrameNumbers(skin, {
-                    frames: [0, 4, 8, 12], // Especifica los números de las columnas que quieres
+                    frames: [0, 4, 8, 12],
                 }),
                 repeat: -1,
                 frameRate: frameRate,
