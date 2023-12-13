@@ -146,8 +146,8 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 723);
                     self.createParticleHouse(this, 920, 723);
 
-                    self.npcCreate(this, 715, 715, 'npcSamurai', 0);
-                    self.npcCreate(this, 700, 800, 'npcWoman', 0);
+                    self.createNPC(this, 700, 800, 'npcWoman', 0);
+                    self.createNPC(this, 715, 720, 'npcSamurai', 0);
 
                     ///Create player
                     if (self.firstTime) {
@@ -224,10 +224,10 @@ export default defineComponent({
                     default: "arcade",
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false,
-                    },
+                        debug: false
+                    }
                 },
-            };
+            }
 
 
             self.game = this.game = new Phaser.Game(config);
@@ -596,7 +596,7 @@ export default defineComponent({
                 }
             });
         },
-        npcCreate(scene, x, y, npc, frame) {
+        createNPC(scene, x, y, npc, frame) {
             this.npc.playerInTrigger = false;
 
             const NPC = scene.physics.add.sprite(x, y, npc, frame);
@@ -632,41 +632,41 @@ export default defineComponent({
                 dialogInfo.anims.play(`DialogInfoAnim`, true);
 
                 scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
-                    this.npc.playerInTrigger = true;
-                    dialogInfo.setAlpha(1);
+                    if (trigger.body.touching.none) {
+                        this.npc.playerInTrigger = true;
+                        dialogInfo.setAlpha(1);
+                        scene.input.keyboard.on('keydown-SPACE', () => {
+                            if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
+                                const distX = this.player.x - npc.x;
+                                const distY = this.player.y - npc.y;
 
-                    if (!trigger.body.touching.none) {
+                                if (Math.abs(distX) > Math.abs(distY)) {
+                                    if (distX > 0) {
+                                        npc.setFrame(3);
+                                    } else {
+                                        npc.setFrame(2);
+                                    }
+                                } else {
+                                    if (distY > 0) {
+                                        npc.setFrame(0);
+                                    } else if (distY < 0) {
+                                        npc.setFrame(1);
+                                    } else {
+                                        npc.setFrame(0);
+                                    }
+                                }
+                                setTimeout(() => {
+                                    this.dialogo(npcName);
+                                }, 100);
+                            }
+                        });
+                    } else {
                         dialogInfo.setAlpha(0);
                         this.npc.playerInTrigger = false;
                     }
                 });
 
-                scene.input.keyboard.on('keydown-SPACE', () => {
-                    if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
-                        const distX = this.player.x - npc.x;
-                        const distY = this.player.y - npc.y;
 
-                        if (Math.abs(distX) > Math.abs(distY)) {
-                            if (distX > 0) {
-                                npc.setFrame(3);
-                            } else {
-                                npc.setFrame(2);
-                            }
-                        } else {
-                            if (distY > 0) {
-                                npc.setFrame(0);
-                            } else if (distY < 0) {
-                                npc.setFrame(1);
-                            } else {
-                                npc.setFrame(0);
-                            }
-                        }
-
-                        setTimeout(() => {
-                            this.dialogo(npcName);
-                        }, 10);
-                    }
-                });
 
             }
         },
@@ -1012,15 +1012,18 @@ button:hover::after {
     0% {
         bottom: 100px;
     }
+
     99.9% {
         bottom: -100px;
     }
+
     100% {
         visibility: hidden;
     }
 }
 
 @media screen and (min-width: 1150px) {
+
     .controls img,
     .controlsHide img {
         width: 40%;
@@ -1029,16 +1032,16 @@ button:hover::after {
 }
 
 @media screen and (min-width: 1440px) {
+
     .controls img,
     .controlsHide img {
         width: 35%;
     }
 
     .controls {
-    bottom: -150px;
+        bottom: -150px;
 
-}
-    
-}
-</style>
+    }
+
+}</style>
 
