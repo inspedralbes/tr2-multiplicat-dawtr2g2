@@ -66,6 +66,9 @@
   import { watch } from 'vue';
   import { uid } from 'uid';
 
+  import { toast } from "vue3-toastify";
+  import "vue3-toastify/dist/index.css";
+
   export default {
     data() {
       return {
@@ -93,7 +96,10 @@
       },
       changeScreen(index) {
         this.screen = index;
-      }
+      },
+      toastNotification(){
+
+      },
     }
   };
 </script>
