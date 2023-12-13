@@ -120,8 +120,6 @@ export default {
 
 
 <style scoped>
-@import url("https://fonts.cdnfonts.com/css/minecraft-3");
-
 .error-message {
     background-color: rgb(255, 95, 95);
     color: white;
@@ -163,7 +161,6 @@ h2 {
 
 .register-container {
     width: 25vw;
-    /* font-family: 'Minecraft', sans-serif !important; */
 
 }
 

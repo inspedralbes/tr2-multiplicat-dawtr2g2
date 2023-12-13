@@ -6,21 +6,9 @@
     cursor: default !important;
 }
 
-html,
-body,
-pre,
-code,
-kbd,
-samp {
-    font-family: 'Minecraft', sans-serif !important;
-}
+
 
 button:hover,
 a:hover {
     cursor: pointer !important;
 }
-
-/* * {
-    cursor: url(../public/img/Kunai.png), auto;
-    cursor: url(../public/img/Kunai.png), auto, pointer;
-} */

@@ -27,8 +27,6 @@ export default {
 </template>
 
 <style scoped>
-@import url("https://fonts.cdnfonts.com/css/minecraft-4");
-
 .landing__container {
     position: absolute;
     background-image: url("https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/01073865290819.5d61d475f0072.jpg");
@@ -49,7 +47,6 @@ export default {
     border: 15px solid black;
     border-radius: 10px;
     padding: 20px;
-    font-family: "Minecraft", sans-serif;
 }
 
 .pixel-art-button {

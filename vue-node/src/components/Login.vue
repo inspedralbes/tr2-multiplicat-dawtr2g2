@@ -7,11 +7,11 @@
             <h1 v-if="error" class="error-message">{{ message }}</h1>
             <h1 v-if="success" class="success-message">{{ message }}</h1>
             <div class="input-group">
-                <label for="email">Email</label>
+                <label for="email">E-mail</label>
                 <input class="nes-input" type="email" id="email" name="email" v-model="email" required>
             </div>
             <div class="input-group">
-                <label for="password">Password</label>
+                <label for="password">Contrasenya</label>
                 <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
             </div>
             <button class="nes-btn" @click="loginAndNavigate" type="button">Login</button>
@@ -96,8 +96,6 @@ export default {
 };
 </script>
 <style scoped>
-@import url('https://fonts.cdnfonts.com/css/minecraft-3');
-
 h2 {
     color: black;
     margin-top: 20px;
@@ -140,7 +138,6 @@ h2 {
 
 .login-container {
     width: 25vw;
-    /* font-family: 'Minecraft', sans-serif !important; */
 
 }
 
