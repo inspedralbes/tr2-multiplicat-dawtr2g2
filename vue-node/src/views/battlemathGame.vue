@@ -251,7 +251,8 @@ export default defineComponent({
             this.navigation_menus.registerModal = false;
         },
         loginUser(user) {
-            this.username = user.username;
+            this.username = user.user.username;
+            this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
             this.canMove = true;
             this.navigation_menus.loginModal = false;
@@ -262,7 +263,7 @@ export default defineComponent({
             return randomIndex === 0 ? skin1 : skin2;
         },
         selectSkin(character) {
-            this.playerSprite = character;
+            this.playerSprite = character.name;
         },
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
@@ -607,11 +608,13 @@ export default defineComponent({
                 let npc = this.npc.npcs[i];
                 let npcName = npc.texture.key;
 
+
                 scene.physics.add.collider(npc, this.player);
                 npc.body.setSize(npc.width, npc.height);
                 npc.body.setOffset(0, 0);
                 npc.setVelocity(0, 0);
                 npc.body.immovable = true;
+
 
                 const trigger = scene.physics.add.sprite(npc.x, npc.y, null).setAlpha(0);
                 trigger.body.setSize(npc.width * 1.8, npc.height * 1.8);
@@ -847,6 +850,7 @@ export default defineComponent({
                 scene.scene.stop("lobby");
                 scene.scene.start("playerHouse");
             }
+            this.npc.npcs = [];
         },
         createParticleHouse(scene, x, y) {
             const emitter = scene.add.particles(x, y, "fire", {
@@ -1043,5 +1047,6 @@ button:hover::after {
 
     }
 
-}</style>
+}
+</style>
 

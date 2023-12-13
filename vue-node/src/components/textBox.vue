@@ -55,7 +55,14 @@ export default {
 }
 </script>
 
+
 <style scoped>
+@import url('https://fonts.cdnfonts.com/css/minecraft-3');
+
+* {
+    font-family: 'Minecraft', sans-serif !important;
+}
+
 p {
     font-size: 24px;
 }

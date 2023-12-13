@@ -13,7 +13,7 @@ class SkinsController extends Controller
     public function index()
     {
         // $skins = skins::all();
-        $skins = skins::whereNotIn('id', [1, 2])->get();
+        $skins = skins::whereNotIn('id', [1, 2,15,16,17,18])->get();
         return response()->json($skins);
     }
 

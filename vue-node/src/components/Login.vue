@@ -1,3 +1,24 @@
+<template>
+    <div class="login-container">
+        <form class="login-form" method="POST">
+            <div class="titulo">
+                <h2>BattleMath</h2>
+            </div>
+            <h1 v-if="error" class="error-message">{{ message }}</h1>
+            <h1 v-if="success" class="success-message">{{ message }}</h1>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input class="nes-input" type="email" id="email" name="email" v-model="email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
+            </div>
+            <button class="nes-btn" @click="loginAndNavigate" type="button">Login</button>
+        </form>
+    </div>
+</template>
+
 <script>
 import router from '../router';
 import { socket } from "@/socket";
@@ -11,7 +32,8 @@ export default {
             password: '',
             error: false,
             success: false,
-            message: ''
+            message: '',
+            data: '',
         };
     },
     methods: {
@@ -24,7 +46,6 @@ export default {
         async loginAndNavigate() {
             await this.loginUser();
             this.error = false;
-            this.irARuta();
 
         },
         recibirerror() {
@@ -39,7 +60,8 @@ export default {
         recibirsucess() {
 
             socket.on('success', (successMessage) => {
-                this.message = successMessage;
+                this.data = successMessage.user;
+                this.message = successMessage.success;
                 this.success = true;
                 this.toastNotification();
             });
@@ -65,40 +87,14 @@ export default {
         this.recibirsucess();
     },
     watch: {
-        success(){
+        success() {
             if (this.success) {
-                this.user = {
-                    username: this.username,
-                    password: this.password
-                }
-                this.$emit('user', this.user);
+                this.$emit('user', this.data);
             }
         }
     }
 };
 </script>
-
-<template>
-    <div class="login-container">
-        <form class="login-form" method="POST">
-            <div class="titulo">
-                <h2>BattleMath</h2>
-            </div>
-            <h1 v-if="error" class="error-message">{{ message }}</h1>
-            <h1 v-if="success" class="success-message">{{ message }}</h1>
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input class="nes-input" type="email" id="email" name="email" v-model="email" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
-            </div>
-            <button class="nes-btn" @click="loginAndNavigate()" type="button">Login</button>
-        </form>
-    </div>
-</template>
-
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
 
@@ -144,7 +140,7 @@ h2 {
 
 .login-container {
     width: 25vw;
-    font-family: 'Minecraft', sans-serif !important;
+    /* font-family: 'Minecraft', sans-serif !important; */
 
 }
 
