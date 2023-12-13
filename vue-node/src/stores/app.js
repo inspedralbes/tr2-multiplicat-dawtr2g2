@@ -37,7 +37,6 @@ export const useAppStore = defineStore('app', {
       this.user = user;
     },
     setTurnOn(){
-      
       this.turn = true;
       console.log(this.turn);
     },
@@ -54,6 +53,22 @@ export const useAppStore = defineStore('app', {
       }else{
         this.turn = true
       }
+    },
+    settimeUp(){
+      this.room.timeUp = true;
+    },
+    settimeOff(){
+      this.room.timeUp = false;
+    },
+    getTimer(){
+      return this.room.timer;
+    },
+    getTimeUp(){
+      return this.room.timeUp;
+    },
+    canviarTimer(secs){
+      this.room.timer = secs;
+      console.log(secs);
     }
   },
 })

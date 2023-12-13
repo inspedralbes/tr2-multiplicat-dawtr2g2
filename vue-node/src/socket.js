@@ -40,13 +40,27 @@ socket.on("viewQuest", (quest) => {
 });
 
 socket.on("viewResp", (resp) => {
-  
   const store = useAppStore();
   store.addResp(resp);
-  
 });
 
 socket.on("loginParameters", (user) => {
   const store = useAppStore();
   store.setUser(user);
+});
+
+socket.on("timer", (timer) => {
+  const store = useAppStore();
+  store.canviarTimer(timer);
+});
+
+socket.on("timeUp", () => {
+  const store = useAppStore();
+  store.settimeUp();
+});
+
+socket.on("startTimer", () => {
+  const store = useAppStore();
+  store.settimeOff();
+  store.canviarTurn();
 });
