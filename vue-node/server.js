@@ -120,7 +120,6 @@ io.on('connection', (socket) => {
     var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
     var a = 0;
 
-   
 
     axios.get(url)
       .then(response => {
@@ -192,20 +191,29 @@ io.on('connection', (socket) => {
       }
       i++;
     }
+    
+    function startTimer(room, id) {
+      room.timerId = setInterval(() => {
+        if (room.timer > 0) {
+          room.timer--;
+          io.to(id).emit('timer', room.timer);
+        } else {
+          clearInterval(room.timerId);
+          console.log("Time's up!");
+          setTimeout(() => {
+            room.timer = 10;
+            startTimer(room, id); // Reinicia el temporizador
+          }, 3000);
+        }
+      }, 1000);
+    }
 
     if (exist) {
       socket.join(id);
       socket.emit("joiningGame", room);
       socket.to(id).emit('playerJoined', room);
       io.emit('viewRooms', rooms);
-      room.timerId = setInterval(() => {
-        if (room.timer > 0) {
-          room.timer--;
-          io.to(id).emit('timer', room.timer);
-        } else {
-          console.log('Time out');
-        }
-      }, 1000);
+      startTimer(room, id);
     }
 });
 

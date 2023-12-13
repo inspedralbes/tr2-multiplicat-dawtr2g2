@@ -40,10 +40,8 @@ socket.on("viewQuest", (quest) => {
 });
 
 socket.on("viewResp", (resp) => {
-  
   const store = useAppStore();
   store.addResp(resp);
-  
 });
 
 socket.on("loginParameters", (user) => {
