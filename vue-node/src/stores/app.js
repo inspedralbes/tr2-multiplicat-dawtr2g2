@@ -54,6 +54,13 @@ export const useAppStore = defineStore('app', {
       }else{
         this.turn = true
       }
+    },
+    getTimer(){
+      return this.room.timer;
+    },
+    canviarTimer(secs){
+      this.room.timer = secs;
+      console.log(secs);
     }
   },
 })

@@ -50,3 +50,8 @@ socket.on("loginParameters", (user) => {
   const store = useAppStore();
   store.setUser(user);
 });
+
+socket.on("timer", (timer) => {
+  const store = useAppStore();
+  store.canviarTimer(timer);
+});

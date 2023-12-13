@@ -57,12 +57,9 @@ io.on('connection', (socket) => {
   
     } catch (error) {
       if (error.response.status === 400) {
-
         console.error('Error al realizar la solicitud:', error.response.data.message);
         socket.emit('error400', error.response.data.message);
-
       }
-      
     }
   });
 
@@ -70,6 +67,7 @@ io.on('connection', (socket) => {
     var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
     const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
     var resp = [];
+    var i = 0;
 
     axios.get(url)
       .then(response => {
@@ -108,10 +106,21 @@ io.on('connection', (socket) => {
       .catch(error => {
         console.error(error);
       });
+      while (i < rooms.length) {
+        const element = rooms[i];
+        if (id === element.id) {
+          exist = true;
+          element.timer = 10;
+        }
+        i++;
+      }
   });
 
   socket.on('compAns', (quest,resp,id) => { 
     var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
+    var a = 0;
+
+   
 
     axios.get(url)
       .then(response => {
@@ -129,6 +138,14 @@ io.on('connection', (socket) => {
       .catch(error => {
         console.error(error);
       });
+      while (a < rooms.length) {
+        const element = rooms[a];
+        if (id === element.id) {
+          exist = true;
+          element.timer = 10;
+        }
+        a++;
+      }
   });
 
   socket.on('getRooms', () => {
@@ -184,9 +201,9 @@ io.on('connection', (socket) => {
       room.timerId = setInterval(() => {
         if (room.timer > 0) {
           room.timer--;
-          console.log(room.timer);
+          io.to(id).emit('timer', room.timer);
         } else {
-          clearInterval(room.timerId);
+          console.log('Time out');
         }
       }, 1000);
     }

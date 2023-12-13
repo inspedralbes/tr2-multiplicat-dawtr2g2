@@ -17,7 +17,7 @@
               </div>
 
               <div class="timer">
-                  <p class="time">10</p>
+                  <p class="time">{{timer}}</p>
                   <div class="title">
                       <p>TIME</p>
                   </div>
@@ -111,7 +111,7 @@
         room: {},
         numQuest:10,
         turn: true,
-        timer: 0,
+        timer: 10,
       };
     },
     created() {
@@ -123,6 +123,10 @@
       
         watch(() => store.questAct, request => {
             this.quest = request;
+        });
+
+        watch(() => store.getTimer(), time => {
+            this.timer = time;
         });
 
         watch(() => store.room, newRoom => {
