@@ -11,8 +11,8 @@ export default {
             password: '',
             password_confirmation: '',
             message: '',
-            error:false,
-            success:false
+            error: false,
+            success: false
         }
     },
     methods: {
@@ -30,24 +30,24 @@ export default {
             await this.registerUser();
             this.error = false;
             this.irARuta();
-            
+
         },
         recibirerror() {
             socket.on('error400', (errorMessage) => {
                 this.message = errorMessage;
                 this.error = true;
                 console.log('Mensaje de error recibido:', this.message);
-                
+
             });
-            
+
         },
         recibirsucess() {
-        
+
             socket.on('success', (successMessage) => {
                 this.message = successMessage;
                 this.success = true;
             });
-            
+
         }
     },
     mounted() {
@@ -55,7 +55,7 @@ export default {
         this.recibirsucess();
     },
     watch: {
-        success(){
+        success() {
             if (this.success) {
                 this.user = {
                     username: this.username,
@@ -116,7 +116,7 @@ export default {
     margin: 0;
 }
 
-.success-message{
+.success-message {
     background-color: rgb(95, 255, 95);
     color: white;
     font-size: 16px;
@@ -146,7 +146,7 @@ h2 {
 
 .register-container {
     width: 25vw;
-    font-family: 'Minecraft', sans-serif !important;
+    /* font-family: 'Minecraft', sans-serif !important; */
 
 }
 

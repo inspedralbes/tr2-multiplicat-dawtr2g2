@@ -48,7 +48,7 @@ export default {
         this.recibirsucess();
     },
     watch: {
-        success(){
+        success() {
             if (this.success) {
                 this.user = {
                     username: this.username,
@@ -127,7 +127,7 @@ h2 {
 
 .login-container {
     width: 25vw;
-    font-family: 'Minecraft', sans-serif !important;
+    /* font-family: 'Minecraft', sans-serif !important; */
 
 }
 
