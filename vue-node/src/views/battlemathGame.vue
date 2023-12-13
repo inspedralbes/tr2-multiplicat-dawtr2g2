@@ -22,6 +22,7 @@
             </div>
         </div>
 
+
         <div v-if="navigation_menus.loginModal" class="login-modal">
             <div class="modal nes-container is-rounded">
                 <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">X</button>
@@ -1011,8 +1012,33 @@ button:hover::after {
     0% {
         bottom: 100px;
     }
-
-    100% {
+    99.9% {
         bottom: -100px;
     }
-}</style>
+    100% {
+        visibility: hidden;
+    }
+}
+
+@media screen and (min-width: 1150px) {
+    .controls img,
+    .controlsHide img {
+        width: 40%;
+    }
+
+}
+
+@media screen and (min-width: 1440px) {
+    .controls img,
+    .controlsHide img {
+        width: 35%;
+    }
+
+    .controls {
+    bottom: -150px;
+
+}
+    
+}
+</style>
+
