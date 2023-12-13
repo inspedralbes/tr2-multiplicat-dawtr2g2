@@ -33,12 +33,13 @@ io.on('connection', (socket) => {
       });
       console.log('Respuesta del servidor:', response.data);
       const user = {
-        token: response.data.token,
-        username: response.data.username
+        username: response.data.user.user.username,
+        token: response.data.user.token,
+        skin: response.data.user.skin
       };
-
+      console.log(user);
       socket.emit('loginParameters', user);
-      socket.emit('success', response.data.success);
+      socket.emit('success', response.data);
     } catch (error) {
       if (error.response.status === 400) {
 
@@ -50,18 +51,19 @@ io.on('connection', (socket) => {
 
   });
 
-  socket.on('register', async (username, email, password, password_confirmation) => {
+  socket.on('register', async (username, email, password, password_confirmation, skin_id) => {
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/registre', {
         username: username,
         email: email,
         password: password,
         password_confirmation: password_confirmation,
+        skin_id: skin_id
       });
-  
+
       console.log('Respuesta del servidor:', response.data);
       socket.emit('success', response.data.success);
-  
+
     } catch (error) {
       if (error.response.status === 400) {
 
@@ -69,7 +71,7 @@ io.on('connection', (socket) => {
         socket.emit('error400', error.response.data.message);
 
       }
-      
+
     }
   });
 
@@ -89,11 +91,11 @@ io.on('connection', (socket) => {
             var urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${data.resposta_correcta_id}`;
           } else {
             randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
-            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;    
+            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;
           }
           promises.push(axios.get(urlResp));
         }
-        
+
         Promise.all(promises)
           .then(responses => {
             resp = responses.map(response => ({
@@ -117,7 +119,7 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('compAns', (quest,resp,id) => { 
+  socket.on('compAns', (quest, resp, id) => {
     var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
 
     axios.get(url)
@@ -128,7 +130,7 @@ io.on('connection', (socket) => {
         if (data == resp) {
           io.to(id).emit('correct');
           console.log('Correcte');
-        }else{
+        } else {
           io.to(id).emit('incorrect');
           console.log('Incorrecte');
         }
@@ -142,20 +144,20 @@ io.on('connection', (socket) => {
     io.emit('viewRooms', rooms);
   });
 
-  socket.on('createRoom', (name,id) => {
+  socket.on('createRoom', (name, id) => {
     var room = {
       name: name,
       id: id,
       players: []
     };
     var player = {
-      name:"player1", 
+      name: "player1",
       id: 1,
       life: 100,
     }
     room.players.push(player);
     rooms.push(room);
-    
+
     socket.join(id);
     socket.emit('roomCreated', room);
     io.emit('viewRooms', rooms);
@@ -170,7 +172,7 @@ io.on('connection', (socket) => {
       const element = rooms[i];
       if (id === element.id) {
         var player = {
-          name:"player2", 
+          name: "player2",
           id: 2,
           life: 100,
         }
@@ -187,7 +189,7 @@ io.on('connection', (socket) => {
       socket.to(id).emit('playerJoined', room);
       io.emit('viewRooms', rooms);
     }
-});
+  });
 
   socket.on('disconnect', () => {
     console.log('Cliente desconectado');

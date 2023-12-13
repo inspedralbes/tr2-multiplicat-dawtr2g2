@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Controllers\SkinsController;
 use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
@@ -32,7 +33,6 @@ class UsersController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|confirmed',
         ]);
-        
         $user = new User;
         $user->username = $fields['username'];
         $user->email = $fields['email'];

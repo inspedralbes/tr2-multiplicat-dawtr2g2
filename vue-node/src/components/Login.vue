@@ -1,66 +1,3 @@
-<script>
-import router from '../router';
-import { socket } from "@/socket";
-
-export default {
-    data() {
-        return {
-            email: '',
-            password: '',
-            error: false,
-            success: false,
-            message: ''
-        };
-    },
-    methods: {
-        irARuta() {
-            router.push('/game');
-        },
-        async loginUser() {
-            socket.emit('login', this.email, this.password);
-        },
-        async loginAndNavigate() {
-            await this.loginUser();
-            this.error = false;
-            this.irARuta();
-
-        },
-        recibirerror() {
-            socket.on('error400', (errorMessage) => {
-                this.message = errorMessage;
-                this.error = true;
-                console.log('Mensaje de error recibido:', this.message);
-
-            });
-
-        },
-        recibirsucess() {
-
-            socket.on('success', (successMessage) => {
-                this.message = successMessage;
-                this.success = true;
-            });
-
-        }
-    },
-    mounted() {
-        this.recibirerror();
-        this.recibirsucess();
-    },
-    watch: {
-        success() {
-            if (this.success) {
-                this.user = {
-                    username: this.username,
-                    password: this.password
-                }
-                this.$emit('user', this.user);
-            }
-        }
-    }
-};
-</script>
-
 <template>
     <div class="login-container">
         <form class="login-form" method="POST">
@@ -77,11 +14,70 @@ export default {
                 <label for="password">Password</label>
                 <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
             </div>
-            <button class="nes-btn" @click="loginAndNavigate()" type="button">Login</button>
+            <button class="nes-btn" @click="loginAndNavigate" type="button">Login</button>
         </form>
     </div>
 </template>
 
+<script>
+import router from '../router';
+import { socket } from "@/socket";
+
+export default {
+    data() {
+        return {
+            email: '',
+            password: '',
+            error: false,
+            success: false,
+            message: '',
+            data: '',
+        };
+    },
+    methods: {
+        irARuta() {
+            router.push('/game');
+        },
+        async loginUser() {
+            socket.emit('login', this.email, this.password);
+        },
+        async loginAndNavigate() {
+            await this.loginUser();
+            this.error = false;
+
+        },
+        recibirerror() {
+            socket.on('error400', (errorMessage) => {
+                this.message = errorMessage;
+                this.error = true;
+                console.log('Mensaje de error recibido:', this.message);
+
+            });
+
+        },
+        recibirsucess() {
+
+            socket.on('success', (successMessage) => {
+                this.data = successMessage.user;
+                this.message = successMessage.success;
+                this.success = true;
+            });
+
+        }
+    },
+    mounted() {
+        this.recibirerror();
+        this.recibirsucess();
+    },
+    watch: {
+        success() {
+            if (this.success) {
+                this.$emit('user', this.data);
+            }
+        }
+    }
+};
+</script>
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');
 

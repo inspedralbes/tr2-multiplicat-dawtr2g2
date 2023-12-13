@@ -1,76 +1,3 @@
-<script>
-import router from '../router';
-import { socket } from "@/socket";
-
-export default {
-    data() {
-        return {
-            user: {},
-            username: '',
-            email: '',
-            password: '',
-            password_confirmation: '',
-            message: '',
-            error: false,
-            success: false
-        }
-    },
-    methods: {
-        irARuta() {
-            router.push('/game');
-        },
-        irARutaload() {
-            router.push('/loading');
-
-        },
-        async registerUser() {
-            socket.emit('register', this.username, this.email, this.password, this.password_confirmation);
-        },
-        async registerAndNavigate() {
-            await this.registerUser();
-            this.error = false;
-            this.irARuta();
-
-        },
-        recibirerror() {
-            socket.on('error400', (errorMessage) => {
-                this.message = errorMessage;
-                this.error = true;
-                console.log('Mensaje de error recibido:', this.message);
-
-            });
-
-        },
-        recibirsucess() {
-
-            socket.on('success', (successMessage) => {
-                this.message = successMessage;
-                this.success = true;
-            });
-
-        }
-    },
-    mounted() {
-        this.recibirerror();
-        this.recibirsucess();
-    },
-    watch: {
-        success() {
-            if (this.success) {
-                this.user = {
-                    username: this.username,
-                    email: this.email,
-                    password: this.password,
-                    password_confirmation: this.password_confirmation
-                }
-                this.$emit('user', this.user);
-            }
-        }
-    }
-}
-</script>
-
-
 <template>
     <div class="register-container">
         <form class="register-form" method="POST">
@@ -96,10 +23,89 @@ export default {
                 <input type="password" id="password_confirmation" name="password_confirmation"
                     v-model="password_confirmation" required>
             </div>
-            <button class="nes-btn" @click="registerAndNavigate()" type="button">Register</button>
+            <div class="select-character">
+                <char_select @selectedCharacter="selectSkin"></char_select>
+            </div>
+            <button class="nes-btn" @click="registerAndNavigate" type="button">Register</button>
         </form>
     </div>
 </template>
+
+<script>
+import router from '../router';
+import { socket } from "@/socket";
+import char_select from '@/components/char_select.vue';
+
+export default {
+    components: {
+        char_select
+    },
+    data() {
+        return {
+            user: {},
+            username: '',
+            email: '',
+            password: '',
+            password_confirmation: '',
+            message: '',
+            skinSelected: '',
+            error: false,
+            success: false
+        }
+    },
+    methods: {
+        irARutaload() {
+            router.push('/loading');
+        },
+        async registerUser() {
+            socket.emit('register', this.username, this.email, this.password, this.password_confirmation, this.skinSelected);
+        },
+        async registerAndNavigate() {
+            await this.registerUser();
+            this.error = false;
+        },
+        recibirerror() {
+            socket.on('error400', (errorMessage) => {
+                this.message = errorMessage;
+                this.error = true;
+                console.log('Mensaje de error recibido:', this.message);
+
+            });
+
+        },
+        recibirsucess() {
+
+            socket.on('success', (successMessage) => {
+                this.message = successMessage;
+                this.success = true;
+            });
+
+        },
+        selectSkin(character) {
+            this.skinSelected = character.id;
+            console.log(this.skinSelected);
+        }
+    },
+    mounted() {
+        this.recibirerror();
+        this.recibirsucess();
+    },
+    watch: {
+        success() {
+            if (this.success) {
+                this.user = {
+                    username: this.username,
+                    email: this.email,
+                    password: this.password,
+                    password_confirmation: this.password_confirmation,
+                    skin_id: this.skinSelected
+                }
+                this.$emit('user', this.user);
+            }
+        }
+    }
+}
+</script>
 
 <style scoped>
 @import url('https://fonts.cdnfonts.com/css/minecraft-3');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\skins;
 
 class AuthController extends Controller
 {
@@ -20,17 +21,17 @@ class AuthController extends Controller
             $user = User::create([
                 'username' => $request->username,
                 'email' => $request->email,
-                'password' => bcrypt($request->password_confirmation)
+                'password' => bcrypt($request->password_confirmation),
+                'skin_id'=>$request->skin_id,
             ]);
     
             $token = $user->createToken('BattleMath')->plainTextToken;
-    
             $response = [
                 'user' => $user,
                 'token' => $token
             ];
     
-            return response()->json(['success' => 'Usuari creat correctament', 'success' => $response], 200);
+            return response()->json(['success' => 'Usuari creat correctament', 'user' => $response], 200);
 
         }
     }
@@ -55,12 +56,15 @@ class AuthController extends Controller
         } else {
             $token = $user->createToken('BattleMath')->plainTextToken;
 
+            $skin= skins::where('id', $user->skin_id)->pluck('name')->first();
+
             $response = [
                 'user' => $user,
-                'token' => $token
+                'token' => $token,
+                'skin' => $skin
             ];
 
-            return response()->json(['success' => 'Usuari logged', 'success' => $response], 200);
+            return response()->json(['success' => 'Usuari logged', 'user' => $response], 200);
 
 
         }
