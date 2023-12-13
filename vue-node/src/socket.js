@@ -53,3 +53,14 @@ socket.on("timer", (timer) => {
   const store = useAppStore();
   store.canviarTimer(timer);
 });
+
+socket.on("timeUp", () => {
+  const store = useAppStore();
+  store.settimeUp();
+});
+
+socket.on("startTimer", () => {
+  const store = useAppStore();
+  store.settimeOff();
+  store.canviarTurn();
+});

@@ -158,7 +158,9 @@ io.on('connection', (socket) => {
       players: [],
       timer: 10,
       timerId: null,
+      timeUp: false
     };
+
     var player = {
       name:"player1", 
       id: 1,
@@ -198,11 +200,13 @@ io.on('connection', (socket) => {
           room.timer--;
           io.to(id).emit('timer', room.timer);
         } else {
+          io.to(id).emit('timeUp');
           clearInterval(room.timerId);
           console.log("Time's up!");
           setTimeout(() => {
             room.timer = 10;
-            startTimer(room, id); // Reinicia el temporizador
+            io.to(id).emit('startTimer');
+            startTimer(room, id);
           }, 3000);
         }
       }, 1000);

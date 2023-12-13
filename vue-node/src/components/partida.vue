@@ -48,7 +48,7 @@
               </div>
           </main>
 
-          <footer class="cards" v-if="room.players.length == 2">
+          <footer class="cards" v-if="room.players.length == 2 && room.timeUp == false">
               <!--
                 <div class="card red">
                   <div class="level-bg"></div>
@@ -127,6 +127,10 @@
 
         watch(() => store.getTimer(), time => {
             this.timer = time;
+        });
+
+        watch(() => store.getTimeUp(), timing => {
+            this.room.timeUp = timing;
         });
 
         watch(() => store.room, newRoom => {
