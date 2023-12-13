@@ -16,7 +16,7 @@ use App\Http\Controllers\RespostaController;
 
 
 //preguntes
-Route::get('/preguntes', [PreguntaController::class, 'adminIndex'])->name('preguntes');
+Route::get('/', [PreguntaController::class, 'adminIndex'])->name('preguntes');
 Route::get('/preguntes/afegir', function () { return view('preguntes.afegir');})->name('view-afegir-pregunta');
 Route::post('/preguntes/afegir', [PreguntaController::class, 'adminStore'])->name('afegir-pregunta');
 Route::get('/preguntes/modificar/{id}', [PreguntaController::class, 'adminShow'])->name('view-modificar-pregunta');

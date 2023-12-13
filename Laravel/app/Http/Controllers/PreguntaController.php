@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pregunta;
+use App\Models\Resposta;
+use App\Http\Controllers\RespostaController;
 use App\Models\Dificultat;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +16,7 @@ class PreguntaController extends Controller
      */
     public function index()
     {
-        $preguntes = Pregunta::all(); 
+        $preguntes = Pregunta::all();
 
         return response()->json($preguntes);
     }
@@ -24,7 +26,6 @@ class PreguntaController extends Controller
         $mostrarPreg = Pregunta::where('dificultat_id', $dif)->get();
 
         return response()->json($mostrarPreg);
-
     }
 
     /**
@@ -38,7 +39,7 @@ class PreguntaController extends Controller
             'tema_id' => 'required'
         ]);
 
-        $mostrar=Pregunta::create($request->all());
+        $mostrar = Pregunta::create($request->all());
 
         return response()->json($mostrar);
     }
@@ -71,64 +72,91 @@ class PreguntaController extends Controller
     public function destroy(string $id)
     {
         $pregunta = Pregunta::find($id);
-    
+
         if (!$pregunta) {
             return response()->json(['message' => 'No s\'ha trobat cap resposta amb aquest id!'], 404);
         }
-    
+
         $pregunta->delete();
-    
+
         return response()->json(['message' => 'Resposta eliminada']);
     }
-    
+
 
     // MÈTODES DE LA PART D'ADMINISTRACIÓ
     public function adminIndex()
     {
         $preguntes = Pregunta::all();
+        
+        foreach ($preguntes as $pregunta) {
+            $resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->first();
+    
+            $pregunta->resposta = $resposta ? $resposta->resposta : null;
+        }
+        return view('preguntes.index', [
+            'preguntes' => $preguntes
+        ]);
 
-        return view('preguntes.index', ['preguntes' => $preguntes]);
+
     }
 
     public function adminStore(Request $request)
     {
-        
-            $request->validate([
-                'pregunta' => 'required',
-                'resposta_correcta_id' => 'required',
-                'tema_id' => 'required',
-                'dificultat_id' => 'required'
-            ]);
-    
-            $pregunta = new Pregunta;
-            $pregunta->pregunta = $request->pregunta;
-            $pregunta->resposta_correcta_id = $request->resposta_correcta_id;
-            $pregunta->tema_id = $request->tema_id;
-            $pregunta->dificultat_id = $request->dificultat_id;
-            $pregunta->save();
-    
-            return redirect()->route('view-afegir-pregunta')->with('success', 'Pregunta afegida correctament');
+
+        $request->validate([
+            'pregunta' => 'required',
+            'resposta' => 'required',
+            'tema_id' => 'required',
+            'dificultat_id' => 'required'
+        ]);
+        $resposta = new Resposta;
+        $resposta->resposta = $request->resposta;
+        $resposta->tema_id = $request->tema_id;
+        $resposta->dificultat_id = $request->dificultat_id;
+        $resposta->save();
+
+        $pregunta = new Pregunta;
+        $pregunta->pregunta = $request->pregunta;
+        $pregunta->tema_id = $request->tema_id;
+        $pregunta->dificultat_id = $request->dificultat_id;
+        $pregunta->resposta_correcta_id = $resposta->id;
+        $pregunta->save();
+
+        return redirect()->route('preguntes')->with('success', 'Pregunta afegida correctament');
     }
 
-    public function adminShow($id) {
+    public function adminShow($id)
+    {
         $pregunta = Pregunta::find($id);
+        $pregunta->resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->pluck('resposta')->first();
+
         return view('preguntes.modificar', ['pregunta' => $pregunta]);
     }
+
+    public function adminUpdate(Request $request, $id)
+    {
+        $pregunta = Pregunta::find($id); 
+        $resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->pluck('resposta')->first();
     
-    public function adminUpdate(Request $request, $id) {
-
-        $pregunta = Pregunta::find($id);
-        $pregunta->update($request->all());
-        
-       
-
-        return redirect()->route('view-modificar-resposta', ['id' => $pregunta->id])->with('success', 'La pregunta ha estat actualitzada correctament');
+        // Actualizar los atributos de la pregunta
+        $pregunta->update([
+            'pregunta' => $request->pregunta,
+            'tema_id' => $request->tema_id,
+            'dificultat_id' => $request->dificultat_id,
+        ]);
+    
+        // Actualizar la respuesta correspondiente
+        $resposta->update(['resposta' => $request->resposta]);
+    
+        return redirect()->route('preguntes')->with('success', 'La pregunta ha sido actualizada correctamente');
     }
+    
 
-    public function adminDelete($id) {
+    public function adminDelete($id)
+    {
         $pregunta = Pregunta::find($id);
         $pregunta->delete();
 
-        return redirect()->route('preguntes')->with('success', 'pregunta eliminada correctament'); 
+        return redirect()->route('preguntes')->with('success', 'pregunta eliminada correctament');
     }
 }
