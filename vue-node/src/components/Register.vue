@@ -5,12 +5,14 @@ import { socket } from "@/socket";
 export default {
     data() {
         return {
+            user: {},
             username: '',
             email: '',
             password: '',
             password_confirmation: '',
             message: '',
-            error:false
+            error:false,
+            success:false
         }
     },
     methods: {
@@ -19,14 +21,15 @@ export default {
         },
         irARutaload() {
             router.push('/loading');
-            console.log("entra?")
+
         },
         async registerUser() {
             socket.emit('register', this.username, this.email, this.password, this.password_confirmation);
         },
         async registerAndNavigate() {
             await this.registerUser();
-            
+            this.error = false;
+            this.irARuta();
             
         },
         recibirerror() {
@@ -37,10 +40,32 @@ export default {
                 
             });
             
+        },
+        recibirsucess() {
+        
+            socket.on('success', (successMessage) => {
+                this.message = successMessage;
+                this.success = true;
+            });
+            
         }
     },
     mounted() {
         this.recibirerror();
+        this.recibirsucess();
+    },
+    watch: {
+        success(){
+            if (this.success) {
+                this.user = {
+                    username: this.username,
+                    email: this.email,
+                    password: this.password,
+                    password_confirmation: this.password_confirmation
+                }
+                this.$emit('user', this.user);
+            }
+        }
     }
 }
 </script>
@@ -53,6 +78,7 @@ export default {
                 <h2>BattleMath</h2>
             </div>
             <h1 v-if="error" class="error-message">{{ message }}</h1>
+            <h1 v-if="success" class="success-message">{{ message }}</h1>
             <div class="input-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" v-model="username" required>
@@ -70,7 +96,7 @@ export default {
                 <input type="password" id="password_confirmation" name="password_confirmation"
                     v-model="password_confirmation" required>
             </div>
-            <button @click="registerAndNavigate()" type="button">Register</button>
+            <button class="nes-btn" @click="registerAndNavigate()" type="button">Register</button>
         </form>
     </div>
 </template>
@@ -81,55 +107,61 @@ export default {
 .error-message {
     background-color: rgb(255, 95, 95);
     color: white;
-    padding: 10px;
+    font-size: 16px;
+    padding: 15px 5px 15px 5px;
     border-radius: 0 0 5px 5px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     margin: 0;
 }
 
-h2 {
+.success-message{
+    background-color: rgb(95, 255, 95);
     color: white;
+    font-size: 16px;
+    padding: 15px 5px 15px 5px;
+    border-radius: 0 0 5px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+
+}
+
+h2 {
+    color: black;
     margin-top: 20px;
 }
 
 .titulo {
-    background-color: #007bff;
+    background-color: #ffad5d;
     width: 100%;
     height: 65px;
     display: flex;
     justify-content: center;
     align-content: center;
+    margin-top: 20px;
 }
 
 .register-container {
-    width: 100vw;
-    height: 75vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Minecraft', sans-serif;
+    width: 25vw;
+    font-family: 'Minecraft', sans-serif !important;
 
 }
 
 
 .register-form {
-    padding: 0 0px 50px 0px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 0 0px 25px 0px;
     display: flex;
     flex-direction: column;
+    margin: 20px 30px 0px 30px;
+
 }
 
 .register-form h2 {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.register-group {
-    margin-bottom: 15px;
-
 }
 
 .input-group label {
@@ -141,35 +173,35 @@ h2 {
 
 }
 
-.input-group{
-    width: 500px;
-}
-
 .input-group input {
-  width: calc(100% - 50px);
-  padding: 10px;
-  margin: 5px 25px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
+    width: calc(100% - 50px);
+    padding: 10px;
+    margin: 5px 25px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+
 }
 
 button {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 20px;
-    margin-left: 25px;
-    margin-right: 25px;
+    border-image-repeat: stretch !important;
+    background-color: #ffad5d !important;
+    margin-top: 25px;
+}
 
+button::after {
+    box-shadow: inset -4px -4px #e46d3a !important;
 }
 
 button:hover {
+    background-color: #ec9e50 !important;
+}
 
-    background-color: #0056b3;
+button:hover::after {
+    box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px #e46d3a !important;
 }
 </style>
