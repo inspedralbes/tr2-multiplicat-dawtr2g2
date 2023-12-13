@@ -1,21 +1,19 @@
-const express = require('express');
-const cors = require('cors');
+import express, { response } from 'express';
+import cors from 'cors';
+import http, { createServer } from 'http';
+import { Server } from 'socket.io';
+import comsManager from './comsManager.js';
+
 const app = express();
-const axios = require('axios');
+const server = http.createServer(app);
 
-
-
-const http = require('http'); // Add this line to import the 'http' module
-const { emit } = require('process');
-
-const server = http.createServer(app); // Create an HTTP server using the 'app' instance
-
+app.use(cors());
 
 app.use(cors());
 
 var rooms = [];
 
-const io = require('socket.io')(server, {
+const io = new Server(server, {
   cors: {
     origin: "*", // Reemplaza con la URL de tu cliente
     methods: ["GET", "POST"]
@@ -23,98 +21,53 @@ const io = require('socket.io')(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log("connected");
+  console.log("Client connectat");
 
   socket.on('login', async (email, password) => {
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
-        email: email,
-        password: password
+    comsManager.login(email, password)
+      .then(response => {
+        const user = {
+          username: response.data.user.username,
+          token: response.data.token,
+          skin: response.data.skin
+        };
+        socket.emit('loginParameters', user);
+        socket.emit('success', response);
+      })
+      .catch(error => {
+        if (error.response.status === 400) {
+          console.error('Error al realizar la solicitud:', error.response.data.message);
+          socket.emit('error400', error.response.data.message);
+        }
       });
-      console.log('Respuesta del servidor:', response.data);
-      const user = {
-        username: response.data.user.user.username,
-        token: response.data.user.token,
-        skin: response.data.user.skin
-      };
-      console.log(user);
-      socket.emit('loginParameters', user);
-      socket.emit('success', response.data);
-    } catch (error) {
-      if (error.response.status === 400) {
-
-        console.error('Error al realizar la solicitud:', error.response.data.message);
-        socket.emit('error400', error.response.data.message);
-
-      }
-    }
-
   });
 
   socket.on('register', async (username, email, password, password_confirmation, skin_id) => {
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/registre', {
-        username: username,
-        email: email,
-        password: password,
-        password_confirmation: password_confirmation,
-        skin_id: skin_id
+    comsManager.register(username, email, password, password_confirmation, skin_id)
+      .then(response => {
+        socket.emit('success', response);
+      })
+      .catch(error => {
+        if (error.response.status === 400) {
+          socket.emit('error400', error.response.data.message);
+        }
       });
-
-      console.log('Respuesta del servidor:', response.data);
-      socket.emit('success', response.data.success);
-
-    } catch (error) {
-      if (error.response.status === 400) {
-        console.error('Error al realizar la solicitud:', error.response.data.message);
-        socket.emit('error400', error.response.data.message);
-      }
-    }
   });
 
   socket.on('genQuest', (id) => {
-    var randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
-    const url = `http://127.0.0.1:8000/api/preguntes/mostrar/${randomNumber}`;
-    var resp = [];
     var i = 0;
+    try {
+      const questData = comsManager.getRandomQuestion();
+      const respData = comsManager.getRandomAnswers(quest);
 
-    axios.get(url)
-      .then(response => {
-        var data = response.data;
-        var respCorr = Math.floor(Math.random() * 4);
+      const quest = {
+        id: questData.id,
+        pregunta: questData.pregunta
+      };
 
-        var promises = [];
-        for (let i = 0; i < 4; i++) {
-          if (respCorr == i) {
-            var urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${data.resposta_correcta_id}`;
-          } else {
-            randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
-            urlResp = `http://127.0.0.1:8000/api/respostes/mostrar/${randomNumber}`;
-          }
-          promises.push(axios.get(urlResp));
-        }
+      io.to(id).emit('viewQuest', quest);
+      socket.to(id).emit('viewResp', responsesData);
 
-        Promise.all(promises)
-          .then(responses => {
-            resp = responses.map(response => ({
-              id: response.data.id,
-              resposta: response.data.resposta
-            }));
-            console.log(resp);
-            var quest = {
-              id: data.id,
-              pregunta: data.pregunta
-            };
-            io.to(id).emit('viewQuest', quest);
-            socket.to(id).emit('viewResp', resp);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      })
-      .catch(error => {
-        console.error(error);
-      });
       while (i < rooms.length) {
         const element = rooms[i];
         if (id === element.id) {
@@ -123,17 +76,19 @@ io.on('connection', (socket) => {
         }
         i++;
       }
+
+      return { questData, respData };
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
   });
 
   socket.on('compAns', (quest, resp, id) => {
-    var url = `http://127.0.0.1:8000/api/preguntes/mostrar/${quest}`
     var a = 0;
-
-
-    axios.get(url)
+    comsManager.checkAnswer(quest)
       .then(response => {
         var data = response.data.resposta_correcta_id;
-        console.log(data);
 
         if (data == resp) {
           io.to(id).emit('correct');
@@ -142,18 +97,18 @@ io.on('connection', (socket) => {
           io.to(id).emit('incorrect');
           console.log('Incorrecte');
         }
+        while (a < rooms.length) {
+          const element = rooms[a];
+          if (id === element.id) {
+            exist = true;
+            element.timer = 10;
+          }
+          a++;
+        }
       })
       .catch(error => {
         console.error(error);
       });
-      while (a < rooms.length) {
-        const element = rooms[a];
-        if (id === element.id) {
-          exist = true;
-          element.timer = 10;
-        }
-        a++;
-      }
   });
 
   socket.on('getRooms', () => {
@@ -202,7 +157,7 @@ io.on('connection', (socket) => {
       }
       i++;
     }
-    
+
     function startTimer(room, id) {
       room.timerId = setInterval(() => {
         if (room.timer > 0) {
@@ -230,8 +185,18 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('getSkins', () => {
+    comsManager.getSkins()
+      .then(response => {
+        socket.emit('viewSkins', response);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  });
+
   socket.on('disconnect', () => {
-    console.log('Cliente desconectado');
+    console.log('Client desconectat');
   });
 });
 

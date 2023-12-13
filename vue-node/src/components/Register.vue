@@ -75,9 +75,10 @@ export default {
 
             });
         },
-        recibirsucess() {
+        recibirsuccess() {
             socket.on("success", (successMessage) => {
-                this.message = successMessage;
+                console.log('Mensaje de success recibido:', successMessage.success);
+                this.message = successMessage.success;
                 this.success = true;
                 this.toastNotification();
             });
@@ -100,7 +101,7 @@ export default {
     },
     mounted() {
         this.recibirerror();
-        this.recibirsucess();
+        this.recibirsuccess();
     },
     watch: {
         success() {

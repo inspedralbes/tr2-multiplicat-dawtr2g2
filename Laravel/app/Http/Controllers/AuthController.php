@@ -31,7 +31,7 @@ class AuthController extends Controller
                 'token' => $token
             ];
     
-            return response()->json(['success' => 'Usuari creat correctament', 'user' => $response], 200);
+            return response()->json(['success' => 'Usuari creat correctament', 'data' => $response], 200);
 
         }
     }
@@ -64,7 +64,7 @@ class AuthController extends Controller
                 'skin' => $skin
             ];
 
-            return response()->json(['success' => 'Has iniciat sessió', 'user' => $response], 200);
+            return response()->json(['success' => 'Has iniciat sessió', 'data' => $response], 200);
 
 
         }

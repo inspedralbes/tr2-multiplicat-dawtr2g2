@@ -52,15 +52,13 @@ export default {
             socket.on('error400', (errorMessage) => {
                 this.message = errorMessage;
                 this.error = true;
-                console.log('Mensaje de error recibido:', this.message);
-
             });
 
         },
-        recibirsucess() {
+        recibirsuccess() {
 
             socket.on('success', (successMessage) => {
-                this.data = successMessage.user;
+                this.data = successMessage.data;
                 this.message = successMessage.success;
                 this.success = true;
                 this.toastNotification();
@@ -84,7 +82,7 @@ export default {
     },
     mounted() {
         this.recibirerror();
-        this.recibirsucess();
+        this.recibirsuccess();
     },
     watch: {
         success() {

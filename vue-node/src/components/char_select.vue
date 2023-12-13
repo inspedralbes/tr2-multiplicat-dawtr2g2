@@ -26,7 +26,7 @@
 
 
 <script>
-import axios from 'axios';
+import { socket } from "@/socket";
 
 export default {
     data() {
@@ -38,18 +38,11 @@ export default {
         };
     },
     mounted() {
-
-        axios.get('http://localhost:8000/api/skins')
-            .then(response => {
-                this.characters = response.data;
-            })
-            .finally(() => {
-                this.loading = false;
-            })
-            .catch(error => {
-                console.error('Error al obtener los datos de la API', error);
-            });
-
+        socket.emit('getSkins');
+        socket.on('viewSkins', (skins) => {
+            this.characters = skins;
+            this.loading = false;
+        });
     },
     computed: {
         selectedCharacter() {
