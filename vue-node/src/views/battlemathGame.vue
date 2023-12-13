@@ -251,11 +251,11 @@ export default defineComponent({
             this.navigation_menus.registerModal = false;
         },
         loginUser(user) {
-            console.log(user);
-            // this.username = user.username;
-            // this.npc.interactingWithNPC = false;
-            // this.canMove = true;
-            // this.navigation_menus.loginModal = false;
+            this.username = user.user.username;
+            this.playerSprite = user.skin;
+            this.npc.interactingWithNPC = false;
+            this.canMove = true;
+            this.navigation_menus.loginModal = false;
 
         },
         randomStartSkin(skin1, skin2) {

@@ -18,6 +18,8 @@ INSERT INTO `skins` (`id`,`name`) VALUES
 (17,'yayo'),
 (18,'fueguito');
 
+INSERT INTO `users` (`id`, `username`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `skin_id`) VALUES
+(1, 'Chadous', 'a22rauespgom@inspedralbes.cat', NULL, '$2y$12$sRhv89qWjWkJuKHgYLlYzex7bIWcVlyI5oDvLVk31w290N1lD0aOy', NULL, '2023-12-13 09:35:35', '2023-12-13 09:35:35', 17);
 
 INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
 (1, 'Nombres i operacions'),
