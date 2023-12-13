@@ -1,6 +1,8 @@
 <script>
 import router from '../router';
 import { socket } from "@/socket";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
     data() {
@@ -39,9 +41,24 @@ export default {
             socket.on('success', (successMessage) => {
                 this.message = successMessage;
                 this.success = true;
+                this.toastNotification();
             });
-
-        }
+        },
+        toastNotification() {
+            toast.success(this.message, {
+                position: "top-right",
+                timeout: 2000,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: true,
+                hideProgressBar: false,
+                closeButton: "button",
+                icon: true,
+                rtl: false,
+            });
+        },
     },
     mounted() {
         this.recibirerror();

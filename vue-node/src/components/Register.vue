@@ -1,75 +1,92 @@
 <script>
-import router from '../router';
+import router from "../router";
 import { socket } from "@/socket";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
     data() {
         return {
             user: {},
-            username: '',
-            email: '',
-            password: '',
-            password_confirmation: '',
-            message: '',
-            error:false,
-            success:false
-        }
+            username: "",
+            email: "",
+            password: "",
+            password_confirmation: "",
+            message: "",
+            error: false,
+            success: false,
+        };
     },
     methods: {
         irARuta() {
-            router.push('/game');
+            router.push("/game");
         },
         irARutaload() {
-            router.push('/loading');
-
+            router.push("/loading");
         },
         async registerUser() {
-            socket.emit('register', this.username, this.email, this.password, this.password_confirmation);
+            socket.emit(
+                "register",
+                this.username,
+                this.email,
+                this.password,
+                this.password_confirmation
+            );
         },
         async registerAndNavigate() {
             await this.registerUser();
             this.error = false;
             this.irARuta();
-            
         },
         recibirerror() {
-            socket.on('error400', (errorMessage) => {
+            socket.on("error400", (errorMessage) => {
                 this.message = errorMessage;
                 this.error = true;
-                console.log('Mensaje de error recibido:', this.message);
-                
+                console.log("Mensaje de error recibido:", this.message);
             });
-            
         },
         recibirsucess() {
-        
-            socket.on('success', (successMessage) => {
+            socket.on("success", (successMessage) => {
                 this.message = successMessage;
                 this.success = true;
+                this.toastNotification();
             });
-            
-        }
+        },
+        toastNotification() {
+            toast.success(this.message, {
+                position: "top-right",
+                timeout: 2000,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: false,
+                closeButton: "button",
+                icon: true,
+                rtl: false,
+            });
+        },
     },
     mounted() {
         this.recibirerror();
         this.recibirsucess();
     },
     watch: {
-        success(){
+        success() {
             if (this.success) {
                 this.user = {
                     username: this.username,
                     email: this.email,
                     password: this.password,
-                    password_confirmation: this.password_confirmation
-                }
-                this.$emit('user', this.user);
+                    password_confirmation: this.password_confirmation,
+                };
+                this.$emit("user", this.user);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
-
 
 <template>
     <div class="register-container">
@@ -81,28 +98,57 @@ export default {
             <h1 v-if="success" class="success-message">{{ message }}</h1>
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" v-model="username" required>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    v-model="username"
+                    required
+                />
             </div>
             <div class="input-group">
                 <label for="username">Email</label>
-                <input type="email" id="email" name="email" v-model="email" required>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    v-model="email"
+                    required
+                />
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" v-model="password" required>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    v-model="password"
+                    required
+                />
             </div>
             <div class="input-group">
                 <label for="password_confirmation">Password Confirmation</label>
-                <input type="password" id="password_confirmation" name="password_confirmation"
-                    v-model="password_confirmation" required>
+                <input
+                    type="password"
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    v-model="password_confirmation"
+                    required
+                />
             </div>
-            <button class="nes-btn" @click="registerAndNavigate()" type="button">Register</button>
+            <button
+                class="nes-btn"
+                @click="registerAndNavigate()"
+                type="button"
+            >
+                Register
+            </button>
         </form>
     </div>
 </template>
 
 <style scoped>
-@import url('https://fonts.cdnfonts.com/css/minecraft-3');
+@import url("https://fonts.cdnfonts.com/css/minecraft-3");
 
 .error-message {
     background-color: rgb(255, 95, 95);
@@ -116,7 +162,7 @@ export default {
     margin: 0;
 }
 
-.success-message{
+.success-message {
     background-color: rgb(95, 255, 95);
     color: white;
     font-size: 16px;
@@ -126,7 +172,6 @@ export default {
     flex-direction: column;
     align-items: center;
     margin: 0;
-
 }
 
 h2 {
@@ -146,17 +191,14 @@ h2 {
 
 .register-container {
     width: 25vw;
-    font-family: 'Minecraft', sans-serif !important;
-
+    font-family: "Minecraft", sans-serif !important;
 }
-
 
 .register-form {
     padding: 0 0px 25px 0px;
     display: flex;
     flex-direction: column;
     margin: 20px 30px 0px 30px;
-
 }
 
 .register-form h2 {
@@ -170,7 +212,6 @@ h2 {
     font-weight: bold;
     margin-top: 25px;
     margin-left: 25px;
-
 }
 
 .input-group input {
@@ -180,7 +221,6 @@ h2 {
     border-radius: 4px;
     border: 1px solid #ccc;
     box-sizing: border-box;
-
 }
 
 button {
