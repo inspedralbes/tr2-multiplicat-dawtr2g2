@@ -30,16 +30,6 @@ const router = createRouter({
       component: Landing
     },
     {
-      path: '/login',
-      name: 'login',
-      component: Login
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: Register
-    },
-    {
       path: '/battle',
       name: 'battle',
       component: Battle
@@ -58,11 +48,6 @@ const router = createRouter({
       path: '/rooms',
       name: 'rooms',
       component: Rooms
-    },
-    {
-      path: '/text',
-      name: 'text',
-      component: textBox
     }
   ]
 })

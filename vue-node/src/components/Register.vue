@@ -7,7 +7,7 @@
             <h1 v-if="error" class="error-message">{{ message }}</h1>
             <h1 v-if="success" class="success-message">{{ message }}</h1>
             <div class="input-group">
-                <label for="username">Username</label>
+                <label for="username">Nom d'usuari</label>
                 <input type="text" id="username" name="username" v-model="username" required>
             </div>
             <div class="input-group">
@@ -15,15 +15,16 @@
                 <input type="email" id="email" name="email" v-model="email" required>
             </div>
             <div class="input-group">
-                <label for="password">Password</label>
+                <label for="password">Contrasenya</label>
                 <input type="password" id="password" name="password" v-model="password" required>
             </div>
             <div class="input-group">
-                <label for="password_confirmation">Password Confirmation</label>
+                <label for="password_confirmation">Confirma la contrasenya</label>
                 <input type="password" id="password_confirmation" name="password_confirmation"
                     v-model="password_confirmation" required>
             </div>
-            <div class="select-character">
+            <div class="input-group">
+                <label for="skin">Selecciona el teu personatge</label>
                 <char_select @selectedCharacter="selectSkin"></char_select>
             </div>
             <button class="nes-btn" @click="registerAndNavigate" type="button">Register</button>
