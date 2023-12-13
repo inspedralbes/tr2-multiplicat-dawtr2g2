@@ -139,7 +139,9 @@ io.on('connection', (socket) => {
     var room = {
       name: name,
       id: id,
-      players: []
+      players: [],
+      timer: 10,
+      timerId: null,
     };
     var player = {
       name:"player1", 
@@ -179,6 +181,14 @@ io.on('connection', (socket) => {
       socket.emit("joiningGame", room);
       socket.to(id).emit('playerJoined', room);
       io.emit('viewRooms', rooms);
+      room.timerId = setInterval(() => {
+        if (room.timer > 0) {
+          room.timer--;
+          console.log(room.timer);
+        } else {
+          clearInterval(room.timerId);
+        }
+      }, 1000);
     }
 });
 

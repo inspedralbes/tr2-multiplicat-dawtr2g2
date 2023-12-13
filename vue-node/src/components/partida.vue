@@ -111,6 +111,7 @@
         room: {},
         numQuest:10,
         turn: true,
+        timer: 0,
       };
     },
     created() {
