@@ -1,13 +1,11 @@
-import express, { response } from 'express';
+import express from 'express';
 import cors from 'cors';
-import http, { createServer } from 'http';
+import http from 'http';
 import { Server } from 'socket.io';
 import comsManager from './comsManager.js';
 
 const app = express();
 const server = http.createServer(app);
-
-app.use(cors());
 
 app.use(cors());
 
@@ -55,11 +53,13 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('genQuest', (id) => {
+  socket.on('genQuest', async (id) => {
     var i = 0;
+    // let exist=
     try {
-      const questData = comsManager.getRandomQuestion();
-      const respData = comsManager.getRandomAnswers(quest);
+      const questData = await comsManager.getRandomQuestion();
+      const respData = await comsManager.getRandomAnswers(questData);
+
 
       const quest = {
         id: questData.id,
@@ -67,12 +67,12 @@ io.on('connection', (socket) => {
       };
 
       io.to(id).emit('viewQuest', quest);
-      socket.to(id).emit('viewResp', responsesData);
+      socket.to(id).emit('viewResp', respData);
 
       while (i < rooms.length) {
         const element = rooms[i];
         if (id === element.id) {
-          exist = true;
+          // exist = true;
           element.timer = 10;
         }
         i++;

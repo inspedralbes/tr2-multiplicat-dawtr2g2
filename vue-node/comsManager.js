@@ -2,16 +2,16 @@ import axios from "axios";
 
 const url = "http://localhost:8000/api/";
 
-async function getQuestion(id) {
-    return axios.get(`${url}preguntes/mostrar/${id}`)
-        .then(response => {
-            const pregunta = response.data;
-            return pregunta;
-        })
-        .catch(error => {
-            console.error(error);
-        });
-};
+// async function getQuestion(id) {
+//     return axios.get(`${url}preguntes/mostrar/${id}`)
+//         .then(response => {
+//             const pregunta = response.data;
+//             return pregunta;
+//         })
+//         .catch(error => {
+//             console.error(error);
+//         });
+// };
 
 async function login(email, password) {
     try {
@@ -19,7 +19,7 @@ async function login(email, password) {
         return response.data;
     } catch (error) {
         console.error(error);
-        throw error; // Puedes manejar el error aquí o relanzarlo para que lo manejen en el lugar donde se llame a la función
+        throw error;
     }
 }
 
@@ -53,22 +53,23 @@ async function getRandomQuestion() {
 async function getRandomAnswers(data) {
     try {
         const respCorr = Math.floor(Math.random() * 4);
-        const promises = [];
+        const responses = [];
+        let urlResp = '';
         for (let i = 0; i < 4; i++) {
-            if (respCorr == i) {
-                const urlResp = `${url}respostes/mostrar/${data.resposta_correcta_id}`;
+            if (respCorr === i) {
+                urlResp = `${url}respostes/mostrar/${data.resposta_correcta_id}`;
             } else {
-                const randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
-                const urlResp = `${url}respostes/mostrar/${randomNumber}`;
+                let randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
+                urlResp = `${url}respostes/mostrar/${randomNumber}`;
             }
-            promises.push(axios.get(urlResp));
+            const response = await axios.get(urlResp);
+            responses.push({
+                id: response.data.id,
+                resposta: response.data.resposta
+            });
         }
-        const responses = await Promise.all(promises);
-        const resp = responses.map(response => ({
-            id: response.data.id,
-            resposta: response.data.resposta
-        }));
-        return resp;
+
+        return responses;
     } catch (error) {
         console.error(error);
         throw error;
@@ -96,7 +97,7 @@ async function getSkins() {
 }
 
 const comsManager = {
-    getQuestion,
+    // getQuestion,
     login,
     register,
     getRandomQuestion,
