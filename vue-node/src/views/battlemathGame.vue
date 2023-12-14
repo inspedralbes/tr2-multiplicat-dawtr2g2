@@ -1,18 +1,15 @@
 <template>
     <div class="game-container">
-        <div class="profile">
+        <!-- <div class="profile">
             <button class="nes-btn profile-button" @click="toggleProfile">
                 <img src="../../public/icons/profile.svg" alt="">
             </button>
             <div class="modal nes-container is-rounded" :class="{ 'not-visible': !this.navigation_menus.profile }">
-                <button v-if="username.length === 0" class="nes-btn"
-                    @click="navigation_menus.loginModal = true">Login</button>
-                <button v-if="username.length === 0" class="nes-btn"
-                    @click="navigation_menus.registerModal = true">Registra't</button>
-                <button v-if="username.length != 0" class="nes-btn"
-                    @click="navigation_menus.registerModal = true">Surt</button>
+                <button v-if="!isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                <button v-if="!isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
+                <button v-if="isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Surt</button>
             </div>
-        </div>
+        </div> -->
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -32,8 +29,9 @@
                 </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
-                    <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
-                    <button class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                    <button v-if="!this.isLogged" class="nes-btn"
+                        @click="navigation_menus.registerModal = true">Registra't</button>
                 </div>
             </div>
         </div>
@@ -86,6 +84,7 @@ export default defineComponent({
             game: null,
             player: null,
             username: '',
+            isLogged: false,
             playerSprite: '',
             canMove: true,
             speed: 30,
@@ -275,8 +274,8 @@ export default defineComponent({
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
             this.canMove = true;
+            this.isLogged = true;
             this.navigation_menus.loginModal = false;
-
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -706,12 +705,21 @@ export default defineComponent({
             this.canMove = false;
             this.npc.interactingWithNPC = true;
             this.npc.npcImage = splittedNPC;
+            console.log(this.isLogged);
             switch (splittedNPC) {
                 case "Woman":
-                    this.npc.npcText = [`Ens coneixem d'abans?`];
+                    if (this.isLogged) {
+                        this.npc.npcText = [`Hola ${this.username}, com estas?`];
+                    } else {
+                        this.npc.npcText = [`Ens coneixem d'abans?`];
+                    }
                     break;
                 case "Samurai":
-                    this.npc.npcText = [`Que en vols canviar d'estil?`];
+                    if (!this.isLogged) {
+                        this.npc.npcText = [`Qui ets? Deuries parlar amb l'altra dona.`];
+                    } else {
+                        this.npc.npcText = [`Hola ${this.username}, que en vols canviar d'estil?`];
+                    }
                     break;
             }
         },
@@ -720,7 +728,7 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                if (this.npc.npcImage === 'Samurai') {
+                if (this.npc.npcImage === 'Samurai' && this.isLogged) {
                     this.canMove = false;
                     this.navigation_menus.showCharSelectModal = true;
                 }
