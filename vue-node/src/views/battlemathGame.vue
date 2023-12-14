@@ -172,9 +172,10 @@ export default defineComponent({
                         self.firstTime = false;
                         self.playerCreate(this, 720, 774, self.playerSprite);
                     } else {
-                        self.playerCreate(this, 793, 856, self.playerSprite);
+                        self.playerCreate(this, 793, 850, self.playerSprite);
                     }
 
+                    self.createNPC(this, 792, 870, 'npcdoorPHouse', 0);
                     self.triggerWithNPC(this);
 
 
@@ -242,7 +243,7 @@ export default defineComponent({
                     default: "arcade",
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
+                        debug: true
                     }
                 },
             }
@@ -439,6 +440,10 @@ export default defineComponent({
             });
         },
         preloadPlayerHouse(scene) {
+            scene.load.spritesheet("npcdoorPHouse", "objects/door.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
             scene.load.image("pHouse_Furniture", "tiles/TilesetElement.png");
             scene.load.image(
                 "pHouse_Walls",
@@ -477,15 +482,6 @@ export default defineComponent({
                 collides: true,
             });
 
-            this.objects.doors = scene.physics.add.staticGroup();
-            const doorLayer = map.getObjectLayer("Doors");
-            doorLayer.objects.forEach((doorsObj) => {
-                this.objects.doors.create(
-                    doorsObj.x + doorsObj.width / 2,
-                    doorsObj.y - doorsObj.height / 1.99,
-                    "door"
-                );
-            });
             // this.debugCollision(scene);
         },
         createPlayerHouse_foreground(scene) {
@@ -633,7 +629,7 @@ export default defineComponent({
             for (let i = 0; i < this.npc.npcs.length; i++) {
                 let npc = this.npc.npcs[i];
                 let npcName = npc.texture.key;
-
+                let dialogInfo = '';
 
                 scene.physics.add.collider(npc, this.player);
                 npc.body.setSize(npc.width, npc.height);
@@ -646,24 +642,30 @@ export default defineComponent({
                 trigger.body.setSize(npc.width * 1.8, npc.height * 1.8);
                 trigger.body.setAllowGravity(false);
 
-                const dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
 
-                dialogInfo.anims.create({
-                    key: `DialogInfoAnim`,
-                    frames: scene.anims.generateFrameNumbers('DialogInfo', {
-                        frames: [0, 1, 2, 3]
-                    }),
-                    repeat: -1,
-                    frameRate: 2,
-                });
-                dialogInfo.setAlpha(0);
 
-                dialogInfo.anims.play(`DialogInfoAnim`, true);
+                if (npcName != 'npcdoorPHouse') {
+                    dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
+
+                    dialogInfo.anims.create({
+                        key: `DialogInfoAnim`,
+                        frames: scene.anims.generateFrameNumbers('DialogInfo', {
+                            frames: [0, 1, 2, 3]
+                        }),
+                        repeat: -1,
+                        frameRate: 2,
+                    });
+                    dialogInfo.setAlpha(0);
+
+                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+                }
 
                 scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
                     if (trigger.body.touching.none) {
                         this.npc.playerInTrigger = true;
-                        dialogInfo.setAlpha(1);
+                        if (npcName != 'npcdoorPHouse') {
+                            dialogInfo.setAlpha(1);
+                        }
                         scene.input.keyboard.on('keydown-SPACE', () => {
                             if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
                                 const distX = this.player.x - npc.x;
@@ -690,7 +692,9 @@ export default defineComponent({
                             }
                         });
                     } else {
-                        dialogInfo.setAlpha(0);
+                        if (npcName != 'npcdoorPHouse') {
+                            dialogInfo.setAlpha(0);
+                        }
                         this.npc.playerInTrigger = false;
                     }
                 });
@@ -705,7 +709,6 @@ export default defineComponent({
             this.canMove = false;
             this.npc.interactingWithNPC = true;
             this.npc.npcImage = splittedNPC;
-            console.log(this.isLogged);
             switch (splittedNPC) {
                 case "Woman":
                     if (this.isLogged) {
@@ -719,6 +722,12 @@ export default defineComponent({
                         this.npc.npcText = [`Qui ets? Deuries parlar amb l'altra dona.`];
                     } else {
                         this.npc.npcText = [`Hola ${this.username}, que en vols canviar d'estil?`];
+                    }
+                    break;
+                case "doorPHouse":
+                    if (!this.isLogged) {
+                        this.npc.npcImage = 'Woman';
+                        this.npc.npcText = [`Qui ets? Vine aquí.`];
                     }
                     break;
             }
@@ -758,14 +767,6 @@ export default defineComponent({
             this.pHouse_layers.furniture.renderDebug(debugGraphics, {
                 tileColor: null,
                 collidingTileColor: new Phaser.Display.Color(100, 134, 48, 255),
-            });
-            this.objects.doors.children.iterate((door) => {
-                debugGraphics.fillRect(
-                    door.x - door.width / 2,
-                    door.y - door.height / 2,
-                    door.width,
-                    door.height
-                );
             });
         },
         playerMovement(scene, skin) {
