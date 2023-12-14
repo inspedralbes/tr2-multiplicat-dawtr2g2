@@ -1,18 +1,15 @@
 <template>
     <div class="game-container">
-        <div class="profile">
+        <!-- <div class="profile">
             <button class="nes-btn profile-button" @click="toggleProfile">
                 <img src="../../public/icons/profile.svg" alt="">
             </button>
             <div class="modal nes-container is-rounded" :class="{ 'not-visible': !this.navigation_menus.profile }">
-                <button v-if="username.length === 0" class="nes-btn"
-                    @click="navigation_menus.loginModal = true">Login</button>
-                <button v-if="username.length === 0" class="nes-btn"
-                    @click="navigation_menus.registerModal = true">Registra't</button>
-                <button v-if="username.length != 0" class="nes-btn"
-                    @click="navigation_menus.registerModal = true">Surt</button>
+                <button v-if="!isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                <button v-if="!isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
+                <button v-if="isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Surt</button>
             </div>
-        </div>
+        </div> -->
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -23,7 +20,7 @@
             </div>
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
-            <div class="npcFace-container">
+            <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
                 <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
             <div class="modal nes-container is-rounded textBox">
@@ -31,9 +28,14 @@
                     <img src="../../public/icons/cross.svg" alt="">
                 </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
-                <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
-                    <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
-                    <button class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
+                <div class="woman-btn" v-if="npc.npcImage === 'Woman' && !this.npc.interactingWithDoor">
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                    <button v-if="!this.isLogged" class="nes-btn"
+                        @click="navigation_menus.registerModal = true">Registra't</button>
+                </div>
+                <div class="woman-btn" v-if="npc.npcImage === 'doorPHouse' && npc.interactingWithDoor">
+                    <button class="nes-btn" @click="goToLobby">Si</button>
+                    <button class="nes-btn" @click="closeNPCModal">No</button>
                 </div>
             </div>
         </div>
@@ -86,6 +88,7 @@ export default defineComponent({
             game: null,
             player: null,
             username: '',
+            isLogged: false,
             playerSprite: '',
             canMove: true,
             speed: 30,
@@ -119,6 +122,7 @@ export default defineComponent({
             npc: {
                 npcs: [],
                 interactingWithNPC: false,
+                interactingWithDoor: false,
                 npcText: '',
                 npcImage: '',
                 playerInTrigger: false,
@@ -173,9 +177,10 @@ export default defineComponent({
                         self.firstTime = false;
                         self.playerCreate(this, 720, 774, self.playerSprite);
                     } else {
-                        self.playerCreate(this, 793, 856, self.playerSprite);
+                        self.playerCreate(this, 793, 840, self.playerSprite);
                     }
 
+                    self.createNPC(this, 792, 870, 'npcdoorPHouse', 0);
                     self.triggerWithNPC(this);
 
 
@@ -275,8 +280,8 @@ export default defineComponent({
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
             this.canMove = true;
+            this.isLogged = true;
             this.navigation_menus.loginModal = false;
-
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -440,6 +445,10 @@ export default defineComponent({
             });
         },
         preloadPlayerHouse(scene) {
+            scene.load.spritesheet("npcdoorPHouse", "objects/door.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
             scene.load.image("pHouse_Furniture", "tiles/TilesetElement.png");
             scene.load.image(
                 "pHouse_Walls",
@@ -478,15 +487,6 @@ export default defineComponent({
                 collides: true,
             });
 
-            this.objects.doors = scene.physics.add.staticGroup();
-            const doorLayer = map.getObjectLayer("Doors");
-            doorLayer.objects.forEach((doorsObj) => {
-                this.objects.doors.create(
-                    doorsObj.x + doorsObj.width / 2,
-                    doorsObj.y - doorsObj.height / 1.99,
-                    "door"
-                );
-            });
             // this.debugCollision(scene);
         },
         createPlayerHouse_foreground(scene) {
@@ -504,12 +504,6 @@ export default defineComponent({
                 this.pHouse_layers.furniture
             );
             scene.physics.add.collider(this.player, this.objects.doors);
-
-            scene.physics.add.overlap(this.player, this.objects.doors, () => {
-                if (this.tecla(scene, "E")) {
-                    this.cambiarEscena(scene, "lobby", 793, 856);
-                }
-            });
         },
         preloadLobby(scene) {
             scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
@@ -615,7 +609,7 @@ export default defineComponent({
 
             scene.physics.add.overlap(this.player, this.objects.doors, (player, door) => {
                 if (door.name === 'player_door') {
-                    this.cambiarEscena(scene, 'playerHouse', 793, 856);
+                    this.cambiarEscena(scene, 'playerHouse');
                 } else {
                     if (this.game) {
                         this.game.destroy(true);
@@ -634,7 +628,7 @@ export default defineComponent({
             for (let i = 0; i < this.npc.npcs.length; i++) {
                 let npc = this.npc.npcs[i];
                 let npcName = npc.texture.key;
-
+                let dialogInfo = '';
 
                 scene.physics.add.collider(npc, this.player);
                 npc.body.setSize(npc.width, npc.height);
@@ -646,72 +640,111 @@ export default defineComponent({
                 const trigger = scene.physics.add.sprite(npc.x, npc.y, null).setAlpha(0);
                 trigger.body.setSize(npc.width * 1.8, npc.height * 1.8);
                 trigger.body.setAllowGravity(false);
+                trigger.child = npc.texture.key;
 
-                const dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
+                if (npcName != 'npcdoorPHouse') {
+                    dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
 
-                dialogInfo.anims.create({
-                    key: `DialogInfoAnim`,
-                    frames: scene.anims.generateFrameNumbers('DialogInfo', {
-                        frames: [0, 1, 2, 3]
-                    }),
-                    repeat: -1,
-                    frameRate: 2,
-                });
-                dialogInfo.setAlpha(0);
+                    dialogInfo.anims.create({
+                        key: `DialogInfoAnim`,
+                        frames: scene.anims.generateFrameNumbers('DialogInfo', {
+                            frames: [0, 1, 2, 3]
+                        }),
+                        repeat: -1,
+                        frameRate: 2,
+                    });
+                    dialogInfo.setAlpha(0);
 
-                dialogInfo.anims.play(`DialogInfoAnim`, true);
+                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+                }
+
+                let dialogoMostrado = false;
 
                 scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
                     if (trigger.body.touching.none) {
                         this.npc.playerInTrigger = true;
-                        dialogInfo.setAlpha(1);
-                        scene.input.keyboard.on('keydown-SPACE', () => {
-                            if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
-                                const distX = this.player.x - npc.x;
-                                const distY = this.player.y - npc.y;
-
-                                if (Math.abs(distX) > Math.abs(distY)) {
-                                    if (distX > 0) {
-                                        npc.setFrame(3);
-                                    } else {
-                                        npc.setFrame(2);
-                                    }
-                                } else {
-                                    if (distY > 0) {
-                                        npc.setFrame(0);
-                                    } else if (distY < 0) {
-                                        npc.setFrame(1);
-                                    } else {
-                                        npc.setFrame(0);
-                                    }
-                                }
-                                setTimeout(() => {
-                                    this.dialogo(npcName);
-                                }, 100);
+                        if (trigger.child != 'npcdoorPHouse') {
+                            dialogInfo.setAlpha(1);
+                        }
+                        if (!dialogoMostrado) {
+                            if (this.isLogged && trigger.child === 'npcdoorPHouse') {
+                                this.cambiarEscena(scene, 'lobby');
+                            } else if (!this.isLogged && trigger.child === 'npcdoorPHouse') {
+                                this.dialogo(scene, trigger.child);
                             }
-                        });
+                            dialogoMostrado = true;
+                            this.interactWithNPC(scene, npc);
+                        }
                     } else {
-                        dialogInfo.setAlpha(0);
+                        if (trigger.child != 'npcdoorPHouse') {
+                            dialogInfo.setAlpha(0);
+                        }
                         this.npc.playerInTrigger = false;
+                        scene.input.keyboard.off('keydown-SPACE');
+                        dialogoMostrado = false;
                     }
                 });
-
-
-
             }
         },
-        dialogo(npc) {
+        interactWithNPC(scene, npc) {
+            scene.input.keyboard.on('keydown-SPACE', () => {
+                if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
+                    const distX = this.player.x - npc.x;
+                    const distY = this.player.y - npc.y;
+
+                    if (Math.abs(distX) > Math.abs(distY)) {
+                        if (distX > 0) {
+                            npc.setFrame(3);
+                        } else {
+                            npc.setFrame(2);
+                        }
+                    } else {
+                        if (distY > 0) {
+                            npc.setFrame(0);
+                        } else if (distY < 0) {
+                            npc.setFrame(1);
+                        } else {
+                            npc.setFrame(0);
+                        }
+                    }
+                    this.dialogo(scene, npc.texture.key);
+                }
+            });
+        },
+        dialogo(scene, npc) {
+            this.npc.npcImage = '';
+            this.npc.npcText = '';
             let parts = npc.split("npc");
             let splittedNPC = parts[1];
             this.canMove = false;
             this.npc.interactingWithNPC = true;
+            this.npc.interactingWithDoor = false;
             this.npc.npcImage = splittedNPC;
             switch (splittedNPC) {
                 case "Woman":
-                    this.npc.npcText = [`Ens coneixem d'abans?`];
+                    if (this.isLogged) {
+                        this.npc.npcText = [`Hola ${this.username}, com estas?`];
+                    } else {
+                        this.npc.npcText = [`Ens coneixem d'abans?`];
+                    }
                     break;
                 case "Samurai":
-                    this.npc.npcText = [`Que en vols canviar d'estil?`];
+                    if (!this.isLogged) {
+                        this.npc.npcText = [`Qui ets? Deuries parlar amb l'altra dona.`];
+                    } else {
+                        this.npc.npcText = [`Hola ${this.username}, que en vols canviar d'estil?`];
+                    }
+                    break;
+                case "doorPHouse":
+                    this.npc.interactingWithDoor = true;
+                    if (!this.isLogged) {
+                        this.npc.npcImage = 'Woman';
+                        this.npc.npcText = [`Qui ets? Vine aquí.`];
+                    } else {
+                        this.closeNPCModal();
+                    }
+                    break;
+                default:
                     break;
             }
         },
@@ -720,7 +753,7 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                if (this.npc.npcImage === 'Samurai') {
+                if (this.npc.npcImage === 'Samurai' && this.isLogged) {
                     this.canMove = false;
                     this.navigation_menus.showCharSelectModal = true;
                 }
@@ -750,14 +783,6 @@ export default defineComponent({
             this.pHouse_layers.furniture.renderDebug(debugGraphics, {
                 tileColor: null,
                 collidingTileColor: new Phaser.Display.Color(100, 134, 48, 255),
-            });
-            this.objects.doors.children.iterate((door) => {
-                debugGraphics.fillRect(
-                    door.x - door.width / 2,
-                    door.y - door.height / 2,
-                    door.width,
-                    door.height
-                );
             });
         },
         playerMovement(scene, skin) {
@@ -868,8 +893,7 @@ export default defineComponent({
                 Phaser.Input.Keyboard.KeyCodes[key]
             ).isDown;
         },
-        cambiarEscena(scene, escena, x, y) {
-            this.player.setPosition(x, y);
+        cambiarEscena(scene, escena) {
             if (escena === "lobby") {
                 scene.scene.stop("playerHouse");
                 scene.scene.start("lobby");
