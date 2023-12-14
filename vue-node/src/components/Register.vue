@@ -97,6 +97,9 @@ export default {
                 rtl: false,
             });
         },
+        selectSkin(skin) {
+            this.skinSelected = skin;
+        }
     },
     mounted() {
         this.recibirerror();

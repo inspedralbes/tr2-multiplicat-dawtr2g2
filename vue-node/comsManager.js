@@ -2,17 +2,6 @@ import axios from "axios";
 
 const url = "http://localhost:8000/api/";
 
-// async function getQuestion(id) {
-//     return axios.get(`${url}preguntes/mostrar/${id}`)
-//         .then(response => {
-//             const pregunta = response.data;
-//             return pregunta;
-//         })
-//         .catch(error => {
-//             console.error(error);
-//         });
-// };
-
 async function login(email, password) {
     try {
         const response = await axios.post(`${url}login`, { email, password });
@@ -30,7 +19,7 @@ async function register(username, email, password, password_confirmation, skin_i
             email: email,
             password: password,
             password_confirmation: password_confirmation,
-            skin_id: skin_id
+            skin_id: skin_id.id
         });
         return response.data;
     } catch (error) {
