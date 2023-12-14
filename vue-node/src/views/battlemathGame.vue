@@ -14,6 +14,7 @@
                 <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
             <div class="modal nes-container is-rounded textBox">
+                <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">X</button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
                     <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
@@ -147,7 +148,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 723);
 
                     self.createNPC(this, 700, 800, 'npcWoman', 0);
-                    self.createNPC(this, 715, 720, 'npcSamurai', 0);
+                    self.createNPC(this, 712, 724, 'npcSamurai', 0);
 
                     ///Create player
                     if (self.firstTime) {
@@ -268,6 +269,10 @@ export default defineComponent({
         },
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
+            this.canMove = true;
+        },
+        closeNPCModal() {
+            this.npc.interactingWithNPC = false;
             this.canMove = true;
         },
         rescaleCamera() {
@@ -906,6 +911,19 @@ button:hover::after {
     justify-content: center;
     top: 10px;
     right: 10px;
+}
+
+.boton-cerrar-npc {
+    position: absolute;
+    font-size: 25px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
 }
 
 .game-container {
