@@ -6,54 +6,69 @@ export const useAppStore = defineStore('app', {
     respAct: {},
     room: {},
     rooms: [],
-    user:{},
+    user: {},
     turn: true,
   }),
   actions: {
-    addRoom(room){
+    addRoom(room) {
       this.room = room;
     },
-    addRooms(rooms){
+    addRooms(rooms) {
       this.rooms = rooms;
     },
-    getRoom(){
+    getRoom() {
       return this.room.players;
     },
-    getLong(){
+    getLong() {
       console.log(this.usersCon);
       return this.usersCon;
     },
-    addQuest(quest){
+    addQuest(quest) {
       this.questAct = quest;
     },
-    addResp(resp){
+    addResp(resp) {
       this.respAct = resp;
     },
-    getQuest(){
+    getQuest() {
       console.log(this.questAct);
       return this.questAct.pregunta;
     },
-    setUser(user){
+    setUser(user) {
       this.user = user;
     },
-    setTurnOn(){
-      
+    setTurnOn() {
       this.turn = true;
       console.log(this.turn);
     },
-    setTurnOff(){
+    setTurnOff() {
       this.turn = false;
       console.log(this.turn);
     },
-    getTurn(){
+    getTurn() {
       return this.turn;
     },
-    canviarTurn(){
+    canviarTurn() {
       if (this.turn === true) {
         this.turn = !this.turn;
-      }else{
+      } else {
         this.turn = true
       }
+    },
+    settimeUp() {
+      this.room.timeUp = true;
+    },
+    settimeOff() {
+      this.room.timeUp = false;
+    },
+    getTimer() {
+      return this.room.timer;
+    },
+    getTimeUp() {
+      return this.room.timeUp;
+    },
+    canviarTimer(secs) {
+      this.room.timer = secs;
+      // console.log(secs);
     }
   },
 })

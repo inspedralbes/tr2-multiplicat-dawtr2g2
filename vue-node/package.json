@@ -2,6 +2,7 @@
   "name": "phaserpruebas",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -17,10 +18,11 @@
     "pinia": "^2.1.7",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
-    "uid": "^2.0.2",
     "sockets": "^0.4.2",
+    "uid": "^2.0.2",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-toastify": "^0.1.14"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.4.0",

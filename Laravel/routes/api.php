@@ -37,10 +37,12 @@ Route::get('/respostes', [RespostaController::class, 'index']);
 //Auth
 Route::post('/registre', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
+Route::put('/perfil/modificar/{id}', [AuthController::class,'update']);
 
 //PROTECTED ROUTES
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class,'logout']);
 });
+
 ///Personatges
 Route::get('/skins', [SkinsController::class, 'index']);

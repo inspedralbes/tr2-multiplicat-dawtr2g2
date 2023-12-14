@@ -52,11 +52,6 @@ const router = createRouter({
       path: '/rooms',
       name: 'rooms',
       component: Rooms
-    },
-    {
-      path: '/text',
-      name: 'text',
-      component: textBox
     }
   ]
 })

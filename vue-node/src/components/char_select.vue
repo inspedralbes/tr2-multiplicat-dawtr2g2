@@ -1,7 +1,7 @@
 <template>
     <div class="char-select">
         <div class="carousel-container">
-            <button type="button" class="nes-btn" v-if="!loading" @click="scroll('left')">&lt;-</button>
+            <button type="button" class="nes-btn" v-if="!loading" @click.prevent="scroll('left')">&lt;-</button>
             <div class="carousel">
                 <div v-for="(character, index) in characters" :key="index" class="character"
                     v-if="index === selectedCharacterIndex" @click="selectCharacter(index)">
@@ -19,14 +19,14 @@
                     </div>
                 </div>
             </div>
-            <button class="nes-btn" v-if="!loading" @click="scroll('right')">-&gt;</button>
+            <button class="nes-btn" v-if="!loading" @click.prevent="scroll('right')">-&gt;</button>
         </div>
     </div>
 </template>
 
 
 <script>
-import axios from 'axios';
+import { socket } from "@/socket";
 
 export default {
     data() {
@@ -38,23 +38,16 @@ export default {
         };
     },
     mounted() {
-
-        axios.get('http://localhost:8000/api/skins')
-            .then(response => {
-                this.characters = response.data;
-            })
-            .finally(() => {
-                this.loading = false;
-            })
-            .catch(error => {
-                console.error('Error al obtener los datos de la API', error);
-            });
-
+        socket.emit('getSkins');
+        socket.on('viewSkins', (skins) => {
+            this.characters = skins;
+            this.loading = false;
+        });
     },
     computed: {
         selectedCharacter() {
             if (this.characters[this.selectedCharacterIndex] != null) {
-                const character = this.characters[this.selectedCharacterIndex].name;
+                const character = this.characters[this.selectedCharacterIndex];
                 this.$emit('selectedCharacter', character);
                 return this.characters[this.selectedCharacterIndex];
             }

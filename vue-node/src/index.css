@@ -6,12 +6,9 @@
     cursor: default !important;
 }
 
+
+
 button:hover,
 a:hover {
     cursor: pointer !important;
 }
-
-/* * {
-    cursor: url(../public/img/Kunai.png), auto;
-    cursor: url(../public/img/Kunai.png), auto, pointer;
-} */

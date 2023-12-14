@@ -16,12 +16,12 @@
                     </div>
                 </div>
 
-                <div class="timer">
-                    <p class="time">10</p>
-                    <div class="title">
-                        <p>TIME</p>
-                    </div>
-                </div>
+              <div class="timer">
+                  <p class="time">{{timer}}</p>
+                  <div class="title">
+                      <p>TIME</p>
+                  </div>
+              </div>
 
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
@@ -44,12 +44,12 @@
                     <H3 class="question">{{ quest.pregunta }}</H3>
                 </div>
                 <div class="character" v-if="room.players.length == 2">
-                    <img src="/img/Skeleton fight.png" alt="">
+                    <img src="/img/Skeleton Fight.png" alt="">
                 </div>
             </main>
 
-            <footer class="cards" v-if="room.players.length == 2">
-                <!--
+          <footer class="cards" v-if="room.players.length == 2 && room.timeUp == false">
+              <!--
                 <div class="card red">
                   <div class="level-bg"></div>
                   <p class="card-level">2</p>
@@ -105,14 +105,15 @@ import { watch } from 'vue';
 export default {
 
     data() {
-        return {
-            quest: '',
-            ans: [],
-            est: '',
-            room: {},
-            numQuest: 10,
-            turn: true,
-        };
+      return {
+        quest: '',
+        ans: [],
+        est: '',
+        room: {},
+        numQuest:10,
+        turn: true,
+        timer: 10,
+      };
     },
     created() {
         const store = useAppStore();
@@ -123,6 +124,14 @@ export default {
 
         watch(() => store.questAct, request => {
             this.quest = request;
+        });
+
+        watch(() => store.getTimer(), time => {
+            this.timer = time;
+        });
+
+        watch(() => store.getTimeUp(), timing => {
+            this.room.timeUp = timing;
         });
 
         watch(() => store.room, newRoom => {
@@ -397,7 +406,7 @@ main {
     align-items: center;
     flex-direction: column;
     overflow: hidden;
-    background-image: url(/img/card-background.jpg);
+    background-image: url(img/card-background.jpg);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
