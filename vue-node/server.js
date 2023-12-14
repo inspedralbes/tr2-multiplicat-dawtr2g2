@@ -42,6 +42,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('register', async (username, email, password, password_confirmation, skin_id) => {
+
     comsManager.register(username, email, password, password_confirmation, skin_id)
       .then(response => {
         socket.emit('success', response);
