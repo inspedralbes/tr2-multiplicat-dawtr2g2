@@ -1,5 +1,18 @@
 <template>
     <div class="game-container">
+        <div class="profile">
+            <button class="nes-btn profile-button" @click="toggleProfile">
+                <img src="../../public/icons/profile.svg" alt="">
+            </button>
+            <div class="modal nes-container is-rounded" :class="{ 'not-visible': !this.navigation_menus.profile }">
+                <button v-if="username.length === 0" class="nes-btn"
+                    @click="navigation_menus.loginModal = true">Login</button>
+                <button v-if="username.length === 0" class="nes-btn"
+                    @click="navigation_menus.registerModal = true">Registra't</button>
+                <button v-if="username.length != 0" class="nes-btn"
+                    @click="navigation_menus.registerModal = true">Surt</button>
+            </div>
+        </div>
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -14,7 +27,9 @@
                 <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
             </div>
             <div class="modal nes-container is-rounded textBox">
-                <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">X</button>
+                <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
+                    <img src="../../public/icons/cross.svg" alt="">
+                </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
                     <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
@@ -26,14 +41,16 @@
 
         <div v-if="navigation_menus.loginModal" class="login-modal">
             <div class="modal nes-container is-rounded">
-                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">X</button>
+                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar"><img
+                        src="../../public/icons/cross.svg" alt=""></button>
                 <login @user="loginUser" />
             </div>
         </div>
 
         <div v-if="navigation_menus.registerModal" class="register-modal">
             <div class="modal nes-container is-rounded">
-                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar">X</button>
+                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar"><img
+                        src="../../public/icons/cross.svg" alt=""></button>
                 <register @user="registerUser" />
             </div>
         </div>
@@ -105,6 +122,7 @@ export default defineComponent({
                 npcText: '',
                 npcImage: '',
                 playerInTrigger: false,
+                profile: false,
             },
             firstTime: true,
             controlsHidden: false,
@@ -274,6 +292,9 @@ export default defineComponent({
         closeNPCModal() {
             this.npc.interactingWithNPC = false;
             this.canMove = true;
+        },
+        toggleProfile() {
+            this.navigation_menus.profile = !this.navigation_menus.profile;
         },
         rescaleCamera() {
             const screenWidth = window.innerWidth;
@@ -901,6 +922,46 @@ button:hover::after {
     box-shadow: inset 4px 4px #e46d3a !important;
 }
 
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+
+.profile button {
+    margin: 20px;
+}
+
+.profile div.not-visible {
+    display: none;
+}
+
+.profile div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 20px;
+    max-height: 100%;
+}
+
+.profile div button {
+    width: 100%;
+}
+
+.profile-button img {
+    width: 50px;
+}
+
+.profile-button {
+    width: 200px;
+}
+
 .boton-cerrar {
     position: absolute;
     font-size: 25px;
@@ -911,6 +972,10 @@ button:hover::after {
     justify-content: center;
     top: 10px;
     right: 10px;
+}
+
+.boton-cerrar>img {
+    width: 30px;
 }
 
 .boton-cerrar-npc {

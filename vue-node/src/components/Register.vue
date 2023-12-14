@@ -27,7 +27,7 @@
                 <label for="skin">Selecciona el teu personatge</label>
                 <char_select @selectedCharacter="selectSkin"></char_select>
             </div>
-            <button class="nes-btn" @click="registerAndNavigate" type="button">Register</button>
+            <button class="nes-btn" @click="registerAndNavigate" type="button">Registra't</button>
         </form>
     </div>
 </template>

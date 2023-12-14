@@ -20,15 +20,17 @@ export default {
     <div class="landing__container">
         <div class="flexCenter">
 
-            <div class="nes-textarea landing">
+            <div class="nes-container is-rounded landing">
                 <h1>BattleMath</h1>
                 <p>Lluita amb els teus coneixements de matemàtiques</p>
                 <button class="nes-btn" @click="irARuta()">Jugar</button>
             </div>
+            <div class="art-credits nes-container is-rounded">
+                <span class="art-credits-text">Pixelart sprites made by <a
+                        href="https://www.patreon.com/pixelarchipel">PIXEL ARCHIPEL</a></span>
+            </div>
         </div>
     </div>
-
-
 </template>
 
 <style scoped>
@@ -41,12 +43,23 @@ export default {
     height: 100vh;
 }
 
-.flexCenter{
+.flexCenter {
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     height: 80vh;
 }
+
+.art-credits {
+    position: absolute;
+    bottom: 20%;
+    padding: 20px;
+    font-size: larger;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+
 .landing {
     background-color: white;
     font-size: 25px;
@@ -56,7 +69,7 @@ export default {
     justify-content: center;
     align-items: center;
     margin: 0;
-    padding:30px;
+    padding: 30px;
 }
 
 button {
@@ -80,7 +93,7 @@ button:hover::after {
     box-shadow: inset 4px 4px #e46d3a !important;
 }
 
-.nes-textarea{
-    border-image-repeat:unset !important;
+.nes-container.is-rounded {
+    border-image-repeat: stretch !important;
 }
 </style>
