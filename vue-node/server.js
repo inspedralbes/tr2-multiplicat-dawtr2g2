@@ -13,7 +13,7 @@ var rooms = [];
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Reemplaza con la URL de tu cliente
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -55,7 +55,6 @@ io.on('connection', (socket) => {
 
   socket.on('genQuest', async (id) => {
     var i = 0;
-    // let exist=
     try {
       const questData = await comsManager.getRandomQuestion();
       const respData = await comsManager.getRandomAnswers(questData);
@@ -72,7 +71,6 @@ io.on('connection', (socket) => {
       while (i < rooms.length) {
         const element = rooms[i];
         if (id === element.id) {
-          // exist = true;
           element.timer = 10;
         }
         i++;
