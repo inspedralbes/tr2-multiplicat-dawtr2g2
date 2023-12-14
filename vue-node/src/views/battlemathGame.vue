@@ -28,7 +28,7 @@
                     <img src="../../public/icons/cross.svg" alt="">
                 </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
-                <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
+                <div class="woman-btn" v-if="!this.npc.interactingWithDoor">
                     <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
                     <button v-if="!this.isLogged" class="nes-btn"
                         @click="navigation_menus.registerModal = true">Registra't</button>
@@ -118,6 +118,7 @@ export default defineComponent({
             npc: {
                 npcs: [],
                 interactingWithNPC: false,
+                interactingWithDoor: false,
                 npcText: '',
                 npcImage: '',
                 playerInTrigger: false,
@@ -704,11 +705,13 @@ export default defineComponent({
             }
         },
         dialogo(npc) {
+            this.npc.npcImage = '';
             let parts = npc.split("npc");
             let splittedNPC = parts[1];
             this.canMove = false;
             this.npc.interactingWithNPC = true;
             this.npc.npcImage = splittedNPC;
+            console.log(splittedNPC);
             switch (splittedNPC) {
                 case "Woman":
                     if (this.isLogged) {
@@ -725,10 +728,13 @@ export default defineComponent({
                     }
                     break;
                 case "doorPHouse":
+                    this.npc.interactingWithDoor = true;
                     if (!this.isLogged) {
                         this.npc.npcImage = 'Woman';
                         this.npc.npcText = [`Qui ets? Vine aquí.`];
                     }
+                    break;
+                default:
                     break;
             }
         },
