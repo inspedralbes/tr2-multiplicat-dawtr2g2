@@ -6,12 +6,12 @@
         <div class="game">
             <header class="header">
                 <div class="player player1">
-                    <img src="/img/monk2 face.png" alt="">
+                    <img :src="`/characters/${room.players[0].skin}_face.png`" alt="">
                     <div class="info">
                         <div class="bar">
                             <div class="progress"></div>
                         </div>
-                        <p class="name">Ermengol Bota</p>
+                        <p class="name">{{room.players[0].name}}</p>
                         <p class="level">Lvl 7</p>
                     </div>
                 </div>
@@ -28,23 +28,23 @@
                         <div class="bar">
                             <div class="progress"></div>
                         </div>
-                        <p class="name">Pedro Garcia</p>
+                        <p class="name">{{room.players[1].name}}</p>
                         <p class="level">Lvl 9</p>
                     </div>
-                    <img src="/img/Skeleton Faceset.png" alt="">
+                    <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
                 </div>
             </header>
 
             <main>
                 <div class="character">
-                    <img src="/img/monk2 fight.png" alt="">
+                    <img :src="`/characters/${room.players[0].skin}_fight.png`" alt="">
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                 </div>
                 <div class="character" v-if="room.players.length == 2">
-                    <img src="/img/Skeleton Fight.png" alt="">
+                    <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
                 </div>
             </main>
 
@@ -113,6 +113,7 @@ export default {
         numQuest:10,
         turn: true,
         timer: 10,
+        player:""
       };
     },
     created() {
@@ -139,6 +140,8 @@ export default {
         })
 
         this.turn = store.getTurn();
+        this.player = store.getUsername();
+
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
         });
@@ -165,7 +168,7 @@ export default {
         compAns(quest, ans) {
             this.ans = [];
             this.est = '';
-            socket.emit('compAns', quest, ans, this.room.id);
+            socket.emit('compAns', quest, ans, this.room.id, this.player);
         },
 
     },

@@ -57,6 +57,12 @@ socket.on("timer", (timer) => {
 socket.on("timeUp", () => {
   const store = useAppStore();
   store.settimeUp();
+  store.questAct = {};
+});
+
+socket.on("life",(player) =>{
+  const store = useAppStore();
+  store.updateLife(player);
 });
 
 socket.on("startTimer", () => {

@@ -69,6 +69,22 @@ export const useAppStore = defineStore('app', {
     canviarTimer(secs) {
       this.room.timer = secs;
       // console.log(secs);
-    }
+    },
+    getUsername() {
+      return this.user.username;
+    },
+    getSkin(){
+      return this.user.skin;
+    },
+    updateLife(player){
+      console.log(player);
+      for (let i = 0; i < this.room.players.length; i++) {
+        const element = this.room.players[i];
+        if (player.id == element.id) {
+          element.life = player.life;
+        }
+      }
+      console.log(this.room.players);
+    } 
   },
 })
