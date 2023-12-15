@@ -34,7 +34,7 @@ INSERT INTO `dificultats` (`id`, `nom_dificultat`,`punts_damage`) VALUES
 (2, 'Bàsic',15),
 (3, 'Intermedi',10),
 (4, 'Avançat',5),
-(5, 'Expert');
+(5, 'Expert',2);
 
 
 
