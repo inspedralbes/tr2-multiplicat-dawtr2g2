@@ -29,13 +29,14 @@
                 </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman' && !this.npc.interactingWithDoor">
-                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
-                    <button v-if="!this.isLogged" class="nes-btn"
+                    <button v-if="!this.isLogged" class="nes-btn npc-btn"
+                        @click="navigation_menus.loginModal = true">Login</button>
+                    <button v-if="!this.isLogged" class="nes-btn npc-btn"
                         @click="navigation_menus.registerModal = true">Registra't</button>
                 </div>
-                <div class="woman-btn" v-if="npc.npcImage === 'doorPHouse' && npc.interactingWithDoor">
-                    <button class="nes-btn" @click="goToLobby">Si</button>
-                    <button class="nes-btn" @click="closeNPCModal">No</button>
+                <div class="woman-btn" v-if="npc.npcImage === 'Samurai' && isLogged">
+                    <button class="npc-btn nes-btn" @click="openCharSelectModal">Si</button>
+                    <button class="npc-btn nes-btn" @click="closeNPCModal">No</button>
                 </div>
             </div>
         </div>
@@ -73,6 +74,7 @@ import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
+import { socket } from "@/socket";
 
 
 export default defineComponent({
@@ -85,6 +87,9 @@ export default defineComponent({
     },
     data() {
         return {
+            player: {
+                skinID: ''
+            },
             game: null,
             player: null,
             username: '',
@@ -288,11 +293,18 @@ export default defineComponent({
             return randomIndex === 0 ? skin1 : skin2;
         },
         selectSkin(character) {
+            this.player.skinID = character.id;
             this.playerSprite = character.name;
+        },
+        openCharSelectModal() {
+            this.npc.interactingWithNPC = false;
+            this.navigation_menus.showCharSelectModal = true;
+            this.canMove = false;
         },
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
             this.canMove = true;
+            socket.emit('newSkin', this.player.skinID);
         },
         closeNPCModal() {
             this.npc.interactingWithNPC = false;
@@ -753,10 +765,10 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                if (this.npc.npcImage === 'Samurai' && this.isLogged) {
-                    this.canMove = false;
-                    this.navigation_menus.showCharSelectModal = true;
-                }
+                // if (this.npc.npcImage === 'Samurai' && this.isLogged) {
+                //     this.canMove = false;
+                //     this.navigation_menus.showCharSelectModal = true;
+                // }
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
@@ -944,6 +956,10 @@ button:hover::after {
 
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
+}
+
+.npc-btn {
+    width: 20%;
 }
 
 .profile {

@@ -85,14 +85,18 @@ async function getSkins() {
     }
 }
 
+async function updateSkin() {
+
+}
+
 const comsManager = {
-    // getQuestion,
     login,
     register,
     getRandomQuestion,
     getRandomAnswers,
     checkAnswer,
-    getSkins
+    getSkins,
+
 }
 
 export default comsManager;

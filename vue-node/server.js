@@ -195,6 +195,10 @@ io.on('connection', (socket) => {
       });
   });
 
+  socket.on('newSkin', () => {
+
+  });
+
   socket.on('disconnect', () => {
     console.log('Client desconectat');
   });
