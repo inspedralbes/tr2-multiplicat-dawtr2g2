@@ -96,7 +96,7 @@ const comsManager = {
     getRandomAnswers,
     checkAnswer,
     getSkins,
-
+    updateSkin
 }
 
 export default comsManager;
