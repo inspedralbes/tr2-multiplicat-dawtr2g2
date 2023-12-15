@@ -26,8 +26,8 @@ export default {
                 <button class="nes-btn" @click="irARuta()">Jugar</button>
             </div>
             <div class="art-credits nes-container is-rounded">
-                <span class="art-credits-text">Pixelart sprites made by <a
-                        href="https://www.patreon.com/pixelarchipel">PIXEL ARCHIPEL</a></span>
+                <span class="art-credits-text">Pixelart sprites made by <a href="https://www.patreon.com/pixelarchipel"
+                        target="_blank">PIXEL ARCHIPEL</a></span>
             </div>
         </div>
     </div>
