@@ -85,8 +85,16 @@ async function getSkins() {
     }
 }
 
-async function updateSkin() {
-
+async function updateSkin(playerID, skinID) {
+    try {
+        const response = await axios.put(`${url}perfil/modificar/${playerID}`, {
+            skin_id: skinID
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
 const comsManager = {

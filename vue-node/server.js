@@ -195,8 +195,15 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('newSkin', () => {
-
+  socket.on('newSkin', (playerID, newSkin) => {
+    comsManager.updateSkin(playerID, newSkin)
+      .then(response => {
+        console.log(response);
+        socket.emit('skinUpdated', response);
+      })
+      .catch(error => {
+        console.error(error);
+      });
   });
 
   socket.on('disconnect', () => {

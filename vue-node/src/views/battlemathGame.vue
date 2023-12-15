@@ -88,7 +88,8 @@ export default defineComponent({
     data() {
         return {
             player: {
-                skinID: ''
+                skinID: '',
+                playerID: ''
             },
             game: null,
             player: null,
@@ -282,6 +283,7 @@ export default defineComponent({
         },
         loginUser(user) {
             this.username = user.user.username;
+            this.player.playerID = user.user.id;
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
             this.canMove = true;
@@ -304,7 +306,7 @@ export default defineComponent({
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
             this.canMove = true;
-            socket.emit('newSkin', this.player.skinID);
+            socket.emit('newSkin', this.player.playerID, this.player.skinID);
         },
         closeNPCModal() {
             this.npc.interactingWithNPC = false;
