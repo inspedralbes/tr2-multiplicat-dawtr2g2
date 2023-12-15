@@ -10,6 +10,7 @@
                 <button v-if="isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Surt</button>
             </div>
         </div> -->
+        <button v-if="isLogged" class="nes-btn" @click="logout">Surt</button>
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -73,6 +74,7 @@ import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
+import { socket } from '@/socket'; 
 
 
 export default defineComponent({
@@ -88,6 +90,7 @@ export default defineComponent({
             game: null,
             player: null,
             username: '',
+            token: '',
             isLogged: false,
             playerSprite: '',
             canMove: true,
@@ -277,11 +280,19 @@ export default defineComponent({
         },
         loginUser(user) {
             this.username = user.user.username;
+            this.token = user.token;
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
             this.canMove = true;
             this.isLogged = true;
             this.navigation_menus.loginModal = false;
+        },
+        logout(){
+            this.isLogged = false;
+            this.username = '';
+            this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
+            this.closeNPCModal();
+            socket.emit('logout', this.token);
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;

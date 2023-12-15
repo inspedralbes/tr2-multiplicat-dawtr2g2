@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://localhost:8000/api/";
+const url = "http://127.0.0.1:8000/api/";
 
 async function login(email, password) {
     try {
@@ -20,6 +20,21 @@ async function register(username, email, password, password_confirmation, skin_i
             password: password,
             password_confirmation: password_confirmation,
             skin_id: skin_id.id
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+async function logout(token) {
+
+    try {
+        const response = await axios.post(`${url}logout`, {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
         return response.data;
     } catch (error) {
@@ -92,7 +107,8 @@ const comsManager = {
     getRandomQuestion,
     getRandomAnswers,
     checkAnswer,
-    getSkins
+    getSkins,
+    logout
 }
 
 export default comsManager;
