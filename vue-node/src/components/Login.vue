@@ -30,7 +30,6 @@ export default {
         return {
             email: '',
             password: '',
-            contador: 0,
             error: false,
             success: false,
             message: '',
@@ -60,13 +59,8 @@ export default {
 
             socket.on('success', (successMessage) => {
                 this.data = successMessage.data;
-                console.log(this.data);
                 this.message = successMessage.success;
-                console.log(this.message);
                 this.success = true;
-                this.contador++;
-                console.log(this.contador);
-                
             });
             
         },
