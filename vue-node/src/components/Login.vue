@@ -7,12 +7,18 @@
             <h1 v-if="error" class="error-message">{{ message }}</h1>
             <h1 v-if="success" class="success-message">{{ message }}</h1>
             <div class="input-group">
-                <label for="email">E-mail</label>
-                <input class="nes-input" type="email" id="email" name="email" v-model="email" required>
+                <label for="username">Email</label>
+                <div class="email-input">
+                    <input type="email" id="email" name="email" v-model="email" required placeholder="correu@exemple.com">
+                    <span class="search-icon"></span>
+                </div>
             </div>
             <div class="input-group">
-                <label for="password">Contrasenya</label>
-                <input class="nes-input" type="password" id="password" name="password" v-model="password" required>
+                <label for="password">Contraseña</label>
+                <div class="password-input">
+                    <input type="password" id="password" name="password" v-model="password" required placeholder="Contrasenya">
+                    <span class="lock-icon"></span>
+                </div>
             </div>
             <button class="nes-btn" @click="loginAndNavigate" type="button">Login</button>
         </form>
@@ -97,6 +103,55 @@ export default {
 };
 </script>
 <style scoped>
+.password-input {
+    position: relative;
+}
+
+.lock-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-55%);
+    right: 33px;
+    width: 25px;
+    height: 25px;
+    filter: invert(50%);
+    background-image: url('https://static.thenounproject.com/png/1507844-200.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease, right 0.3s ease;
+
+}
+
+.password-input input:focus+.lock-icon {
+    transform: translateY(-55%) scale(1.2);
+    filter: saturate(0%) brightness(1000%);
+    right: 30px;
+}
+
+.email-input {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 33px;
+    width: 25px;
+    height: 20px;
+    filter: invert(50%);
+    background-image: url('https://cdn1.iconfinder.com/data/icons/pixel-art-essential/512/Search-512.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease, right 0.3s ease;
+}
+
+.email-input input:focus+.search-icon {
+    transform: translateY(-50%) scale(1.2);
+    filter: saturate(0%) brightness(1000%);
+    right: 30px;
+}
+
 h2 {
     color: black;
     margin-top: 20px;
@@ -138,7 +193,7 @@ h2 {
 }
 
 .login-container {
-    width: 25vw;
+    width: 35vw;
 
 }
 
@@ -187,12 +242,24 @@ button:hover::after {
 }
 
 .input-group input {
+    position: relative;
     width: calc(100% - 50px);
     padding: 10px;
     margin: 5px 25px;
+    border: none;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border-bottom: 2px solid black;
     box-sizing: border-box;
+    background-color: transparent;
+    transition: border-bottom-width 0.2s;
 
+}
+
+.input-group input:focus {
+    outline: none;
+    border-bottom-width: 3px;
+}
+.input-group input:focus::placeholder {
+    color: transparent;
 }
 </style>
