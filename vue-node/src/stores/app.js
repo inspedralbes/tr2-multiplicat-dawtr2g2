@@ -68,7 +68,6 @@ export const useAppStore = defineStore('app', {
     },
     canviarTimer(secs) {
       this.room.timer = secs;
-      // console.log(secs);
     },
     getUsername() {
       return this.user.username;
