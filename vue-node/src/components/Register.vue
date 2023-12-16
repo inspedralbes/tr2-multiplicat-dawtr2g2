@@ -79,8 +79,9 @@ export default {
             socket.on("success", (successMessage) => {
                 this.message = successMessage.success;
                 this.success = true;
-                this.toastNotification();
             });
+            
+
         },
         toastNotification() {
             toast.success(this.message, {
@@ -116,6 +117,7 @@ export default {
                     skin_id: this.skinSelected
                 }
                 this.$emit('user', this.user);
+                this.toastNotification();
             }
         },
     },

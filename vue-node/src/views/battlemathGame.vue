@@ -74,7 +74,9 @@ import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
-import { socket } from '@/socket'; 
+import { socket } from '@/socket';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 
 export default defineComponent({
@@ -91,6 +93,8 @@ export default defineComponent({
             player: null,
             username: '',
             token: '',
+            success: false,
+            message: '',
             isLogged: false,
             playerSprite: '',
             canMove: true,
@@ -138,6 +142,7 @@ export default defineComponent({
     mounted() {
         this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
         this.initializeGame();
+        this.recibirsuccessLogout();
     },
     watch: {
         playerSprite(newSkin) {
@@ -151,6 +156,11 @@ export default defineComponent({
                 this.player.anims.play(parts.join("_"));
             }
         },
+        success(){
+            if(this.success){
+                this.toastNotification();
+            }
+        }
     },
     methods: {
         initializeGame() {
@@ -283,16 +293,37 @@ export default defineComponent({
             this.token = user.token;
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
-            this.canMove = true;
             this.isLogged = true;
+            this.canMove = true;
             this.navigation_menus.loginModal = false;
         },
-        logout(){
+        logout() {
             this.isLogged = false;
             this.username = '';
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
             this.closeNPCModal();
             socket.emit('logout', this.token);
+        },
+        recibirsuccessLogout() {
+            socket.on('successLogout', (response) => {
+                this.success = true;
+                this.message = response.success;
+            });
+        },
+        toastNotification() {
+            toast.success(this.message, {
+                position: "top-right",
+                timeout: 2000,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: false,
+                closeButton: "button",
+                icon: true,
+                rtl: false,
+            });
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
@@ -304,6 +335,7 @@ export default defineComponent({
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
             this.canMove = true;
+
         },
         closeNPCModal() {
             this.npc.interactingWithNPC = false;

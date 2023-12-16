@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
     
     comsManager.logout(token)
       .then(response => {
-        socket.emit('success', response);
+        socket.emit('successLogout', response);
         socket.emit('logoutEliminarInfo');
       })
       .catch(error => {
