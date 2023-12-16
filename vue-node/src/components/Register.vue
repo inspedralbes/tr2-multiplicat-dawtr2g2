@@ -59,11 +59,19 @@ export default {
     methods: {
         irARutaload() {
             router.push('/loading');
+        }, validateEmail(email) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailPattern.test(email);
         },
         async registerUser() {
             socket.emit('register', this.username, this.email, this.password, this.password_confirmation, this.skinSelected);
         },
         async registerAndNavigate() {
+            if (!this.validateEmail(this.email)) {
+                this.error = true;
+                this.message = 'Correu electrònic no vàlid';
+                return;
+            }
             await this.registerUser();
             this.error = false;
         },
@@ -80,7 +88,7 @@ export default {
                 this.message = successMessage.success;
                 this.success = true;
             });
-            
+
 
         },
         toastNotification() {
