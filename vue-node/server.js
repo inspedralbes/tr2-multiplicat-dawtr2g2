@@ -56,10 +56,18 @@ io.on('connection', (socket) => {
 
   socket.on('genQuest', async (id) => {
     var i = 0;
+    const room = rooms.find(room => room.id === id);
+    var exist = false;
+    var questData = {};
     try {
-      const questData = await comsManager.getRandomQuestion();
+      while(!exist){
+        questData = await comsManager.getRandomQuestion();
+        if (!room.quests.some(q => q.id === questData.id)) {
+          exist = true;
+          room.quests.push(questData);
+        }
+      }
       const respData = await comsManager.getRandomAnswers(questData);
-
 
       const quest = {
         id: questData.id,
@@ -69,13 +77,8 @@ io.on('connection', (socket) => {
       io.to(id).emit('viewQuest', quest);
       socket.to(id).emit('viewResp', respData);
 
-      while (i < rooms.length) {
-        const element = rooms[i];
-        if (id === element.id) {
-          element.timer = 10;
-        }
-        i++;
-      }
+      room.timer = 10;
+      
       return { questData, respData };
     } catch (error) {
       console.error(error);
@@ -146,7 +149,7 @@ io.on('connection', (socket) => {
       timer: 10,
       timerId: null,
       timeUp: false,
-      
+      quests: []
     };
 
     var player = {
