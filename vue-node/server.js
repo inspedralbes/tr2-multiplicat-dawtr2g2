@@ -145,7 +145,8 @@ io.on('connection', (socket) => {
       players: [],
       timer: 10,
       timerId: null,
-      timeUp: false
+      timeUp: false,
+      
     };
 
     var player = {

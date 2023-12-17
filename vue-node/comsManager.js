@@ -44,18 +44,21 @@ async function getRandomAnswers(data) {
         const respCorr = Math.floor(Math.random() * 4);
         const responses = [];
         let urlResp = '';
-        for (let i = 0; i < 4; i++) {
-            if (respCorr === i) {
+        while (responses.length < 4) {
+            if (respCorr === responses.length) {
                 urlResp = `${url}respostes/mostrar/${data.resposta_correcta_id}`;
             } else {
                 let randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
                 urlResp = `${url}respostes/mostrar/${randomNumber}`;
             }
             const response = await axios.get(urlResp);
-            responses.push({
+            const newResponse = {
                 id: response.data.id,
                 resposta: response.data.resposta
-            });
+            };
+            if (!responses.some(r => r.id === newResponse.id)) {
+                responses.push(newResponse);
+            }
         }
 
         return responses;
