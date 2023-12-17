@@ -72,3 +72,7 @@ socket.on("startTimer", () => {
   store.settimeOff();
   store.canviarTurn();
 });
+
+socket.on("gameOver",(player) =>{
+  router.push('/gameover');
+});

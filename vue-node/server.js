@@ -108,6 +108,11 @@ io.on('connection', (socket) => {
                       player.life = player.life - response;
                       console.log(player.life);
                       io.to(id).emit('life', player);
+                      if (player.life <= 0) {
+                        io.to(id).emit('gameOver');
+                        clearInterval(element.timerId);
+                        console.log("Game over!");
+                      }
                     })
                     .catch(error => {
                       console.error(error);
