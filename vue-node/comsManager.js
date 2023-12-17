@@ -85,6 +85,17 @@ async function getSkins() {
     }
 }
 
+async function getDamage(id) {
+    try {
+        const response = await axios.get(`${url}getDamage/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+    
+}
+
 const comsManager = {
     // getQuestion,
     login,
@@ -92,7 +103,8 @@ const comsManager = {
     getRandomQuestion,
     getRandomAnswers,
     checkAnswer,
-    getSkins
+    getSkins,
+    getDamage
 }
 
 export default comsManager;

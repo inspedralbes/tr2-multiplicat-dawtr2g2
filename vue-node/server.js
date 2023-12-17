@@ -100,8 +100,15 @@ io.on('connection', (socket) => {
               while (y < element.players.length) {
                 const player = element.players[y];
                 if (player.name === user) {
-                  player.life = player.life - 10;
-                  io.to(id).emit('life', player);
+                  comsManager.getDamage(response.dificultat_id)
+                    .then(response => {
+                      player.life = player.life - response;
+                      console.log(player.life);
+                      io.to(id).emit('life', player);
+                    })
+                    .catch(error => {
+                      console.error(error);
+                    });
                 }
                 y++;
               }
