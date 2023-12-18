@@ -36,6 +36,13 @@ export const useAppStore = defineStore('app', {
     setUser(user) {
       this.user = user;
     },
+    unsetUser() {
+      this.user = {};
+    },
+    getToken() {
+      console.log(this.user.tokens);
+      return this.user.tokens;
+    },
     setTurnOn() {
       this.turn = true;
       console.log(this.turn);
