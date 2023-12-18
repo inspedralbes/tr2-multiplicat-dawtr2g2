@@ -16,7 +16,8 @@
             <div class="input-group">
                 <label for="password">Contraseña</label>
                 <div class="password-input">
-                    <input type="password" id="password" name="password" v-model="password" required placeholder="Contrasenya">
+                    <input type="password" id="password" name="password" v-model="password" required
+                        placeholder="Contrasenya">
                     <span class="lock-icon"></span>
                 </div>
             </div>
@@ -68,7 +69,7 @@ export default {
                 this.message = successMessage.success;
                 this.success = true;
             });
-            
+
         },
         toastNotification() {
             toast.success(this.message, {
@@ -84,7 +85,8 @@ export default {
                 icon: true,
                 rtl: false,
             });
-        },
+        }
+
     },
     mounted() {
         this.recibirerror();
@@ -103,6 +105,7 @@ export default {
 };
 </script>
 <style scoped>
+
 .password-input {
     position: relative;
 }
@@ -259,7 +262,7 @@ button:hover::after {
     outline: none;
     border-bottom-width: 3px;
 }
+
 .input-group input:focus::placeholder {
     color: transparent;
-}
-</style>
+}</style>
