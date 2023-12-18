@@ -88,6 +88,11 @@ export default {
     mounted() {
         socket.emit("getRooms");
         const store = useAppStore();
+
+        if (!store.isLogged) {
+            this.$router.push("/");
+        }
+
         watch(
             () => store.rooms,
             (newVal) => {
