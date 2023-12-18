@@ -19,7 +19,10 @@ INSERT INTO `skins` (`id`,`name`) VALUES
 (18,'fueguito');
 
 INSERT INTO `users` (`id`, `username`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `skin_id`) VALUES
-(1, 'Chadous', 'a22rauespgom@inspedralbes.cat', NULL, '$2y$12$sRhv89qWjWkJuKHgYLlYzex7bIWcVlyI5oDvLVk31w290N1lD0aOy', NULL, '2023-12-13 09:35:35', '2023-12-13 09:35:35', 17);
+(1, 'Chadous', 'a22rauespgom@inspedralbes.cat', NULL, '$2y$12$sRhv89qWjWkJuKHgYLlYzex7bIWcVlyI5oDvLVk31w290N1lD0aOy', NULL, '2023-12-13 08:35:35', '2023-12-13 08:35:35', 17),
+(2, 'Ivan', 'a22ivabarsan@inspedralbes.cat', NULL, '$2y$12$/luptSi4pZxhkUjqpmh4oOiMKLwE8WrZ8DdVEJ1EDLve0Oek2PO4G', NULL, '2023-12-18 07:08:39', '2023-12-18 07:08:39', 15),
+(3, 'titis017', 'a20pedgarguz@inspedralbes.cat', NULL, '$2y$12$4dY7Dhw9xnNUxVxHGswh7uSeHbhiYdnv/ml5dynxaP7VBF636fT4C', NULL, '2023-12-18 07:11:41', '2023-12-18 07:11:41', 18),
+(4, 'DGrazz', 'a16margarlop@inspedralbes.cat', NULL, '$2y$12$CSjV4fN7wzCR9CZYBRpEaeKmJ/NFdPl3DPHMgr2uCbG1I/zOMQqF.', NULL, '2023-12-18 07:12:57', '2023-12-18 07:12:57', 16);
 
 INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
 (1, 'Nombres i operacions'),
