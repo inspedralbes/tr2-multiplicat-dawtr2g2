@@ -78,6 +78,7 @@ import Router from '../router';
 import { socket } from '@/socket';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import { useAppStore } from "../stores/app";
 
 
 export default defineComponent({
@@ -142,6 +143,14 @@ export default defineComponent({
             },
             firstTime: true,
             controlsHidden: false,
+
+            playerInfo: {
+                id: null,
+                skin: "",
+                x: "",
+                y: "",
+            },
+            playerSprites: {},
         };
     },
     mounted() {
@@ -213,6 +222,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 851);
 
                     self.playerMovement(this, self.playerSprite);
+
                 },
                 update: function () {
                 },
@@ -249,7 +259,7 @@ export default defineComponent({
                     self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-
+                    self.addPlayerInfo();
                 },
             };
 
@@ -878,10 +888,16 @@ export default defineComponent({
             scene.input.keyboard.on('keyup', event => {
                 switch (event.code) {
                     default:
+                        // scene.scene.isActive('lobby')
                         const parts = this.player.anims.currentAnim.key.split("_");
                         parts[1] = "idle";
                         this.player.anims.play(parts.join("_"));
                         this.player.setVelocity(0, 0);
+
+                        if (scene.scene.isActive('lobby')) {
+                            // this.addPlayerInfo();
+                        }
+
                         break;
                 }
             });
@@ -979,6 +995,42 @@ export default defineComponent({
             });
 
             return emitter;
+        },
+        addPlayerInfo(scene) {
+            const store = useAppStore();
+            this.playerInfo.id = store.getId();
+            this.playerInfo.skin = this.playerSprite;
+            this.playerInfo.x = this.player.x;
+            this.playerInfo.y = this.player.y;
+
+            socket.emit("addPlayer", this.playerInfo);
+            this.viewPlayers(scene);
+        },
+
+        viewPlayers(scene) {
+            socket.on("viewPlayers", (players) => {
+                console.log("jugadores" + players);
+                for (let i = 0; i < players.length; i++) {
+                    if (players[i].id !== this.playerInfo.id) {
+                        // Si ya tenemos un sprite para este jugador, lo eliminamos
+                        if (this.playerSprites[players[i].id]) {
+                            this.playerSprites[players[i].id].destroy();
+                        }
+
+                        // Creamos un nuevo sprite para el jugador
+                        const jugador = scene.physics.add.sprite(
+                            players[i].x,
+                            players[i].y,
+                            players[i].skin
+                        );
+
+                        // Almacenamos el sprite en nuestro objeto
+                        this.playerSprites[players[i].id] = jugador;
+
+                        console.log("Pintar jugador" + players[i].id);
+                    }
+                }
+            });
         },
     },
 });

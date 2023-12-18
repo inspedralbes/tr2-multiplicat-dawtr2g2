@@ -70,3 +70,8 @@ socket.on("startTimer", () => {
   store.settimeOff();
   store.canviarTurn();
 });
+
+socket.on("viewPlayers", (players) => {
+  const store = useAppStore();
+  store.addPlayers(players);
+});
