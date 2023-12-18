@@ -47,6 +47,7 @@ export default {
     background-size: cover;
     width: 100vw;
     height: 100vh;
+    background-position: 0 30%;
 }
 
 .flexCenter {
