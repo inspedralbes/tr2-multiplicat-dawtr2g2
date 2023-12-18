@@ -32,14 +32,8 @@ export default {
                 <!-- <button id="play" @click="playMusic()">Play</button> -->
             </div>
             <div class="art-credits nes-container is-rounded">
-                <span class="art-credits-text"
-                    >Pixelart sprites made by
-                    <a
-                        href="https://www.patreon.com/pixelarchipel"
-                        target="_blank"
-                        >PIXEL ARCHIPEL</a
-                    ></span
-                >
+                <span class="art-credits-text">Pixelart sprites made by
+                    <a href="https://www.patreon.com/pixelarchipel" target="_blank">PIXEL ARCHIPEL</a></span>
             </div>
         </div>
     </div>
@@ -48,7 +42,7 @@ export default {
 <style scoped>
 .landing__container {
     position: absolute;
-    background-image: url("https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/01073865290819.5d61d475f0072.jpg");
+    background-image: url("/img/landing_1.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     width: 100vw;
