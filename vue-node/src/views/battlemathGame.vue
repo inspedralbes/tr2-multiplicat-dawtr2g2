@@ -857,9 +857,10 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
-            if (this.canMove) {
-                scene.input.keyboard.on('keydown', event => {
-                    this.controlsHidden = true;
+            // if (this.canMove) {
+            scene.input.keyboard.on('keydown', event => {
+                this.controlsHidden = true;
+                if (this.canMove) {
                     switch (event.code) {
                         case 'ArrowLeft':
                             this.player.anims.play(`${skin}_move_left`, true);
@@ -880,8 +881,11 @@ export default defineComponent({
                         default:
                             break;
                     }
-                });
-                scene.input.keyboard.on('keyup', event => {
+                }
+            });
+
+            scene.input.keyboard.on('keyup', event => {
+                if (this.canMove) {
                     switch (event.code) {
                         default:
                             const parts = this.player.anims.currentAnim.key.split("_");
@@ -890,8 +894,9 @@ export default defineComponent({
                             this.player.setVelocity(0, 0);
                             break;
                     }
-                });
-            }
+                }
+            });
+            // }
         },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
