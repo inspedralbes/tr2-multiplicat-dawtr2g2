@@ -8,6 +8,7 @@ export default {
     },
     methods: {
         irARuta() {
+            this.playMusic();
             router.push("/game");
         },
         playMusic() {
@@ -28,7 +29,7 @@ export default {
                 <h1>BattleMath</h1>
                 <p>Lluita amb els teus coneixements de matemàtiques</p>
                 <button class="nes-btn" @click="irARuta()">Jugar</button>
-                <button id="play" @click="playMusic()">Play</button>
+                <!-- <button id="play" @click="playMusic()">Play</button> -->
             </div>
             <div class="art-credits nes-container is-rounded">
                 <span class="art-credits-text"
