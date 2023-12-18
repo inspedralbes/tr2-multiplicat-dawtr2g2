@@ -195,10 +195,6 @@ export default defineComponent({
                     //     Ýmovement = -1;
                     // });
 
-                    // this.input.keyboard.on('keydown-SPACE', event => {
-                    //     console.log('Hello from the Space Bar!');
-                    // });
-
                     self.createPlayerHouse(this);
                     self.createParticleHouse(this, 664, 723);
                     self.createParticleHouse(this, 856, 723);
@@ -226,9 +222,11 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
+
+                    self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-                    self.playerMovement(this, self.playerSprite);
+                    // self.playerMovement(this, self.playerSprite);
                 },
             };
 
@@ -859,36 +857,40 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
-            if (
-                !this.playerMoved &&
-                (this.tecla(scene, "LEFT") ||
-                    this.tecla(scene, "RIGHT") ||
-                    this.tecla(scene, "UP") ||
-                    this.tecla(scene, "DOWN"))
-            ) {
-                this.controlsHidden = true;
-            }
-
             if (this.canMove) {
-                if (this.tecla(scene, 'LEFT')) {
-                    //this.player.setVelocity(Xmovement*currentSpeed*sprint,Ymovement*currentSpeed*sprint )
-                    this.player.setVelocity(-currentSpeed, 0);
-                    this.player.anims.play(`${skin}_move_left`, true);
-                } else if (this.tecla(scene, 'RIGHT')) {
-                    this.player.setVelocity(currentSpeed, 0);
-                    this.player.anims.play(`${skin}_move_right`, true);
-                } else if (this.tecla(scene, 'UP')) {
-                    this.player.setVelocity(0, -currentSpeed);
-                    this.player.anims.play(`${skin}_move_up`, true);
-                } else if (this.tecla(scene, 'DOWN')) {
-                    this.player.setVelocity(0, currentSpeed);
-                    this.player.anims.play(`${skin}_move_down`, true);
-                } else {
-                    const parts = this.player.anims.currentAnim.key.split("_");
-                    parts[1] = "idle";
-                    this.player.anims.play(parts.join("_"));
-                    this.player.setVelocity(0, 0);
-                }
+                scene.input.keyboard.on('keydown', event => {
+                    this.controlsHidden = true;
+                    switch (event.code) {
+                        case 'ArrowLeft':
+                            this.player.anims.play(`${skin}_move_left`, true);
+                            this.player.setVelocity(-currentSpeed, 0);
+                            break;
+                        case 'ArrowRight':
+                            this.player.anims.play(`${skin}_move_right`, true);
+                            this.player.setVelocity(currentSpeed, 0);
+                            break;
+                        case 'ArrowUp':
+                            this.player.anims.play(`${skin}_move_up`, true);
+                            this.player.setVelocity(0, -currentSpeed);
+                            break;
+                        case 'ArrowDown':
+                            this.player.anims.play(`${skin}_move_down`, true);
+                            this.player.setVelocity(0, currentSpeed);
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                scene.input.keyboard.on('keyup', event => {
+                    switch (event.code) {
+                        default:
+                            const parts = this.player.anims.currentAnim.key.split("_");
+                            parts[1] = "idle";
+                            this.player.anims.play(parts.join("_"));
+                            this.player.setVelocity(0, 0);
+                            break;
+                    }
+                });
             }
         },
         createPlayerAnims(scene, skin) {
