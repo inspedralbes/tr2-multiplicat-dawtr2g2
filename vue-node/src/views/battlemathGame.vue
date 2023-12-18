@@ -10,7 +10,7 @@
                 <button v-if="isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Surt</button>
             </div>
         </div> -->
-        <button v-if="isLogged" class="nes-btn" @click="logout">Surt</button>
+        
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -31,6 +31,7 @@
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman' && !this.npc.interactingWithDoor">
                     <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                    <button v-if="this.isLogged" class="nes-btn" @click="logout">Surt</button>
                     <button v-if="!this.isLogged" class="nes-btn"
                         @click="navigation_menus.registerModal = true">Registra't</button>
                 </div>
