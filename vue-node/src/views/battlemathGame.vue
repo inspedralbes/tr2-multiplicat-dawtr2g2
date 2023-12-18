@@ -246,6 +246,9 @@ export default defineComponent({
                         self.player,
                         self.lobby_layers.fg
                     );
+                    self.createNPC(this, 910, 420, 'npcRyu', 0);
+                    self.triggerWithNPC(this);
+
                     self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
@@ -804,6 +807,10 @@ export default defineComponent({
                         this.closeNPCModal();
                     }
                     break;
+                case "Ryu":
+                    this.npc.npcText = [`Hola ${this.username}, hauries d'anar al Dojo.`,
+                        `Allà podràs lluitar contra altres jugadors.`, `Es l'edifici amb el terrat vermell.`];
+                    break;
                 default:
                     break;
             }
@@ -821,11 +828,11 @@ export default defineComponent({
 
             this.player.anims.play(`${skin}_idle_down`);
             this.player.body.setSize(
-                this.player.width * 0.6,
+                this.player.width * 1,
                 this.player.height * 0.2
             );
             this.player.body.setOffset(
-                this.player.width * 0.2,
+                this.player.width * 0,
                 this.player.height * 0.8
             );
             scene.physics.world.enable(this.player);
