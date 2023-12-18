@@ -8,13 +8,7 @@ export default {
     },
     methods: {
         irARuta() {
-            this.playMusic();
             router.push("/game");
-        },
-        playMusic() {
-            const audio = new Audio("/audio/coral-chorus.mp3");
-            audio.loop = true;
-            audio.play();
         },
     },
 };
