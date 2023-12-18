@@ -222,7 +222,6 @@ io.on('connection', (socket) => {
       });
   });
 
-  /* ------------------------------ SOCKET LOBBY ------------------------------ */
   socket.on("addPlayer", (playerInfo) => {
     if (players.length === 0) {
         players.push(playerInfo);

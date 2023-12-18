@@ -6,9 +6,8 @@ export const useAppStore = defineStore("app", {
         respAct: {},
         room: {},
         rooms: [],
-        user: {},
-        isLogged: false,
         turn: true,
+        user: {},
         players: [],
     }),
     actions: {
@@ -37,11 +36,9 @@ export const useAppStore = defineStore("app", {
         },
         setUser(user) {
             this.user = user;
-            this.isLogged = true;
         },
         unsetUser() {
             this.user = {};
-            this.isLogged = false;
         },
         getToken() {
             console.log(this.user.tokens);
