@@ -8,7 +8,13 @@ export default {
     },
     methods: {
         irARuta() {
+            this.playMusic();
             router.push("/game");
+        },
+        playMusic() {
+            const audio = new Audio("/audio/coral-chorus.mp3");
+            audio.loop = true;
+            audio.play();
         },
     },
 };
@@ -19,15 +25,21 @@ export default {
 
     <div class="landing__container">
         <div class="flexCenter">
-
             <div class="nes-container is-rounded landing">
                 <h1>BattleMath</h1>
                 <p>Lluita amb els teus coneixements de matemàtiques</p>
                 <button class="nes-btn" @click="irARuta()">Jugar</button>
+                <!-- <button id="play" @click="playMusic()">Play</button> -->
             </div>
             <div class="art-credits nes-container is-rounded">
-                <span class="art-credits-text">Pixelart sprites made by <a href="https://www.patreon.com/pixelarchipel"
-                        target="_blank">PIXEL ARCHIPEL</a></span>
+                <span class="art-credits-text"
+                    >Pixelart sprites made by
+                    <a
+                        href="https://www.patreon.com/pixelarchipel"
+                        target="_blank"
+                        >PIXEL ARCHIPEL</a
+                    ></span
+                >
             </div>
         </div>
     </div>
@@ -58,7 +70,6 @@ export default {
     font-size: larger;
     background-color: rgba(255, 255, 255, 0.7);
 }
-
 
 .landing {
     background-color: white;
