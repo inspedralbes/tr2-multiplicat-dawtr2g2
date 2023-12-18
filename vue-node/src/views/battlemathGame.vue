@@ -182,6 +182,23 @@ export default defineComponent({
                     this.load.image('dialogBox', '/img/DialogBoxFaceset.png')
                 },
                 create: function () {
+
+
+                    // this.input.keyboard.on('keydown-A', event => {
+                    //     console.log('Hello from the A Key!');
+                    //     Xmovement = -1;
+
+                    // });
+
+                    // this.input.keyboard.on(Phaser.Events, event => {
+                    //     console.log(event.key);
+                    //     Ýmovement = -1;
+                    // });
+
+                    // this.input.keyboard.on('keydown-SPACE', event => {
+                    //     console.log('Hello from the Space Bar!');
+                    // });
+
                     self.createPlayerHouse(this);
                     self.createParticleHouse(this, 664, 723);
                     self.createParticleHouse(this, 856, 723);
@@ -808,10 +825,6 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                // if (this.npc.npcImage === 'Samurai' && this.isLogged) {
-                //     this.canMove = false;
-                //     this.navigation_menus.showCharSelectModal = true;
-                // }
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
@@ -858,6 +871,7 @@ export default defineComponent({
 
             if (this.canMove) {
                 if (this.tecla(scene, 'LEFT')) {
+                    //this.player.setVelocity(Xmovement*currentSpeed*sprint,Ymovement*currentSpeed*sprint )
                     this.player.setVelocity(-currentSpeed, 0);
                     this.player.anims.play(`${skin}_move_left`, true);
                 } else if (this.tecla(scene, 'RIGHT')) {
