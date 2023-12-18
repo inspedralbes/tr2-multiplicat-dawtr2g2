@@ -183,18 +183,7 @@ export default defineComponent({
                 },
                 create: function () {
 
-
-                    // this.input.keyboard.on('keydown-A', event => {
-                    //     console.log('Hello from the A Key!');
-                    //     Xmovement = -1;
-
-                    // });
-
-                    // this.input.keyboard.on(Phaser.Events, event => {
-                    //     console.log(event.key);
-                    //     Ýmovement = -1;
-                    // });
-
+                    ///Create map
                     self.createPlayerHouse(this);
                     self.createParticleHouse(this, 664, 723);
                     self.createParticleHouse(this, 856, 723);
@@ -226,7 +215,6 @@ export default defineComponent({
                     self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-                    // self.playerMovement(this, self.playerSprite);
                 },
             };
 
@@ -250,6 +238,7 @@ export default defineComponent({
                     } else {
                         this.player.setVelocity(0, 0);
                     }
+
                     self.addLobbyCollisions(this);
                     this.cameras.main.startFollow(self.player, true);
                     self.createLobby_foreground(this);
@@ -257,9 +246,10 @@ export default defineComponent({
                         self.player,
                         self.lobby_layers.fg
                     );
+                    self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-                    self.playerMovement(this, self.playerSprite);
+
                 },
             };
 
@@ -856,11 +846,12 @@ export default defineComponent({
             const runSpeedMultiplier = 1.5;
 
             let currentSpeed = speed;
-
-            // if (this.canMove) {
             scene.input.keyboard.on('keydown', event => {
                 this.controlsHidden = true;
                 if (this.canMove) {
+                    if (skin != this.playerSprite) {
+                        skin = this.playerSprite;
+                    }
                     switch (event.code) {
                         case 'ArrowLeft':
                             this.player.anims.play(`${skin}_move_left`, true);
@@ -885,18 +876,15 @@ export default defineComponent({
             });
 
             scene.input.keyboard.on('keyup', event => {
-                if (this.canMove) {
-                    switch (event.code) {
-                        default:
-                            const parts = this.player.anims.currentAnim.key.split("_");
-                            parts[1] = "idle";
-                            this.player.anims.play(parts.join("_"));
-                            this.player.setVelocity(0, 0);
-                            break;
-                    }
+                switch (event.code) {
+                    default:
+                        const parts = this.player.anims.currentAnim.key.split("_");
+                        parts[1] = "idle";
+                        this.player.anims.play(parts.join("_"));
+                        this.player.setVelocity(0, 0);
+                        break;
                 }
             });
-            // }
         },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
