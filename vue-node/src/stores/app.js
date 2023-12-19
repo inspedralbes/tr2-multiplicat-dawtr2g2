@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -10,7 +10,11 @@ export const useAppStore = defineStore('app', {
     isLogged: false,
     turn: true,
     lastRoute: '',
+    players: [],
   }),
+  persist: {
+    paths: ['user', 'isLogged', 'lastRoute', 'players']
+  },
   actions: {
     addRoom(room) {
       this.room = room;
@@ -81,9 +85,6 @@ export const useAppStore = defineStore('app', {
     getSkin() {
       return this.user.skin;
     },
-    setNewSkin(skin) {
-      this.user.skin = skin;
-    },
     updateLife(player) {
       for (let i = 0; i < this.room.players.length; i++) {
         const element = this.room.players[i];
@@ -115,9 +116,15 @@ export const useAppStore = defineStore('app', {
     },
     getIsLogged() {
       return this.isLogged;
+    },
+    getId() {
+      return this.user.userId;
+    },
+    addPlayers(players) {
+      this.players = players;
+    },
+    setNewSkin(skin) {
+      this.user.skin = skin;
     }
   },
-  persist: {
-    paths: ['user', 'isLogged', 'lastRoute'],
-  }
 })

@@ -1,18 +1,23 @@
 <template>
     <div>
-        <div class="win" v-if="win == true">
-            <h1>VICTORIA</h1>
-            <img :src="`/characters/${skin}_fight.png`" alt="">
-            <button class="nes-btn" @click=tornarRooms()>Tornar</button>
-            <img class="confetti" src="/img/confetti-gif-8.gif" alt="">
-            <img class="confetti" src="https://i.pinimg.com/originals/fd/b0/9c/fdb09cd5e747f5c8330f998f11efb0a1.gif" alt="">
+        <div class="win-container" v-if="win == true">
+            <div class="win">
+                <h1>VICTORIA</h1>
+                <img :src="`/characters/${skin}_fight.png`" alt="">
+                <button class="nes-btn" @click=tornarRooms()>Tornar</button>
+                <img class="confetti" src="/img/confetti-gif-8.gif" alt="">
+                <img class="confetti" src="https://i.pinimg.com/originals/fd/b0/9c/fdb09cd5e747f5c8330f998f11efb0a1.gif"
+                    alt="">
+            </div>
         </div>
 
-        <div class="lose" v-if="win == false">
-            <h1>DERROTA</h1>
-            <img :src="`/characters/${skin}_fight.png`" alt="">
-            <button class="nes-btn" @click="tornarRooms()">Tornar</button>
-            <img class="lluvia" src="/img/lluvia.gif" alt="">
+        <div class="lose-container" v-if="win == false">
+            <div class="lose">
+                <h1>DERROTA</h1>
+                <img :src="`/characters/${skin}_fight.png`" alt="">
+                <button class="nes-btn" @click="tornarRooms()">Tornar</button>
+                <img class="lluvia" src="/img/lluvia.gif" alt="">
+            </div>
         </div>
 
     </div>
@@ -23,7 +28,7 @@ import { useAppStore } from '../stores/app';
 import router from '../router'
 
 export default {
-    
+
     name: "gameOver",
     data() {
         return {
@@ -37,7 +42,7 @@ export default {
         this.skin = appStore.user.skin;
     },
     methods: {
-        tornarRooms(){
+        tornarRooms() {
             const store = useAppStore();
             router.push('/rooms');
             store.room = null;
@@ -47,8 +52,10 @@ export default {
 </script>
 
 <style scoped>
-.win, .lose {
+.win,
+.lose {
     background-color: #1e2736;
+    opacity: 0.9;
     width: 100%;
     height: 100vh;
     display: grid;
@@ -105,5 +112,17 @@ button:hover::after {
     top: 0;
     z-index: 1;
     object-fit: cover;
+}
+
+.win-container {
+    background-size: cover;
+    background-position: 0 60%;
+    background-image: url('/img/win_bg.jpg');
+}
+
+.lose-container {
+    background-size: cover;
+    background-position: 0 60%;
+    background-image: url('/img/lose_bg.jpg');
 }
 </style>

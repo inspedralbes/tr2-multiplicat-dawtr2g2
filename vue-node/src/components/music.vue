@@ -1,8 +1,8 @@
 <template>
     <button class="nes-btn" @click="toggleMuteAndPlay">
         <img :src="isMuted
-            ? '/public/img/mute-sound.png'
-            : '/public/img/unmute-sound.png'
+            ? '/img/mute-sound.png'
+            : '/img/unmute-sound.png'
             " alt="" />
     </button>
 </template>

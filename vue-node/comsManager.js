@@ -67,12 +67,14 @@ async function getRandomAnswers(data) {
                 urlResp = `${url}respostes/mostrar/${randomNumber}`;
             }
             const response = await axios.get(urlResp);
-            const newResponse = {
-                id: response.data.id,
-                resposta: response.data.resposta
-            };
-            if (!responses.some(r => r.id === newResponse.id)) {
-                responses.push(newResponse);
+            if (response.data.resposta != null) {
+                const newResponse = {
+                    id: response.data.id,
+                    resposta: response.data.resposta
+                };
+                if (!responses.some(r => r.id === newResponse.id)) {
+                    responses.push(newResponse);
+                }
             }
         }
 
@@ -111,7 +113,7 @@ async function getDamage(id) {
         console.error(error);
         throw error;
     }
-    
+
 }
 
 async function updateSkin(playerID, skinID) {

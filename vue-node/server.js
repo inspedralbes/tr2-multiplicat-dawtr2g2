@@ -1,9 +1,9 @@
-import express from 'express';
-import cors from 'cors';
-import http from 'http';
-import { Server } from 'socket.io';
-import comsManager from './comsManager.js';
-import { useAppStore } from './src/stores/app.js';
+import express from "express";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+import comsManager from "./comsManager.js";
+import { useAppStore } from "./src/stores/app.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -11,73 +11,81 @@ const server = http.createServer(app);
 app.use(cors());
 
 var rooms = [];
+var players = [];
 
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
 });
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   console.log("Client connectat");
 
-  socket.on('login', async (email, password) => {
-    comsManager.login(email, password)
-      .then(response => {
+  socket.on("login", async (email, password) => {
+    comsManager
+      .login(email, password)
+      .then((response) => {
         const user = {
           userId: response.data.user.id,
           username: response.data.user.username,
           token: response.data.token,
-          skin: response.data.skin
+          skin: response.data.skin,
         };
-        socket.emit('loginParameters', user);     
-        socket.emit('success', response);
+        socket.emit("loginParameters", user);
+        socket.emit("success", response);
       })
-      .catch(error => {
+      .catch((error) => {
         if (error.response.status === 400) {
-          console.error('Error al realizar la solicitud:', error.response.data.message);
-          socket.emit('error400', error.response.data.message);
+          console.error(
+            "Error al realizar la solicitud:",
+            error.response.data.message
+          );
+          socket.emit("error400", error.response.data.message);
         }
       });
   });
 
-  socket.on('register', async (username, email, password, password_confirmation, skin_id) => {
+  socket.on(
+    "register",
+    async (username, email, password, password_confirmation, skin_id) => {
+      comsManager
+        .register(username, email, password, password_confirmation, skin_id)
+        .then((response) => {
+          socket.emit("success", response);
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            socket.emit("error400", error.response.data.message);
+          }
+        });
+    }
+  );
 
-    comsManager.register(username, email, password, password_confirmation, skin_id)
-      .then(response => {
-        socket.emit('success', response);
+  socket.on("logout", (token) => {
+    comsManager
+      .logout(token)
+      .then((response) => {
+        socket.emit("successLogout", response);
+        socket.emit("logoutEliminarInfo");
       })
-      .catch(error => {
+      .catch((error) => {
         if (error.response.status === 400) {
-          socket.emit('error400', error.response.data.message);
+          socket.emit("error400", error.response.data.message);
         }
       });
   });
 
-  socket.on('logout', (token) => {
-    
-    comsManager.logout(token)
-      .then(response => {
-        socket.emit('successLogout', response);
-        socket.emit('logoutEliminarInfo');
-      })
-      .catch(error => {
-        if (error.response.status === 400) {
-          socket.emit('error400', error.response.data.message);
-        }
-      });
-  });
-
-  socket.on('genQuest', async (id) => {
+  socket.on("genQuest", async (id) => {
     var i = 0;
-    const room = rooms.find(room => room.id === id);
+    const room = rooms.find((room) => room.id === id);
     var exist = false;
     var questData = {};
     try {
-      while(!exist){
+      while (!exist) {
         questData = await comsManager.getRandomQuestion();
-        if (!room.quests.some(q => q.id === questData.id)) {
+        if (!room.quests.some((q) => q.id === questData.id)) {
           exist = true;
           room.quests.push(questData);
         }
@@ -86,14 +94,14 @@ io.on('connection', (socket) => {
 
       const quest = {
         id: questData.id,
-        pregunta: questData.pregunta
+        pregunta: questData.pregunta,
       };
 
-      io.to(id).emit('viewQuest', quest);
-      socket.to(id).emit('viewResp', respData);
+      io.to(id).emit("viewQuest", quest);
+      socket.to(id).emit("viewResp", respData);
 
       room.timer = 10;
-      
+
       return { questData, respData };
     } catch (error) {
       console.error(error);
@@ -141,8 +149,7 @@ io.on('connection', (socket) => {
                         if (roomIndex !== -1) {
                           rooms.splice(roomIndex, 1);
                         }
-
-                        io.emit("viewRooms", rooms);
+                        io.emit('viewRooms', rooms);
                       }
                     })
                     .catch((error) => {
@@ -173,11 +180,11 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('getRooms', () => {
-    io.emit('viewRooms', rooms);
+  socket.on("getRooms", () => {
+    io.emit("viewRooms", rooms);
   });
 
-  socket.on('createRoom', (name, id,user) => {
+  socket.on("createRoom", (name, id, user) => {
     var room = {
       name: name,
       id: id,
@@ -185,24 +192,24 @@ io.on('connection', (socket) => {
       timer: 10,
       timerId: null,
       timeUp: false,
-      quests: []
+      quests: [],
     };
 
     var player = {
       name: user.name,
       id: 1,
       life: 100,
-      skin: user.skin
-    }
+      skin: user.skin,
+    };
     room.players.push(player);
     rooms.push(room);
 
     socket.join(id);
-    socket.emit('roomCreated', room);
-    io.emit('viewRooms', rooms);
+    socket.emit("roomCreated", room);
+    io.emit("viewRooms", rooms);
   });
 
-  socket.on('joinRoom', (id,user) => {
+  socket.on("joinRoom", (id, user) => {
     var exist = false;
     var i = 0;
     var room = {};
@@ -214,8 +221,8 @@ io.on('connection', (socket) => {
           name: user.name,
           id: 2,
           life: 100,
-          skin: user.skin
-        }
+          skin: user.skin,
+        };
         exist = true;
         element.players.push(player);
         room = element;
@@ -227,14 +234,14 @@ io.on('connection', (socket) => {
       room.timerId = setInterval(() => {
         if (room.timer > 0) {
           room.timer--;
-          io.to(id).emit('timer', room.timer);
+          io.to(id).emit("timer", room.timer);
         } else {
-          io.to(id).emit('timeUp');
+          io.to(id).emit("timeUp");
           clearInterval(room.timerId);
           console.log("Time's up!");
           setTimeout(() => {
             room.timer = 10;
-            io.to(id).emit('startTimer');
+            io.to(id).emit("startTimer");
             startTimer(room, id);
           }, 3000);
         }
@@ -244,29 +251,31 @@ io.on('connection', (socket) => {
     if (exist) {
       socket.join(id);
       socket.emit("joiningGame", room);
-      socket.to(id).emit('playerJoined', room);
-      io.emit('viewRooms', rooms);
+      socket.to(id).emit("playerJoined", room);
+      io.emit("viewRooms", rooms);
       startTimer(room, id);
     }
   });
 
-  socket.on('getSkins', () => {
-    comsManager.getSkins()
-      .then(response => {
-        socket.emit('viewSkins', response);
+  socket.on("getSkins", () => {
+    comsManager
+      .getSkins()
+      .then((response) => {
+        socket.emit("viewSkins", response);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   });
 
-  socket.on('newSkin', (playerID, newSkin) => {
-    comsManager.updateSkin(playerID, newSkin)
-      .then(response => {
+  socket.on("newSkin", (playerID, newSkin) => {
+    comsManager
+      .updateSkin(playerID, newSkin)
+      .then((response) => {
         console.log(response);
-        socket.emit('skinUpdated', response);
+        socket.emit("skinUpdated", response);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   });
@@ -290,8 +299,30 @@ io.on('connection', (socket) => {
     
   });
 
-  socket.on('disconnect', () => {
-    console.log('Client desconectat');
+  socket.on("addPlayer", (playerInfo) => {
+    if (players.length === 0) {
+      players.push(playerInfo);
+    } else {
+      var i = 0;
+      while (i < players.length && !exist) {
+        var exist = false;
+        if (players[i].id === playerInfo.id) {
+          players[i] = playerInfo;
+          exist = true;
+        }
+        i++;
+      }
+      if (!exist) {
+        players.push(playerInfo);
+      }
+    }
+
+    console.log(players);
+    io.emit("viewPlayers", players);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client desconectat");
   });
 
 

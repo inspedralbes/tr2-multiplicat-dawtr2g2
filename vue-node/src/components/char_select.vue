@@ -89,6 +89,9 @@ span {
 button {
     border-image-repeat: stretch !important;
     background-color: #ffad5d !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 button::after {
@@ -101,12 +104,6 @@ button:hover {
 
 button:hover::after {
     box-shadow: inset -6px -6px #e46d3a !important;
-}
-
-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 button>img {
