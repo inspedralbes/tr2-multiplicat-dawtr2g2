@@ -29,12 +29,12 @@ INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
 (5, 'Geometria'),
 (6, 'Estadística');
 
-INSERT INTO `dificultats` (`id`, `nom_dificultat`,`punts_damage`) VALUES
-(1, 'Principiant',25),
-(2, 'Bàsic',15),
-(3, 'Intermedi',10),
-(4, 'Avançat',5),
-(5, 'Expert',2);
+INSERT INTO `dificultats` (`id`, `nom_dificultat`) VALUES
+(1, 'Principiant'),
+(2, 'Bàsic'),
+(3, 'Intermedi'),
+(4, 'Avançat'),
+(5, 'Expert');
 
 
 
