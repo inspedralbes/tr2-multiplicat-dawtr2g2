@@ -118,11 +118,6 @@ export const useAppStore = defineStore('app', {
     }
   },
   persist: {
-    enabled: true,
-    user: true,
-    isLogged: true,
-    lastRoute: true,
-    strategies: {
-    }
+    paths: ['user', 'isLogged', 'lastRoute'],
   }
 })
