@@ -9,8 +9,12 @@ export const useAppStore = defineStore('app', {
     user: {},
     isLogged: false,
     turn: true,
+    lastRoute: '',
     players: [],
   }),
+  persist: {
+    paths: ['user', 'isLogged', 'lastRoute', 'players']
+  },
   actions: {
     addRoom(room) {
       this.room = room;
@@ -22,7 +26,6 @@ export const useAppStore = defineStore('app', {
       return this.room.players;
     },
     getLong() {
-      console.log(this.usersCon);
       return this.usersCon;
     },
     addQuest(quest) {
@@ -32,7 +35,6 @@ export const useAppStore = defineStore('app', {
       this.respAct = resp;
     },
     getQuest() {
-      console.log(this.questAct);
       return this.questAct.pregunta;
     },
     setUser(user) {
@@ -44,16 +46,13 @@ export const useAppStore = defineStore('app', {
       this.isLogged = false;
     },
     getToken() {
-      console.log(this.user.tokens);
       return this.user.tokens;
     },
     setTurnOn() {
       this.turn = true;
-      console.log(this.turn);
     },
     setTurnOff() {
       this.turn = false;
-      console.log(this.turn);
     },
     getTurn() {
       return this.turn;
@@ -79,16 +78,53 @@ export const useAppStore = defineStore('app', {
     },
     canviarTimer(secs) {
       this.room.timer = secs;
-      // console.log(secs);
+    },
+    getUsername() {
+      return this.user.username;
+    },
+    getSkin() {
+      return this.user.skin;
+    },
+    updateLife(player) {
+      for (let i = 0; i < this.room.players.length; i++) {
+        const element = this.room.players[i];
+        if (player.id == element.id) {
+          element.life = player.life;
+        }
+      }
+    },
+    gameOver(player) {
+      for (let i = 0; i < this.room.players.length; i++) {
+        const element = this.room.players[i];
+        if (this.user.username == element.name) {
+          if (element.life <= 0) {
+            return false
+          } else {
+            return true
+          }
+        }
+      }
+    },
+    resetRoom() {
+      this.room = {};
+    },
+    setLastRoute(route) {
+      this.lastRoute = route;
+    },
+    getLastRoute() {
+      return this.lastRoute;
+    },
+    getIsLogged() {
+      return this.isLogged;
     },
     getId() {
-        console.log(this.user.userId);
-        return this.user.userId;
+      console.log(this.user.userId);
+      return this.user.userId;
     },
 
     addPlayers(players) {
-        console.log(players);
-        this.players = players;
+      console.log(players);
+      this.players = players;
     },
   },
 })
