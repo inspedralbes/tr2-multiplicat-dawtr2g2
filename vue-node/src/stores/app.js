@@ -7,6 +7,7 @@ export const useAppStore = defineStore('app', {
     room: {},
     rooms: [],
     user: {},
+    isLogged: false,
     turn: true,
   }),
   actions: {
@@ -33,6 +34,15 @@ export const useAppStore = defineStore('app', {
     },
     setUser(user) {
       this.user = user;
+      this.isLogged = true;
+    },
+    unsetUser() {
+      this.user = {};
+      this.isLogged = false;
+    },
+    getToken() {
+      console.log(this.user.tokens);
+      return this.user.tokens;
     },
     setTurnOn() {
       this.turn = true;
