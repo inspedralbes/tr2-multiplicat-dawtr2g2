@@ -23,7 +23,7 @@ import { useAppStore } from '../stores/app';
 import router from '../router'
 
 export default {
-
+    
     name: "gameOver",
     data() {
         return {
@@ -33,17 +33,11 @@ export default {
     },
     mounted() {
         const appStore = useAppStore();
-
-        if (!store.isLogged) {
-            this.$router.push("/");
-        }
-
-
         this.win = appStore.gameOver();
         this.skin = appStore.user.skin;
     },
     methods: {
-        tornarRooms() {
+        tornarRooms(){
             const store = useAppStore();
             router.push('/rooms');
             store.room = null;
@@ -53,8 +47,7 @@ export default {
 </script>
 
 <style scoped>
-.win,
-.lose {
+.win, .lose {
     background-color: #1e2736;
     width: 100%;
     height: 100vh;
