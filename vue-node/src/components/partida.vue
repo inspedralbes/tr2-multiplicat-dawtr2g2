@@ -171,10 +171,12 @@ export default {
         });
 
         socket.on('correct', () => {
+            this.quest.pregunta = 'Correcte'
             this.est = 'Correcte';
         });
 
         socket.on('incorrect', () => {
+            this.quest.pregunta = 'Incorrecte'
             this.est = 'Incorrecte';
         });
 
