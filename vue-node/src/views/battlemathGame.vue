@@ -359,8 +359,12 @@ export default defineComponent({
             return randomIndex === 0 ? skin1 : skin2;
         },
         selectSkin(character) {
+            const store = useAppStore();
+
             this.player.skinID = character.id;
             this.playerSprite = character.name;
+            store.setSkin(character.name);
+
         },
         openCharSelectModal() {
             this.npc.interactingWithNPC = false;
