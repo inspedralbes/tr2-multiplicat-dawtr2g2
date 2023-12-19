@@ -1,5 +1,6 @@
 <template>
     <div>
+        <button class="option tornar" @click="returnGame">Torna al joc</button>
         <div class="rooms__container">
             <div class="box">
                 <div class="options">
@@ -82,7 +83,7 @@ export default {
             room: "",
             rooms: [],
             screen: 1,
-            player:{
+            player: {
                 name: "",
                 skin: "",
             }
@@ -105,19 +106,23 @@ export default {
         );
         this.player.name = store.getUsername();
         this.player.skin = store.getSkin();
+        console.log(this.$router);
     },
     methods: {
         createRoom() {
-            socket.emit("createRoom", this.room, uid(),this.player);
+            socket.emit("createRoom", this.room, uid(), this.player);
             this.room = "";
             this.rooms = [];
         },
         joinRoom(id) {
-            socket.emit("joinRoom", id,this.player);
+            socket.emit("joinRoom", id, this.player);
         },
         changeScreen(index) {
             this.screen = index;
         },
+        returnGame() {
+            this.$router.push("/game");
+        }
     },
 };
 </script>
@@ -221,15 +226,15 @@ export default {
 }
 
 .createRoom {
-    background-color: transparent;
+    background-color: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;
     border-radius: 15px;
     padding: 30px;
-    margin-top: 10px;
 }
 
 .info__container {
+    margin-top: 10px;
     width: 100%;
     height: 100%;
     background-color: #282828;
@@ -349,5 +354,11 @@ option:checked {
     .box {
         height: 50%;
     }
+}
+
+.tornar {
+    position: fixed;
+    top: 3%;
+    left: 3%;
 }
 </style>
