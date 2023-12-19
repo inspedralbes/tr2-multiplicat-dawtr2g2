@@ -1,5 +1,5 @@
 // import index from './index.css'
-
+// Funciona con el import de abajo
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { defineCustomElements as defineIonPhaser } from '@ion-phaser/core/loader';
