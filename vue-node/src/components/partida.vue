@@ -6,7 +6,7 @@
         <div class="game">
             <header class="header">
                 <div class="player player1">
-                    <img src="/img/monk2 face.png" alt="">
+                    <img :src="`/characters/${room.players[0].skin}_face.png`" alt="">
                     <div class="info">
                         <div class="bar">
                             <div class="progress" :class="{ 'low-life': room.players[0].life < 30 }"
@@ -35,20 +35,20 @@
                         <p class="name">{{ room.players[1].name }}</p>
                         <p class="level">Lvl 9</p>
                     </div>
-                    <img src="/img/Skeleton Faceset.png" alt="">
+                    <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
                 </div>
             </header>
 
             <main>
                 <div class="character">
-                    <img src="/img/monk2 fight.png" alt="">
+                    <img :src="`/characters/${room.players[0].skin}_fight.png`" alt="">
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                 </div>
-                <div class="character" v-if="room.players.length == 2">
-                    <img src="/img/Skeleton Fight.png" alt="">
+                <div class="character" v-if="room.players.length == 2" style="transform: scaleX(-1);">
+                    <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
                 </div>
             </main>
 
@@ -135,7 +135,9 @@ export default {
         }
 
         watch(() => store.questAct, request => {
+            this.mostResp = true;
             this.quest = request;
+            console.log(this.quest)
         });
 
         watch(() => store.getTimer(), time => {
@@ -151,8 +153,13 @@ export default {
         })
 
         this.turn = store.getTurn();
+        this.player = store.getUsername();
+
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
+            if (this.turn == true) {
+                this.mostResp = false;
+            }
         });
 
         watch(() => store.respAct, answers => {
@@ -177,11 +184,13 @@ export default {
             this.numQuest--;
             console.log(this.room)
             socket.emit('genQuest', this.room.id);
+            this.mostResp = true;
         },
         compAns(quest, ans) {
+            this.mostResp = false;
             this.ans = [];
             this.est = '';
-            socket.emit('compAns', quest, ans, this.room.id);
+            socket.emit('compAns', quest, ans, this.room.id, this.player);
         },
 
     },
@@ -197,13 +206,6 @@ export default {
     font-family: Arial, Helvetica, sans-serif !important;
 }
 
-.container {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .game {
     background-image: url('/img/combate.jpg');
@@ -274,9 +276,10 @@ export default {
 }
 
 .player1 .bar .progress {
-    width: 60%;
+    width: 100%;
     height: 100%;
-    background-color: #d9b444;
+    background-color: #44d953;
+    /*background-color: #d9b444;*/
     border-radius: 5px;
 }
 
@@ -327,7 +330,7 @@ export default {
 }
 
 .player2 .bar .progress {
-    width: 90%;
+    width: 100%;
     height: 100%;
     background-color: #44d953;
     border-radius: 5px;

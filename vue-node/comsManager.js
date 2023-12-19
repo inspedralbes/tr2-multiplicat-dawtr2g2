@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://localhost:8000/api/";
+const url = "http://127.0.0.1:8000/api/";
 
 async function login(email, password) {
     try {
@@ -28,6 +28,21 @@ async function register(username, email, password, password_confirmation, skin_i
     }
 }
 
+async function logout(token) {
+
+    try {
+        const response = await axios.post(`${url}logout`, {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 async function getRandomQuestion() {
     try {
         const randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
@@ -44,18 +59,21 @@ async function getRandomAnswers(data) {
         const respCorr = Math.floor(Math.random() * 4);
         const responses = [];
         let urlResp = '';
-        for (let i = 0; i < 4; i++) {
-            if (respCorr === i) {
+        while (responses.length < 4) {
+            if (respCorr === responses.length) {
                 urlResp = `${url}respostes/mostrar/${data.resposta_correcta_id}`;
             } else {
                 let randomNumber = Math.floor(Math.random() * (120 - 1 + 1)) + 1;
                 urlResp = `${url}respostes/mostrar/${randomNumber}`;
             }
             const response = await axios.get(urlResp);
-            responses.push({
+            const newResponse = {
                 id: response.data.id,
                 resposta: response.data.resposta
-            });
+            };
+            if (!responses.some(r => r.id === newResponse.id)) {
+                responses.push(newResponse);
+            }
         }
 
         return responses;
@@ -85,14 +103,39 @@ async function getSkins() {
     }
 }
 
+async function getDamage(id) {
+    try {
+        const response = await axios.get(`${url}getDamage/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+    
+}
+
+async function updateSkin(playerID, skinID) {
+    try {
+        const response = await axios.put(`${url}perfil/modificar/${playerID}`, {
+            skin_id: skinID
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 const comsManager = {
-    // getQuestion,
     login,
     register,
     getRandomQuestion,
     getRandomAnswers,
     checkAnswer,
-    getSkins
+    getSkins,
+    getDamage,
+    updateSkin,
+    logout
 }
 
 export default comsManager;

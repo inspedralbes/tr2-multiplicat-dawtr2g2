@@ -3,18 +3,10 @@
         <div class="rooms__container">
             <div class="box">
                 <div class="options">
-                    <button
-                        class="option"
-                        :class="{ active: screen === 0 }"
-                        @click="changeScreen(0)"
-                    >
+                    <button class="option" :class="{ active: screen === 0 }" @click="changeScreen(0)">
                         LISTA PARTIDAS
                     </button>
-                    <button
-                        class="option"
-                        :class="{ active: screen === 1 }"
-                        @click="changeScreen(1)"
-                    >
+                    <button class="option" :class="{ active: screen === 1 }" @click="changeScreen(1)">
                         CREAR PARTIDAS
                     </button>
                 </div>
@@ -22,15 +14,11 @@
                     <div style="width: 100%" v-for="room in rooms" :key="room">
                         <div class="room" v-if="room.players.length < 2">
                             <h2 class="title">{{ room.name }}</h2>
-                            <h3 class="user">Julian</h3>
+                            <h3 class="user">{{ room.players[0].name }}</h3>
                             <h4 class="capacity">
                                 {{ room.players.length }}/2
                             </h4>
-                            <button
-                                class="join-btn"
-                                value="{{room.id}}"
-                                @click="joinRoom(room.id)"
-                            >
+                            <button class="join-btn" value="{{room.id}}" @click="joinRoom(room.id)">
                                 Unirse
                             </button>
                         </div>
@@ -94,27 +82,38 @@ export default {
             room: "",
             rooms: [],
             screen: 1,
+            player:{
+                name: "",
+                skin: "",
+            }
         };
     },
 
     mounted() {
         socket.emit("getRooms");
         const store = useAppStore();
+
+        if (!store.isLogged) {
+            this.$router.push("/");
+        }
+
         watch(
             () => store.rooms,
             (newVal) => {
                 this.rooms = newVal;
             }
         );
+        this.player.name = store.getUsername();
+        this.player.skin = store.getSkin();
     },
     methods: {
         createRoom() {
-            socket.emit("createRoom", this.room, uid());
+            socket.emit("createRoom", this.room, uid(),this.player);
             this.room = "";
             this.rooms = [];
         },
         joinRoom(id) {
-            socket.emit("joinRoom", id);
+            socket.emit("joinRoom", id,this.player);
         },
         changeScreen(index) {
             this.screen = index;
@@ -127,9 +126,10 @@ export default {
 .rooms__container {
     width: 100%;
     height: 100vh;
-    background-image: url(../../public/img/pixelArt-background.jpeg);
+    background-image: url('/img/rooms_bg.jpg');
     background-size: cover;
     display: flex;
+    background-position: 0 60%;
     align-items: center;
 }
 

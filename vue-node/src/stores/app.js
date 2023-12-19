@@ -7,6 +7,7 @@ export const useAppStore = defineStore('app', {
     room: {},
     rooms: [],
     user: {},
+    isLogged: false,
     turn: true,
   }),
   actions: {
@@ -20,7 +21,6 @@ export const useAppStore = defineStore('app', {
       return this.room.players;
     },
     getLong() {
-      console.log(this.usersCon);
       return this.usersCon;
     },
     addQuest(quest) {
@@ -30,19 +30,25 @@ export const useAppStore = defineStore('app', {
       this.respAct = resp;
     },
     getQuest() {
-      console.log(this.questAct);
       return this.questAct.pregunta;
     },
     setUser(user) {
       this.user = user;
+      this.isLogged = true;
+    },
+    unsetUser() {
+      this.user = {};
+      this.isLogged = false;
+    },
+    getToken() {
+      console.log(this.user.tokens);
+      return this.user.tokens;
     },
     setTurnOn() {
       this.turn = true;
-      console.log(this.turn);
     },
     setTurnOff() {
       this.turn = false;
-      console.log(this.turn);
     },
     getTurn() {
       return this.turn;
@@ -68,7 +74,36 @@ export const useAppStore = defineStore('app', {
     },
     canviarTimer(secs) {
       this.room.timer = secs;
-      // console.log(secs);
-    }
+    },
+    getUsername() {
+      return this.user.username;
+    },
+    getSkin(){
+      return this.user.skin;
+    },
+    updateLife(player){
+      for (let i = 0; i < this.room.players.length; i++) {
+        const element = this.room.players[i];
+        if (player.id == element.id) {
+          element.life = player.life;
+        }
+      }
+    },
+    gameOver(player){
+      for (let i = 0; i < this.room.players.length; i++) {
+        const element = this.room.players[i];
+        console.log(element);
+        if (this.user.username == element.name) {
+          if (element.life <= 0) {
+            return false
+          }else{
+            return true
+          }
+        }
+      }
+    },
+    resetRoom(){
+      this.room = {};
+    } 
   },
 })

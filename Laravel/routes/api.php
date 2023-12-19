@@ -6,7 +6,7 @@ use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespostaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SkinsController;
-
+use App\Http\Controllers\DificultatController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,3 +46,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 ///Personatges
 Route::get('/skins', [SkinsController::class, 'index']);
+
+//DIFICULTATS
+Route::get('/getDamage/{id}', [DificultatController::class, 'getDamage']);
