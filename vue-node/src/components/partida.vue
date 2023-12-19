@@ -6,12 +6,12 @@
         <div class="game">
             <header class="header">
                 <div class="player player1">
-                    <img src="/img/monk2 face.png" alt="">
+                    <img :src="`/characters/${room.players[0].skin}_face.png`" alt="">
                     <div class="info">
                         <div class="bar">
-                            <div class="progress"></div>
+                            <div class="progress" :class="{ 'low-life': room.players[0].life < 30 }" :style="{ width: room.players[0].life + '%', background: room.players[0].life < 30 ? 'red' : room.players[0].life < 60 ? 'yellow' : '' }"></div>
                         </div>
-                        <p class="name">Ermengol Bota</p>
+                        <p class="name">{{room.players[0].name}}</p>
                         <p class="level">Lvl 7</p>
                     </div>
                 </div>
@@ -26,25 +26,25 @@
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
                         <div class="bar">
-                            <div class="progress"></div>
+                            <div type="range" class="progress" :class="{ 'low-life': room.players[1].life < 30 }" :style="{ width: room.players[1].life + '%', background: room.players[1].life < 30 ? 'red' : room.players[1].life < 60 ? 'yellow' : '' }"></div>
                         </div>
-                        <p class="name">Pedro Garcia</p>
+                        <p class="name">{{room.players[1].name}}</p>
                         <p class="level">Lvl 9</p>
                     </div>
-                    <img src="/img/Skeleton Faceset.png" alt="">
+                    <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
                 </div>
             </header>
 
             <main>
                 <div class="character">
-                    <img src="/img/monk2 fight.png" alt="">
+                    <img :src="`/characters/${room.players[0].skin}_fight.png`" alt="">
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                 </div>
-                <div class="character" v-if="room.players.length == 2">
-                    <img src="/img/Skeleton Fight.png" alt="">
+                <div class="character" v-if="room.players.length == 2" style="transform: scaleX(-1);">
+                    <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
                 </div>
             </main>
 
@@ -58,7 +58,7 @@
               </div>
               -->
 
-                <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="ans.length == 0 && turn">
+                <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
                     <p class="card-level">3</p>
                     <img class="image" src="/img/geometry.png" alt="">
@@ -72,8 +72,7 @@
                   <h3 class="title">Calcul</h3>
               </div>
               -->
-                <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id, answer.id)"
-                    :value="answer.id">
+                <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id, answer.id) " v-if="turn && ans != {} && this.mostResp == true" :value="answer.id">
                     <div class="level-bg"></div>
                     <p class="card-level">{{ index + 1 }}</p>
                     <h3 class="title-ans">{{ answer.resposta }}</h3>
@@ -113,6 +112,8 @@ export default {
         numQuest:10,
         turn: true,
         timer: 10,
+        player:"",
+        mostResp: false
       };
     },
     created() {
@@ -123,7 +124,9 @@ export default {
         const store = useAppStore();
 
         watch(() => store.questAct, request => {
+            this.mostResp = true;
             this.quest = request;
+            console.log(this.quest)
         });
 
         watch(() => store.getTimer(), time => {
@@ -139,12 +142,21 @@ export default {
         })
 
         this.turn = store.getTurn();
+        this.player = store.getUsername();
+
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
+            if (this.turn == true) {
+                this.mostResp = false;
+            }
         });
 
         watch(() => store.respAct, answers => {
-            this.ans = answers;
+            if (answers.length != {}) {
+                this.ans = answers;
+                this.mostResp = true;
+            }
+            
         });
 
         socket.on('correct', () => {
@@ -161,11 +173,13 @@ export default {
             this.numQuest--;
             console.log(this.room)
             socket.emit('genQuest', this.room.id);
+            this.mostResp = true;
         },
         compAns(quest, ans) {
+            this.mostResp = false;
             this.ans = [];
             this.est = '';
-            socket.emit('compAns', quest, ans, this.room.id);
+            socket.emit('compAns', quest, ans, this.room.id, this.player);
         },
 
     },
@@ -181,13 +195,6 @@ export default {
     font-family: Arial, Helvetica, sans-serif !important;
 }
 
-.container {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .game {
     background-color: #1e2736;
@@ -243,11 +250,41 @@ export default {
     margin-top: 45px;
 }
 
+.low-life {
+    animation-name: lowLife;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+
+    -webkit-animation-name:lowLife;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+}
 .player1 .bar .progress {
-    width: 60%;
+    width: 100%;
     height: 100%;
-    background-color: #d9b444;
+    background-color: #44d953;
+    /*background-color: #d9b444;*/
     border-radius: 5px;
+}
+
+@-moz-keyframes lowLife{  
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes lowLife {  
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+   100% { opacity: 1.0; }
+}
+
+@keyframes lowLife {  
+  0% { opacity: 1.0; }
+   50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
 }
 
 .player2 .bar {
@@ -255,7 +292,7 @@ export default {
 }
 
 .player2 .bar .progress {
-    width: 90%;
+    width: 100%;
     height: 100%;
     background-color: #44d953;
     border-radius: 5px;

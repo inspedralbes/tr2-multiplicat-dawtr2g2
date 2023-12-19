@@ -22,7 +22,7 @@
                     <div style="width: 100%" v-for="room in rooms" :key="room">
                         <div class="room" v-if="room.players.length < 2">
                             <h2 class="title">{{ room.name }}</h2>
-                            <h3 class="user">Julian</h3>
+                            <h3 class="user">{{ room.players[0].name }}</h3>
                             <h4 class="capacity">
                                 {{ room.players.length }}/2
                             </h4>
@@ -94,6 +94,10 @@ export default {
             room: "",
             rooms: [],
             screen: 1,
+            player:{
+                name: "",
+                skin: "",
+            }
         };
     },
 
@@ -106,15 +110,17 @@ export default {
                 this.rooms = newVal;
             }
         );
+        this.player.name = store.getUsername();
+        this.player.skin = store.getSkin();
     },
     methods: {
         createRoom() {
-            socket.emit("createRoom", this.room, uid());
+            socket.emit("createRoom", this.room, uid(),this.player);
             this.room = "";
             this.rooms = [];
         },
         joinRoom(id) {
-            socket.emit("joinRoom", id);
+            socket.emit("joinRoom", id,this.player);
         },
         changeScreen(index) {
             this.screen = index;

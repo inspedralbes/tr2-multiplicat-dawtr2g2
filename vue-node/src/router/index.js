@@ -10,6 +10,7 @@ import Rooms from '../views/RoomsView.vue'
 import Register from '../components/Register.vue'
 import Loading from '../views/Loading.vue'
 import textBox from '../components/textBox.vue'
+import gameOver from '../views/gameOver.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,11 @@ const router = createRouter({
       path: '/rooms',
       name: 'rooms',
       component: Rooms
+    },
+    {
+      path: '/endGame',
+      name: 'endGame',
+      component: gameOver
     }
   ]
 })

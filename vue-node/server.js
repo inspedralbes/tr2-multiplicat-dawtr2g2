@@ -56,10 +56,18 @@ io.on('connection', (socket) => {
 
   socket.on('genQuest', async (id) => {
     var i = 0;
+    const room = rooms.find(room => room.id === id);
+    var exist = false;
+    var questData = {};
     try {
-      const questData = await comsManager.getRandomQuestion();
+      while(!exist){
+        questData = await comsManager.getRandomQuestion();
+        if (!room.quests.some(q => q.id === questData.id)) {
+          exist = true;
+          room.quests.push(questData);
+        }
+      }
       const respData = await comsManager.getRandomAnswers(questData);
-
 
       const quest = {
         id: questData.id,
@@ -69,14 +77,8 @@ io.on('connection', (socket) => {
       io.to(id).emit('viewQuest', quest);
       socket.to(id).emit('viewResp', respData);
 
-      while (i < rooms.length) {
-        const element = rooms[i];
-        if (id === element.id) {
-          element.timer = 10;
-        }
-        i++;
-      }
-
+      room.timer = 10;
+      
       return { questData, respData };
     } catch (error) {
       console.error(error);
@@ -84,23 +86,58 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('compAns', (quest, resp, id) => {
+  socket.on('compAns', (quest, resp, id,user) => {
     var a = 0;
     comsManager.checkAnswer(quest)
       .then(response => {
-        var data = response.data.resposta_correcta_id;
-
+        var data = response.resposta_correcta_id;
         if (data == resp) {
           io.to(id).emit('correct');
           console.log('Correcte');
         } else {
+          let x = 0;
+          while (x < rooms.length) {
+            const element = rooms[x];
+            if (id === element.id) {
+              let y = 0;
+              while (y < element.players.length) {
+                const player = element.players[y];
+                if (player.name === user) {
+                  comsManager.getDamage(response.dificultat_id)
+                    .then(response => {
+                      player.life = player.life - response;
+                      console.log(player.life);
+                      io.to(id).emit('life', player);
+                      if (player.life <= 0) {
+                        io.to(id).emit('gameOver',player);
+                        clearInterval(element.timerId);
+                        io.to(id).emit('disconnectRoom',id);
+
+                        const roomIndex = rooms.findIndex(room => room.id === id);
+                        if (roomIndex !== -1) {
+                          rooms.splice(roomIndex, 1);
+                        }
+                        io.emit('viewRooms', rooms);
+                      }
+                    })
+                    .catch(error => {
+                      console.error(error);
+                    });
+                }
+                y++;
+              }
+            }
+            x++;
+          }
+
           io.to(id).emit('incorrect');
           console.log('Incorrecte');
         }
+
+        let a = 0;
         while (a < rooms.length) {
           const element = rooms[a];
           if (id === element.id) {
-            exist = true;
             element.timer = 10;
           }
           a++;
@@ -115,20 +152,22 @@ io.on('connection', (socket) => {
     io.emit('viewRooms', rooms);
   });
 
-  socket.on('createRoom', (name, id) => {
+  socket.on('createRoom', (name, id,user) => {
     var room = {
       name: name,
       id: id,
       players: [],
       timer: 10,
       timerId: null,
-      timeUp: false
+      timeUp: false,
+      quests: []
     };
 
     var player = {
-      name: "player1",
+      name: user.name,
       id: 1,
       life: 100,
+      skin: user.skin
     }
     room.players.push(player);
     rooms.push(room);
@@ -138,7 +177,7 @@ io.on('connection', (socket) => {
     io.emit('viewRooms', rooms);
   });
 
-  socket.on('joinRoom', (id) => {
+  socket.on('joinRoom', (id,user) => {
     var exist = false;
     var i = 0;
     var room = {};
@@ -147,9 +186,10 @@ io.on('connection', (socket) => {
       const element = rooms[i];
       if (id === element.id) {
         var player = {
-          name: "player2",
+          name: user.name,
           id: 2,
           life: 100,
+          skin: user.skin
         }
         exist = true;
         element.players.push(player);
