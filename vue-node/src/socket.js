@@ -90,3 +90,7 @@ socket.on('disconnectRoom', (room) => {
   const store = useAppStore();
   store.resetRoom();
 });
+socket.on("viewPlayers", (players) => {
+  const store = useAppStore();
+  store.addPlayers(players);
+});

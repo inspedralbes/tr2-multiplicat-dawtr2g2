@@ -11,6 +11,7 @@ const server = http.createServer(app);
 app.use(cors());
 
 var rooms = [];
+var players = [];
 
 const io = new Server(server, {
   cors: {
@@ -260,6 +261,28 @@ io.on('connection', (socket) => {
         console.error(error);
       });
   });
+
+  socket.on("addPlayer", (playerInfo) => {
+    if (players.length === 0) {
+        players.push(playerInfo);
+    } else {
+        var i = 0;
+        while (i < players.length && !exist) {
+            var exist = false;
+            if (players[i].id === playerInfo.id) {
+                players[i] = playerInfo;
+                exist = true;
+            }
+            i++;
+        }
+        if (!exist) {
+            players.push(playerInfo);
+        }
+    }
+
+    console.log(players);
+    io.emit("viewPlayers", players);
+});
 
   socket.on('disconnect', () => {
     console.log('Client desconectat');
