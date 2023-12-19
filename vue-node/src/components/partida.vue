@@ -206,17 +206,20 @@ export default {
     font-family: Arial, Helvetica, sans-serif !important;
 }
 
-
-.game {
-    background-image: url('/img/combate.jpg');
+.container__game {
     background-size: cover;
     background-position: 0 60%;
+    background-image: url('/img/combate.jpg');
+}
+
+.game {
     width: 100%;
     height: 100vh;
     display: grid;
     grid-template-rows: repeat(3, 1fr);
     align-items: center;
     justify-items: center;
+    background-color: rgba(0, 0, 0, 0.9);
 }
 
 
@@ -339,7 +342,8 @@ export default {
 .player .name {
     font-size: 18px;
     font-weight: 600;
-    color: #fff;
+    color: #ffffff;
+    border-radius: 0 0 10px 10px;
 }
 
 .player .level {
@@ -387,8 +391,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 0 50px 50px rgba(214, 13, 13, .5);
+
 }
 
 .character {
