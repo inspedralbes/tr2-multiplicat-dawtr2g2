@@ -359,6 +359,6 @@ option:checked {
 .tornar {
     position: fixed;
     top: 3%;
-    left: 7%;
+    left: 8%;
 }
 </style>
