@@ -177,6 +177,12 @@ export default {
         socket.on('incorrect', () => {
             this.est = 'Incorrecte';
         });
+
+        watch(() => this.numQuest, newVal => {
+        if (newVal == 0) {
+            this.numQuest = 10;
+        }
+        });
     },
     methods: {
         genQuest() {
