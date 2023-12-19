@@ -101,14 +101,15 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('compAns', (quest, resp, id,user) => {
+  socket.on("compAns", (quest, resp, id, user) => {
     var a = 0;
-    comsManager.checkAnswer(quest)
-      .then(response => {
+    comsManager
+      .checkAnswer(quest)
+      .then((response) => {
         var data = response.resposta_correcta_id;
         if (data == resp) {
-          io.to(id).emit('correct');
-          console.log('Correcte');
+          io.to(id).emit("correct");
+          console.log("Correcte");
         } else {
           let x = 0;
           while (x < rooms.length) {
@@ -118,24 +119,33 @@ io.on('connection', (socket) => {
               while (y < element.players.length) {
                 const player = element.players[y];
                 if (player.name === user) {
-                  comsManager.getDamage(response.dificultat_id)
-                    .then(response => {
+                  comsManager
+                    .getDamage(response.dificultat_id)
+                    .then((response) => {
                       player.life = player.life - response;
                       console.log(player.life);
-                      io.to(id).emit('life', player);
+                      io.to(id).emit("life", player);
                       if (player.life <= 0) {
-                        io.to(id).emit('gameOver',player);
+                        io.to(id).emit("gameOver", player);
                         clearInterval(element.timerId);
-                        io.to(id).emit('disconnectRoom',id);
 
-                        const roomIndex = rooms.findIndex(room => room.id === id);
+                        io.to(id).emit("disconnectRoom", id);
+                        const socketsInRoom = io.sockets.adapter.rooms.get(id);
+
+                        for (const socketId of socketsInRoom) {
+                          const socket = io.sockets.sockets.get(socketId);
+                          socket.leave(id);
+                        }
+
+                        const roomIndex = rooms.findIndex((room) => room.id === id);
                         if (roomIndex !== -1) {
                           rooms.splice(roomIndex, 1);
                         }
-                        io.emit('viewRooms', rooms);
+
+                        io.emit("viewRooms", rooms);
                       }
                     })
-                    .catch(error => {
+                    .catch((error) => {
                       console.error(error);
                     });
                 }
@@ -145,8 +155,8 @@ io.on('connection', (socket) => {
             x++;
           }
 
-          io.to(id).emit('incorrect');
-          console.log('Incorrecte');
+          io.to(id).emit("incorrect");
+          console.log("Incorrecte");
         }
 
         let a = 0;
@@ -158,7 +168,7 @@ io.on('connection', (socket) => {
           a++;
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   });
@@ -261,9 +271,30 @@ io.on('connection', (socket) => {
       });
   });
 
+  socket.on("exitRoom", (id) => {
+    
+    io.to(id).emit("disconnectRoom", id);
+    const socketsInRoom = io.sockets.adapter.rooms.get(id);
+
+    for (const socketId of socketsInRoom) {
+      const socket = io.sockets.sockets.get(socketId);
+      socket.leave(id);
+    }
+
+    const roomIndex = rooms.findIndex((room) => room.id === id);
+    if (roomIndex !== -1) {
+      rooms.splice(roomIndex, 1);
+    }
+
+    io.emit("viewRooms", rooms);
+    
+  });
+
   socket.on('disconnect', () => {
     console.log('Client desconectat');
   });
+
+
 });
 
 const PORT = process.env.PORT || 3817;

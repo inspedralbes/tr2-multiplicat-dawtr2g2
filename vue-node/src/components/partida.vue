@@ -3,6 +3,8 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <div class="container__game">
+        <button class="nes-btn sortir" @click="sortir">Surt</button>
+
         <div class="game">
             <header class="header">
                 <div class="player player1">
@@ -45,8 +47,9 @@
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
-                    <H3 class="question" >{{ quest.pregunta }}</H3>
-                    <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}</h4>
+                    <H3 class="question">{{ quest.pregunta }}</H3>
+                    <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}
+                    </h4>
                 </div>
                 <div class="character" v-if="room.players.length == 2" style="transform: scaleX(-1);">
                     <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
@@ -126,7 +129,6 @@ export default {
         watch(() => store.questAct, request => {
             this.mostResp = true;
             this.quest = request;
-            console.log(this.quest)
         });
 
         watch(() => store.getTimer(), time => {
@@ -163,7 +165,7 @@ export default {
             this.quest = '';
             this.est = 'Correcte'
             this.showEstForThreeSeconds();
-            
+
         });
 
         socket.on('incorrect', () => {
@@ -173,16 +175,15 @@ export default {
         });
 
         watch(() => this.numQuest, newVal => {
-        if (newVal == 0) {
-            this.numQuest = 10;
-        }
+            if (newVal == 0) {
+                this.numQuest = 10;
+            }
         });
     },
     methods: {
         genQuest() {
             this.est = '';
             this.numQuest--;
-            console.log(this.room)
             socket.emit('genQuest', this.room.id);
             this.mostResp = true;
         },
@@ -198,6 +199,9 @@ export default {
                 this.showEst = false;
             }, 3000);
         },
+        sortir() {
+            socket.emit('exitRoom', this.room.id);
+        }
 
     },
 
@@ -206,14 +210,15 @@ export default {
   
 <style scoped>
 .correct {
-  color: green;
-  font-size: 30px;
+    color: green;
+    font-size: 30px;
 }
 
 .incorrect {
-  color: red;
-  font-size: 30px;
+    color: red;
+    font-size: 30px;
 }
+
 * {
     margin: 0;
     padding: 0;
@@ -297,7 +302,6 @@ export default {
     width: 100%;
     height: 100%;
     background-color: #44d953;
-    /*background-color: #d9b444;*/
     border-radius: 5px;
 }
 
@@ -558,6 +562,35 @@ main {
 
 .blue {
     background-color: #5ad5db;
+}
+
+.sortir {
+    border-image-repeat: stretch !important;
+    background-color: #ffad5d !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 3%;
+    right: 5%;
+    width: 6vw;
+    height: 3vh;
+}
+
+.sortir::after {
+    box-shadow: inset -4px -4px #e46d3a !important;
+}
+
+.sortir:hover {
+    background-color: #ec9e50 !important;
+}
+
+.sortir:hover::after {
+    box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+.nes-btn:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px #e46d3a !important;
 }
 </style>
   

@@ -85,8 +85,12 @@ socket.on("gameOver",(player) =>{
   store.gameOver(player);
 });
 
-socket.on('disconnectRoom', (room) => {
-  socket.leave(room);
+socket.on('disconnectRoom', () => {
+  router.push('/rooms');
   const store = useAppStore();
   store.resetRoom();
+});
+socket.on("viewPlayers", (players) => {
+  const store = useAppStore();
+  store.addPlayers(players);
 });
