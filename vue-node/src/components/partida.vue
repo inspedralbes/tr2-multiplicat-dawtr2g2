@@ -9,26 +9,30 @@
                     <img :src="`/characters/${room.players[0].skin}_face.png`" alt="">
                     <div class="info">
                         <div class="bar">
-                            <div class="progress" :class="{ 'low-life': room.players[0].life < 30 }" :style="{ width: room.players[0].life + '%', background: room.players[0].life < 30 ? 'red' : room.players[0].life < 60 ? 'yellow' : '' }"></div>
+                            <div class="progress" :class="{ 'low-life': room.players[0].life < 30 }"
+                                :style="{ width: room.players[0].life + '%', background: room.players[0].life < 30 ? 'red' : room.players[0].life < 60 ? 'yellow' : '' }">
+                            </div>
                         </div>
-                        <p class="name">{{room.players[0].name}}</p>
+                        <p class="name">{{ room.players[0].name }}</p>
                         <p class="level">Lvl 7</p>
                     </div>
                 </div>
 
-              <div class="timer">
-                  <p class="time">{{timer}}</p>
-                  <div class="title">
-                      <p>TIME</p>
-                  </div>
-              </div>
+                <div class="timer">
+                    <p class="time">{{ timer }}</p>
+                    <div class="title">
+                        <p>TIME</p>
+                    </div>
+                </div>
 
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
                         <div class="bar">
-                            <div type="range" class="progress" :class="{ 'low-life': room.players[1].life < 30 }" :style="{ width: room.players[1].life + '%', background: room.players[1].life < 30 ? 'red' : room.players[1].life < 60 ? 'yellow' : '' }"></div>
+                            <div type="range" class="progress" :class="{ 'low-life': room.players[1].life < 30 }"
+                                :style="{ width: room.players[1].life + '%', background: room.players[1].life < 30 ? 'red' : room.players[1].life < 60 ? 'yellow' : '' }">
+                            </div>
                         </div>
-                        <p class="name">{{room.players[1].name}}</p>
+                        <p class="name">{{ room.players[1].name }}</p>
                         <p class="level">Lvl 9</p>
                     </div>
                     <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
@@ -48,8 +52,8 @@
                 </div>
             </main>
 
-          <footer class="cards" v-if="room.players.length == 2 && room.timeUp == false">
-              <!--
+            <footer class="cards" v-if="room.players.length == 2 && room.timeUp == false">
+                <!--
                 <div class="card red">
                   <div class="level-bg"></div>
                   <p class="card-level">2</p>
@@ -58,7 +62,8 @@
               </div>
               -->
 
-                <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()" v-if="turn && this.mostResp == false">
+                <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()"
+                    v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
                     <p class="card-level">3</p>
                     <img class="image" src="/img/geometry.png" alt="">
@@ -72,7 +77,8 @@
                   <h3 class="title">Calcul</h3>
               </div>
               -->
-                <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id, answer.id) " v-if="turn && ans != {} && this.mostResp == true" :value="answer.id">
+                <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id, answer.id)"
+                    v-if="turn && ans != {} && this.mostResp == true" :value="answer.id">
                     <div class="level-bg"></div>
                     <p class="card-level">{{ index + 1 }}</p>
                     <h3 class="title-ans">{{ answer.resposta }}</h3>
@@ -104,17 +110,17 @@ import { watch } from 'vue';
 export default {
 
     data() {
-      return {
-        quest: '',
-        ans: [],
-        est: '',
-        room: {},
-        numQuest:10,
-        turn: true,
-        timer: 10,
-        player:"",
-        mostResp: false
-      };
+        return {
+            quest: '',
+            ans: [],
+            est: '',
+            room: {},
+            numQuest: 10,
+            turn: true,
+            timer: 10,
+            player: "",
+            mostResp: false
+        };
     },
     created() {
         const store = useAppStore();
@@ -122,6 +128,11 @@ export default {
     },
     mounted() {
         const store = useAppStore();
+
+
+        if (!store.isLogged) {
+            this.$router.push("/");
+        }
 
         watch(() => store.questAct, request => {
             this.mostResp = true;
@@ -156,7 +167,7 @@ export default {
                 this.ans = answers;
                 this.mostResp = true;
             }
-            
+
         });
 
         socket.on('correct', () => {
@@ -197,7 +208,9 @@ export default {
 
 
 .game {
-    background-color: #1e2736;
+    background-image: url('/img/combate.jpg');
+    background-size: cover;
+    background-position: 0 60%;
     width: 100%;
     height: 100vh;
     display: grid;
@@ -256,11 +269,12 @@ export default {
     animation-timing-function: linear;
     animation-iteration-count: infinite;
 
-    -webkit-animation-name:lowLife;
+    -webkit-animation-name: lowLife;
     -webkit-animation-duration: 1s;
     -webkit-animation-timing-function: linear;
     -webkit-animation-iteration-count: infinite;
 }
+
 .player1 .bar .progress {
     width: 100%;
     height: 100%;
@@ -269,22 +283,46 @@ export default {
     border-radius: 5px;
 }
 
-@-moz-keyframes lowLife{  
-  0% { opacity: 1.0; }
-  50% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+@-moz-keyframes lowLife {
+    0% {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.0;
+    }
+
+    100% {
+        opacity: 1.0;
+    }
 }
 
-@-webkit-keyframes lowLife {  
-  0% { opacity: 1.0; }
-  50% { opacity: 0.0; }
-   100% { opacity: 1.0; }
+@-webkit-keyframes lowLife {
+    0% {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.0;
+    }
+
+    100% {
+        opacity: 1.0;
+    }
 }
 
-@keyframes lowLife {  
-  0% { opacity: 1.0; }
-   50% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+@keyframes lowLife {
+    0% {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.0;
+    }
+
+    100% {
+        opacity: 1.0;
+    }
 }
 
 .player2 .bar {
@@ -349,6 +387,8 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 50px 50px rgba(214, 13, 13, .5);
 }
 
 .character {
