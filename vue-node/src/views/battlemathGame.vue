@@ -942,12 +942,12 @@ export default defineComponent({
                         skin = this.playerSprite;
                     }
 
-                    if (scene.scene.isActive("lobby")) {
-                        console.log("aaaa");
-                        this.playerInfoInterval = setInterval(() => {
-                            this.addPlayerInfo(scene);
-                        }, 1000);
-                    }
+                    // if (scene.scene.isActive("lobby")) {
+                    //     console.log("aaaa");
+                    //     this.playerInfoInterval = setInterval(() => {
+                    //         this.addPlayerInfo(scene);
+                    //     }, 1000);
+                    // }
 
                     switch (event.code) {
                         case "ArrowLeft":
@@ -975,7 +975,10 @@ export default defineComponent({
             scene.input.keyboard.on("keyup", (event) => {
                 switch (event.code) {
                     default:
-                        clearInterval(this.playerInfoInterval);
+                        // clearInterval(this.playerInfoInterval);
+                        if (scene.scene.isActive("lobby")) {
+                            this.addPlayerInfo(scene);
+                        }
                         const parts =
                             this.player.anims.currentAnim.key.split("_");
                         parts[1] = "idle";
