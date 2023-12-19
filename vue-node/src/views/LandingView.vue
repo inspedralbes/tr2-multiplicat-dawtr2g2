@@ -2,19 +2,24 @@
 import Preloader from "../components/preloader.vue";
 import Music from "../components/music.vue";
 import router from "../router";
+import { useAppStore } from "../stores/app";
 
 export default {
     components: {
         Preloader,
         Music,
-        
+
+    },
+    mounted() {
+        const store = useAppStore();
+        store.setLastRoute("/landing");
     },
     methods: {
         irARuta() {
             router.push("/game");
         },
     },
-    
+
 };
 </script>
 
