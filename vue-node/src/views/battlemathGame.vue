@@ -1113,13 +1113,7 @@ export default defineComponent({
                                 fontFamily: "Arial",
                                 fontSize: 10,
                                 color: "#fff",
-                                // backgroundColor: "#00000069",
-                                // padding: {
-                                //     left: 2,
-                                //     right: 2,
-                                //     top: 1,
-                                //     bottom: 1,
-                                // },
+                                
                                 
                             }
                         );
