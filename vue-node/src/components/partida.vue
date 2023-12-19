@@ -45,7 +45,8 @@
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
-                    <H3 class="question">{{ quest.pregunta }}</H3>
+                    <H3 class="question" >{{ quest.pregunta }}</H3>
+                    <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}</h4>
                 </div>
                 <div class="character" v-if="room.players.length == 2" style="transform: scaleX(-1);">
                     <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
@@ -88,19 +89,6 @@
         </div>
     </div>
 </template>
-
-
-<!--
-  <template>
-  <div>
-    <div>{{ quest.pregunta }}</div>
-    <button @click="genQuest()">Generar Pregunta</button>
-    
-    <div>{{est}}</div>
-  </div>
-    
-</template>
--->
   
 <script>
 import { socket } from "@/socket";
@@ -113,13 +101,14 @@ export default {
         return {
             quest: '',
             ans: [],
-            est: '',
             room: {},
             numQuest: 10,
             turn: true,
             timer: 10,
             player: "",
-            mostResp: false
+            mostResp: false,
+            est: '',
+            showEst: false,
         };
     },
     created() {
@@ -171,13 +160,16 @@ export default {
         });
 
         socket.on('correct', () => {
-            this.quest.pregunta = 'Correcte'
-            this.est = 'Correcte';
+            this.quest = '';
+            this.est = 'Correcte'
+            this.showEstForThreeSeconds();
+            
         });
 
         socket.on('incorrect', () => {
-            this.quest.pregunta = 'Incorrecte'
-            this.est = 'Incorrecte';
+            this.quest = '';
+            this.est = 'Incorrecte'
+            this.showEstForThreeSeconds();
         });
 
         watch(() => this.numQuest, newVal => {
@@ -200,6 +192,12 @@ export default {
             this.est = '';
             socket.emit('compAns', quest, ans, this.room.id, this.player);
         },
+        showEstForThreeSeconds() {
+            this.showEst = true;
+            setTimeout(() => {
+                this.showEst = false;
+            }, 3000);
+        },
 
     },
 
@@ -207,6 +205,15 @@ export default {
 </script>
   
 <style scoped>
+.correct {
+  color: green;
+  font-size: 30px;
+}
+
+.incorrect {
+  color: red;
+  font-size: 30px;
+}
 * {
     margin: 0;
     padding: 0;
