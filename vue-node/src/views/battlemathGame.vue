@@ -69,6 +69,8 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { useAppStore } from '@/stores/app';
+
 import char_select from '@/components/char_select.vue';
 import login from '@/components/Login.vue';
 import register from '@/components/Register.vue';
@@ -129,7 +131,8 @@ export default defineComponent({
             navigation_menus: {
                 showCharSelectModal: false,
                 loginModal: false,
-                registerModal: false
+                registerModal: false,
+                sceneStart: 1,
             },
             npc: {
                 npcs: [],
@@ -145,9 +148,27 @@ export default defineComponent({
         };
     },
     mounted() {
-        this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
-        this.initializeGame();
+        const store = useAppStore();
+        this.isLogged = store.getIsLogged();
+        if (this.isLogged) {
+            this.username = store.getUsername();
+            this.token = store.getToken();
+            this.playerSprite = store.getSkin();
+        } else {
+            this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
+        }
+
         this.recibirsuccessLogout();
+        if (store.getLastRoute() === '/rooms') {
+            this.navigation_menus.sceneStart = 2;
+            setTimeout(() => {
+                this.navigation_menus.sceneStart = 1;
+            }, 1000);
+        } else {
+            this.navigation_menus.sceneStart = 1;
+        }
+        this.initializeGame();
+        store.setLastRoute("/game");
     },
     watch: {
         playerSprite(newSkin) {
@@ -193,8 +214,7 @@ export default defineComponent({
                     self.createNPC(this, 712, 724, 'npcSamurai', 0);
 
                     ///Create player
-                    if (self.firstTime) {
-                        self.firstTime = false;
+                    if (!self.isLogged) {
                         self.playerCreate(this, 720, 774, self.playerSprite);
                     } else {
                         self.playerCreate(this, 793, 840, self.playerSprite);
@@ -223,22 +243,22 @@ export default defineComponent({
                 preload: function () {
                     self.player = null;
                     self.preloadLobby(this);
-                    this.load.spritesheet(
-                        "player",
-                        `characters/${self.playerSprite}.png`,
-                        { frameWidth: 16, frameHeight: 16 }
-                    );
+                    self.preloadNPC(this);
+                    self.preloadSkins(this);
                 },
                 create: function () {
                     self.createLobby(this);
 
+                    self.createNPC(this, 910, 420, 'npcRyu', 0);
                     ///Create player
-                    if (!self.player) {
+                    if (self.navigation_menus.sceneStart === 1) {
                         self.playerCreate(this, 888, 390, self.playerSprite);
                     } else {
-                        this.player.setVelocity(0, 0);
+                        self.playerCreate(this, 687, 554, self.playerSprite);
                     }
 
+
+                    self.triggerWithNPC(this);
                     self.addLobbyCollisions(this);
                     this.cameras.main.startFollow(self.player, true);
                     self.createLobby_foreground(this);
@@ -246,13 +266,10 @@ export default defineComponent({
                         self.player,
                         self.lobby_layers.fg
                     );
-                    self.createNPC(this, 910, 420, 'npcRyu', 0);
-                    self.triggerWithNPC(this);
 
                     self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-
                 },
             };
 
@@ -285,9 +302,7 @@ export default defineComponent({
             this.game.scene.add("playerHouse", playerHouseConfig, false);
             this.game.scene.add("lobby", lobbyConfig, false);
 
-            const sceneStart = 1;
-
-            if (sceneStart === 1) {
+            if (self.navigation_menus.sceneStart === 1) {
                 this.game.scene.start("playerHouse");
             } else {
                 this.game.scene.start("lobby");
@@ -823,10 +838,18 @@ export default defineComponent({
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
-            this.createPlayerAnims(scene, skin);
-            this.player = scene.physics.add.sprite(x, y, skin);
+            const store = useAppStore();
+            if (this.navigation_menus.sceneStart === 2) {
+                const skin2 = store.getSkin();
+                this.createPlayerAnims(scene, skin2);
+                this.player = scene.physics.add.sprite(x, y, skin2);
+                this.player.anims.play(`${skin2}_idle_down`);
+            } else {
+                this.createPlayerAnims(scene, skin);
+                this.player = scene.physics.add.sprite(x, y, skin);
+                this.player.anims.play(`${skin}_idle_down`);
+            }
 
-            this.player.anims.play(`${skin}_idle_down`);
             this.player.body.setSize(
                 this.player.width * 1,
                 this.player.height * 0.2
@@ -836,6 +859,7 @@ export default defineComponent({
                 this.player.height * 0.8
             );
             scene.physics.world.enable(this.player);
+
         },
         debugCollision(scene) {
             const debugGraphics = scene.add.graphics().setAlpha(0.75);
@@ -895,6 +919,12 @@ export default defineComponent({
         },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
+            const store = useAppStore();
+
+            if (this.navigation_menus.sceneStart === 2) {
+                skin = store.getSkin();
+            }
+
 
             scene.anims.create({
                 key: `${skin}_idle_down`,

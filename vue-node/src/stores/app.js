@@ -42,7 +42,6 @@ export const useAppStore = defineStore('app', {
       this.isLogged = false;
     },
     getToken() {
-      console.log(this.user.tokens);
       return this.user.tokens;
     },
     setTurnOn() {
@@ -93,7 +92,6 @@ export const useAppStore = defineStore('app', {
     gameOver(player) {
       for (let i = 0; i < this.room.players.length; i++) {
         const element = this.room.players[i];
-        console.log(element);
         if (this.user.username == element.name) {
           if (element.life <= 0) {
             return false
@@ -108,6 +106,12 @@ export const useAppStore = defineStore('app', {
     },
     setLastRoute(route) {
       this.lastRoute = route;
+    },
+    getLastRoute() {
+      return this.lastRoute;
+    },
+    getIsLogged() {
+      return this.isLogged;
     }
   },
 })

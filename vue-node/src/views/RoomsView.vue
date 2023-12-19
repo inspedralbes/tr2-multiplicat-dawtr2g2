@@ -106,7 +106,7 @@ export default {
         );
         this.player.name = store.getUsername();
         this.player.skin = store.getSkin();
-        console.log(this.$router);
+        store.setLastRoute("/rooms");
     },
     methods: {
         createRoom() {
