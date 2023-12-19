@@ -81,6 +81,9 @@ export const useAppStore = defineStore('app', {
     getSkin() {
       return this.user.skin;
     },
+    setNewSkin(skin) {
+      this.user.skin = skin;
+    },
     updateLife(player) {
       for (let i = 0; i < this.room.players.length; i++) {
         const element = this.room.players[i];
@@ -114,4 +117,7 @@ export const useAppStore = defineStore('app', {
       return this.isLogged;
     }
   },
+  persist: {
+    paths: ['user', 'isLogged', 'lastRoute'],
+  }
 })
