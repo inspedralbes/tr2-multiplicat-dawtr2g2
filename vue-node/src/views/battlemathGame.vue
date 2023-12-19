@@ -159,6 +159,7 @@ export default defineComponent({
 
             playerInfo: {
                 id: null,
+                username: "",
                 skin: "",
                 x: "",
                 y: "",
@@ -1084,6 +1085,7 @@ export default defineComponent({
         addPlayerInfo(scene) {
             const store = useAppStore();
             this.playerInfo.id = store.getId();
+            this.playerInfo.username = store.getUsername();
             this.playerInfo.skin = this.playerSprite;
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
@@ -1098,8 +1100,29 @@ export default defineComponent({
                     if (players[i].id !== this.playerInfo.id) {
                         // Si ya tenemos un sprite para este jugador, lo eliminamos
                         if (this.playerSprites[players[i].id]) {
-                            this.playerSprites[players[i].id].destroy();
+                            this.playerSprites[players[i].id].sprite.destroy();
+                            this.playerSprites[players[i].id].text.destroy();
                         }
+
+                        //Añadimos el username encima del personaje
+                        const text = scene.add.text(
+                            players[i].x - 10,
+                            players[i].y - 20,
+                            players[i].username,
+                            {
+                                fontFamily: "Arial",
+                                fontSize: 10,
+                                color: "#fff",
+                                // backgroundColor: "#00000069",
+                                // padding: {
+                                //     left: 2,
+                                //     right: 2,
+                                //     top: 1,
+                                //     bottom: 1,
+                                // },
+                                
+                            }
+                        );
 
                         // Creamos un nuevo sprite para el jugador
                         const jugador = scene.physics.add.sprite(
@@ -1108,13 +1131,13 @@ export default defineComponent({
                             players[i].skin
                         );
 
-                        // Almacenamos el sprite en nuestro objeto
-                        this.playerSprites[players[i].id] = jugador;
-
+                        // Almacenamos el sprite y el texto en nuestro objeto
+                        this.playerSprites[players[i].id] = { sprite: jugador, text: text };
                     }
                 }
             });
-        },
+        }
+
     },
 });
 </script>
