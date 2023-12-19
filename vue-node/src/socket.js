@@ -74,5 +74,13 @@ socket.on("startTimer", () => {
 });
 
 socket.on("gameOver",(player) =>{
-  router.push('/gameover');
+  const store = useAppStore();
+  router.push('/endGame');
+  store.gameOver(player);
+});
+
+socket.on('disconnectRoom', (room) => {
+  socket.leave(room);
+  const store = useAppStore();
+  store.resetRoom();
 });

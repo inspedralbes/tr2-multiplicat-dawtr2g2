@@ -109,9 +109,15 @@ io.on('connection', (socket) => {
                       console.log(player.life);
                       io.to(id).emit('life', player);
                       if (player.life <= 0) {
-                        io.to(id).emit('gameOver');
+                        io.to(id).emit('gameOver',player);
                         clearInterval(element.timerId);
-                        console.log("Game over!");
+                        io.to(id).emit('disconnectRoom',id);
+
+                        const roomIndex = rooms.findIndex(room => room.id === id);
+                        if (roomIndex !== -1) {
+                          rooms.splice(roomIndex, 1);
+                        }
+                        io.emit('viewRooms', rooms);
                       }
                     })
                     .catch(error => {
