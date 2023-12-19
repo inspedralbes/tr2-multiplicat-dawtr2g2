@@ -363,7 +363,7 @@ export default defineComponent({
 
             this.player.skinID = character.id;
             this.playerSprite = character.name;
-            store.setSkin(character.name);
+            store.setNewSkin(character.name);
 
         },
         openCharSelectModal() {
