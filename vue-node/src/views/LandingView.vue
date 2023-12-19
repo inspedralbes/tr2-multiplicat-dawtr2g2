@@ -1,16 +1,20 @@
 <script>
 import Preloader from "../components/preloader.vue";
+import Music from "../components/music.vue";
 import router from "../router";
 
 export default {
     components: {
         Preloader,
+        Music,
+        
     },
     methods: {
         irARuta() {
             router.push("/game");
         },
     },
+    
 };
 </script>
 
