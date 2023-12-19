@@ -292,7 +292,7 @@ h2 {
 .input-group input {
     position: relative;
     width: calc(100% - 50px);
-    padding: 10px 40px 10px 10px;
+    padding: 10px 39px 10px 10px;
     margin: 5px 25px;
     border: none;
     border-radius: 4px;
