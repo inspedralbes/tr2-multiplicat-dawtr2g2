@@ -117,4 +117,12 @@ export const useAppStore = defineStore('app', {
       return this.isLogged;
     }
   },
+  persist: {
+    enabled: true,
+    user: true,
+    isLogged: true,
+    lastRoute: true,
+    strategies: {
+    }
+  }
 })
