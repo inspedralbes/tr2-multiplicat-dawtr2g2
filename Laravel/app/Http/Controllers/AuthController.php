@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\skins;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -86,15 +84,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        if (Auth::user()) {
-            Auth::user()->tokens()->delete();
-            return response()->json(['success' => 'S\'ha tancat la sessió'], 200);
-        } else {
-            return response()->json(['message' => 'No hi ha cap sessió iniciada'], 400);
-        }
+        //auth()->user()->tokens()->delete();
 
         return [
-            'success' => 'S\'ha tancat la sessió',
+            'message' => 'S\'ha tancat la sessió',
         ];
     }
 }

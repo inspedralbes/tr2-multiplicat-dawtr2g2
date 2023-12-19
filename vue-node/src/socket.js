@@ -49,12 +49,6 @@ socket.on("loginParameters", (user) => {
   store.setUser(user);
 });
 
-socket.on("logoutEliminarInfo", () => {
-  const store = useAppStore();
-  store.unsetUser();
-  
-});
-
 socket.on("timer", (timer) => {
   const store = useAppStore();
   store.canviarTimer(timer);

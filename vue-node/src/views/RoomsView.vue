@@ -3,10 +3,18 @@
         <div class="rooms__container">
             <div class="box">
                 <div class="options">
-                    <button class="option" :class="{ active: screen === 0 }" @click="changeScreen(0)">
+                    <button
+                        class="option"
+                        :class="{ active: screen === 0 }"
+                        @click="changeScreen(0)"
+                    >
                         LISTA PARTIDAS
                     </button>
-                    <button class="option" :class="{ active: screen === 1 }" @click="changeScreen(1)">
+                    <button
+                        class="option"
+                        :class="{ active: screen === 1 }"
+                        @click="changeScreen(1)"
+                    >
                         CREAR PARTIDAS
                     </button>
                 </div>
@@ -18,7 +26,11 @@
                             <h4 class="capacity">
                                 {{ room.players.length }}/2
                             </h4>
-                            <button class="join-btn" value="{{room.id}}" @click="joinRoom(room.id)">
+                            <button
+                                class="join-btn"
+                                value="{{room.id}}"
+                                @click="joinRoom(room.id)"
+                            >
                                 Unirse
                             </button>
                         </div>
@@ -92,11 +104,6 @@ export default {
     mounted() {
         socket.emit("getRooms");
         const store = useAppStore();
-
-        if (!store.isLogged) {
-            this.$router.push("/");
-        }
-
         watch(
             () => store.rooms,
             (newVal) => {
@@ -126,10 +133,9 @@ export default {
 .rooms__container {
     width: 100%;
     height: 100vh;
-    background-image: url('/img/rooms_bg.jpg');
+    background-image: url(../../public/img/pixelArt-background.jpeg);
     background-size: cover;
     display: flex;
-    background-position: 0 60%;
     align-items: center;
 }
 
