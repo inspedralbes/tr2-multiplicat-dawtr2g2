@@ -120,9 +120,11 @@ export const useAppStore = defineStore('app', {
     getId() {
       return this.user.userId;
     },
-
     addPlayers(players) {
       this.players = players;
     },
+    setNewSkin(skin) {
+      this.user.skin = skin;
+    }
   },
 })
