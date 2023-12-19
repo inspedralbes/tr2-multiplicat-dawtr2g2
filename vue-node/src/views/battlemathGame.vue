@@ -10,7 +10,6 @@
                 <button v-if="isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Surt</button>
             </div>
         </div> -->
-
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -31,13 +30,12 @@
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
                 <div class="woman-btn" v-if="npc.npcImage === 'Woman' && !this.npc.interactingWithDoor">
                     <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
-                    <button v-if="this.isLogged" class="nes-btn" @click="logout">Surt</button>
                     <button v-if="!this.isLogged" class="nes-btn"
                         @click="navigation_menus.registerModal = true">Registra't</button>
                 </div>
-                <div class="woman-btn" v-if="npc.npcImage === 'Samurai' && isLogged">
-                    <button class="npc-btn nes-btn" @click="openCharSelectModal">Si</button>
-                    <button class="npc-btn nes-btn" @click="closeNPCModal">No</button>
+                <div class="woman-btn" v-if="npc.npcImage === 'doorPHouse' && npc.interactingWithDoor">
+                    <button class="nes-btn" @click="goToLobby">Si</button>
+                    <button class="nes-btn" @click="closeNPCModal">No</button>
                 </div>
             </div>
         </div>
@@ -75,9 +73,6 @@ import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
-import { socket } from '@/socket';
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
 
 
 export default defineComponent({
@@ -90,16 +85,9 @@ export default defineComponent({
     },
     data() {
         return {
-            player: {
-                skinID: '',
-                playerID: ''
-            },
             game: null,
             player: null,
             username: '',
-            token: '',
-            success: false,
-            message: '',
             isLogged: false,
             playerSprite: '',
             canMove: true,
@@ -147,7 +135,6 @@ export default defineComponent({
     mounted() {
         this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
         this.initializeGame();
-        this.recibirsuccessLogout();
     },
     watch: {
         playerSprite(newSkin) {
@@ -161,11 +148,6 @@ export default defineComponent({
                 this.player.anims.play(parts.join("_"));
             }
         },
-        success() {
-            if (this.success) {
-                this.toastNotification();
-            }
-        }
     },
     methods: {
         initializeGame() {
@@ -182,8 +164,6 @@ export default defineComponent({
                     this.load.image('dialogBox', '/img/DialogBoxFaceset.png')
                 },
                 create: function () {
-
-                    ///Create map
                     self.createPlayerHouse(this);
                     self.createParticleHouse(this, 664, 723);
                     self.createParticleHouse(this, 856, 723);
@@ -211,10 +191,9 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
-
-                    self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
+                    self.playerMovement(this, self.playerSprite);
                 },
             };
 
@@ -238,7 +217,6 @@ export default defineComponent({
                     } else {
                         this.player.setVelocity(0, 0);
                     }
-
                     self.addLobbyCollisions(this);
                     this.cameras.main.startFollow(self.player, true);
                     self.createLobby_foreground(this);
@@ -246,13 +224,9 @@ export default defineComponent({
                         self.player,
                         self.lobby_layers.fg
                     );
-                    self.createNPC(this, 910, 420, 'npcRyu', 0);
-                    self.triggerWithNPC(this);
-
-                    self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-
+                    self.playerMovement(this, self.playerSprite);
                 },
             };
 
@@ -303,59 +277,22 @@ export default defineComponent({
         },
         loginUser(user) {
             this.username = user.user.username;
-            this.player.playerID = user.user.id;
-            this.token = user.token;
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
-            this.isLogged = true;
             this.canMove = true;
+            this.isLogged = true;
             this.navigation_menus.loginModal = false;
-        },
-        logout() {
-            this.isLogged = false;
-            this.username = '';
-            this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
-            this.closeNPCModal();
-            socket.emit('logout', this.token);
-        },
-        recibirsuccessLogout() {
-            socket.on('successLogout', (response) => {
-                this.success = true;
-                this.message = response.success;
-            });
-        },
-        toastNotification() {
-            toast.success(this.message, {
-                position: "top-right",
-                timeout: 2000,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                draggablePercent: 0.6,
-                showCloseButtonOnHover: false,
-                hideProgressBar: false,
-                closeButton: "button",
-                icon: true,
-                rtl: false,
-            });
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
             return randomIndex === 0 ? skin1 : skin2;
         },
         selectSkin(character) {
-            this.player.skinID = character.id;
             this.playerSprite = character.name;
-        },
-        openCharSelectModal() {
-            this.npc.interactingWithNPC = false;
-            this.navigation_menus.showCharSelectModal = true;
-            this.canMove = false;
         },
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
             this.canMove = true;
-            socket.emit('newSkin', this.player.playerID, this.player.skinID);
         },
         closeNPCModal() {
             this.npc.interactingWithNPC = false;
@@ -807,10 +744,6 @@ export default defineComponent({
                         this.closeNPCModal();
                     }
                     break;
-                case "Ryu":
-                    this.npc.npcText = [`Hola ${this.username}, hauries d'anar al Dojo.`,
-                        `Allà podràs lluitar contra altres jugadors.`, `Es l'edifici amb el terrat vermell.`];
-                    break;
                 default:
                     break;
             }
@@ -820,6 +753,10 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
+                if (this.npc.npcImage === 'Samurai' && this.isLogged) {
+                    this.canMove = false;
+                    this.navigation_menus.showCharSelectModal = true;
+                }
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
@@ -828,11 +765,11 @@ export default defineComponent({
 
             this.player.anims.play(`${skin}_idle_down`);
             this.player.body.setSize(
-                this.player.width * 1,
+                this.player.width * 0.6,
                 this.player.height * 0.2
             );
             this.player.body.setOffset(
-                this.player.width * 0,
+                this.player.width * 0.2,
                 this.player.height * 0.8
             );
             scene.physics.world.enable(this.player);
@@ -853,45 +790,37 @@ export default defineComponent({
             const runSpeedMultiplier = 1.5;
 
             let currentSpeed = speed;
-            scene.input.keyboard.on('keydown', event => {
-                this.controlsHidden = true;
-                if (this.canMove) {
-                    if (skin != this.playerSprite) {
-                        skin = this.playerSprite;
-                    }
-                    switch (event.code) {
-                        case 'ArrowLeft':
-                            this.player.anims.play(`${skin}_move_left`, true);
-                            this.player.setVelocity(-currentSpeed, 0);
-                            break;
-                        case 'ArrowRight':
-                            this.player.anims.play(`${skin}_move_right`, true);
-                            this.player.setVelocity(currentSpeed, 0);
-                            break;
-                        case 'ArrowUp':
-                            this.player.anims.play(`${skin}_move_up`, true);
-                            this.player.setVelocity(0, -currentSpeed);
-                            break;
-                        case 'ArrowDown':
-                            this.player.anims.play(`${skin}_move_down`, true);
-                            this.player.setVelocity(0, currentSpeed);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            });
 
-            scene.input.keyboard.on('keyup', event => {
-                switch (event.code) {
-                    default:
-                        const parts = this.player.anims.currentAnim.key.split("_");
-                        parts[1] = "idle";
-                        this.player.anims.play(parts.join("_"));
-                        this.player.setVelocity(0, 0);
-                        break;
+            if (
+                !this.playerMoved &&
+                (this.tecla(scene, "LEFT") ||
+                    this.tecla(scene, "RIGHT") ||
+                    this.tecla(scene, "UP") ||
+                    this.tecla(scene, "DOWN"))
+            ) {
+                this.controlsHidden = true;
+            }
+
+            if (this.canMove) {
+                if (this.tecla(scene, 'LEFT')) {
+                    this.player.setVelocity(-currentSpeed, 0);
+                    this.player.anims.play(`${skin}_move_left`, true);
+                } else if (this.tecla(scene, 'RIGHT')) {
+                    this.player.setVelocity(currentSpeed, 0);
+                    this.player.anims.play(`${skin}_move_right`, true);
+                } else if (this.tecla(scene, 'UP')) {
+                    this.player.setVelocity(0, -currentSpeed);
+                    this.player.anims.play(`${skin}_move_up`, true);
+                } else if (this.tecla(scene, 'DOWN')) {
+                    this.player.setVelocity(0, currentSpeed);
+                    this.player.anims.play(`${skin}_move_down`, true);
+                } else {
+                    const parts = this.player.anims.currentAnim.key.split("_");
+                    parts[1] = "idle";
+                    this.player.anims.play(parts.join("_"));
+                    this.player.setVelocity(0, 0);
                 }
-            });
+            }
         },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
@@ -1015,10 +944,6 @@ button:hover::after {
 
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
-}
-
-.npc-btn {
-    width: 20%;
 }
 
 .profile {
