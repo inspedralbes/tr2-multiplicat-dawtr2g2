@@ -9,6 +9,7 @@ export const useAppStore = defineStore('app', {
     user: {},
     isLogged: false,
     turn: true,
+    lastRoute: '',
   }),
   actions: {
     addRoom(room) {
@@ -41,7 +42,6 @@ export const useAppStore = defineStore('app', {
       this.isLogged = false;
     },
     getToken() {
-      console.log(this.user.tokens);
       return this.user.tokens;
     },
     setTurnOn() {
@@ -78,10 +78,10 @@ export const useAppStore = defineStore('app', {
     getUsername() {
       return this.user.username;
     },
-    getSkin(){
+    getSkin() {
       return this.user.skin;
     },
-    updateLife(player){
+    updateLife(player) {
       for (let i = 0; i < this.room.players.length; i++) {
         const element = this.room.players[i];
         if (player.id == element.id) {
@@ -89,21 +89,29 @@ export const useAppStore = defineStore('app', {
         }
       }
     },
-    gameOver(player){
+    gameOver(player) {
       for (let i = 0; i < this.room.players.length; i++) {
         const element = this.room.players[i];
-        console.log(element);
         if (this.user.username == element.name) {
           if (element.life <= 0) {
             return false
-          }else{
+          } else {
             return true
           }
         }
       }
     },
-    resetRoom(){
+    resetRoom() {
       this.room = {};
+    },
+    setLastRoute(route) {
+      this.lastRoute = route;
+    },
+    getLastRoute() {
+      return this.lastRoute;
+    },
+    getIsLogged() {
+      return this.isLogged;
     }
   },
 })
