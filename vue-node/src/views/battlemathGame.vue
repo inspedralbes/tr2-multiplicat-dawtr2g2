@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+        <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
