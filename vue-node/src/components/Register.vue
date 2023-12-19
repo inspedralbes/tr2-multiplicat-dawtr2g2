@@ -26,7 +26,8 @@
             <div class="input-group">
                 <label for="password">Contraseña</label>
                 <div class="password-input">
-                    <input type="password" id="password" name="password" v-model="password" required placeholder="Contrasenya">
+                    <input type="password" id="password" name="password" v-model="password" required
+                        placeholder="Contrasenya">
                     <span class="lock-icon"></span>
                 </div>
             </div>
@@ -95,7 +96,6 @@ export default {
             socket.on("error400", (errorMessage) => {
                 this.message = errorMessage;
                 this.error = true;
-                console.log('Mensaje de error recibido:', this.message);
 
             });
         },
@@ -150,7 +150,6 @@ export default {
 
 
 <style scoped>
-
 .password-input {
     position: relative;
 }
@@ -307,6 +306,7 @@ h2 {
     outline: none;
     border-bottom-width: 3px;
 }
+
 .input-group input:focus::placeholder {
     color: transparent;
 }

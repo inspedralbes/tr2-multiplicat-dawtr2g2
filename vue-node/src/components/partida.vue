@@ -129,7 +129,6 @@ export default {
         watch(() => store.questAct, request => {
             this.mostResp = true;
             this.quest = request;
-            console.log(this.quest)
         });
 
         watch(() => store.getTimer(), time => {
@@ -185,7 +184,6 @@ export default {
         genQuest() {
             this.est = '';
             this.numQuest--;
-            console.log(this.room)
             socket.emit('genQuest', this.room.id);
             this.mostResp = true;
         },
