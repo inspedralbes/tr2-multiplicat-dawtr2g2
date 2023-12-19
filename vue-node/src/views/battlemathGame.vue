@@ -22,57 +22,28 @@
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
             <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
-                <img
-                    class="npcFace"
-                    :src="`/npc/face_${npc.npcImage}.png`"
-                    alt=""
-                />
+                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
             <div class="modal nes-container is-rounded textBox">
-                <button
-                    @click="closeNPCModal"
-                    class="nes-btn boton-cerrar boton-cerrar-npc"
-                >
+                <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
-                <div
-                    class="woman-btn"
-                    v-if="
-                        npc.npcImage === 'Woman' &&
-                        !this.npc.interactingWithDoor
-                    "
-                >
-                    <button
-                        v-if="!this.isLogged"
-                        class="nes-btn"
-                        @click="navigation_menus.loginModal = true"
-                    >
+                <div class="woman-btn" v-if="npc.npcImage === 'Woman' &&
+                    !this.npc.interactingWithDoor
+                    ">
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">
                         Login
                     </button>
-                    <button
-                        v-if="this.isLogged"
-                        class="nes-btn"
-                        @click="logout"
-                    >
+                    <button v-if="this.isLogged" class="nes-btn" @click="logout">
                         Surt
                     </button>
-                    <button
-                        v-if="!this.isLogged"
-                        class="nes-btn"
-                        @click="navigation_menus.registerModal = true"
-                    >
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">
                         Registra't
                     </button>
                 </div>
-                <div
-                    class="woman-btn"
-                    v-if="npc.npcImage === 'Samurai' && isLogged"
-                >
-                    <button
-                        class="npc-btn nes-btn"
-                        @click="openCharSelectModal"
-                    >
+                <div class="woman-btn" v-if="npc.npcImage === 'Samurai' && isLogged">
+                    <button class="npc-btn nes-btn" @click="openCharSelectModal">
                         Si
                     </button>
                     <button class="npc-btn nes-btn" @click="closeNPCModal">
@@ -84,10 +55,7 @@
 
         <div v-if="navigation_menus.loginModal" class="login-modal">
             <div class="modal nes-container is-rounded">
-                <button
-                    @click="navigation_menus.loginModal = false"
-                    class="nes-btn boton-cerrar"
-                >
+                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
                 <login @user="loginUser" />
@@ -96,10 +64,7 @@
 
         <div v-if="navigation_menus.registerModal" class="register-modal">
             <div class="modal nes-container is-rounded">
-                <button
-                    @click="navigation_menus.registerModal = false"
-                    class="nes-btn boton-cerrar"
-                >
+                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
                 <register @user="registerUser" />
@@ -286,7 +251,7 @@ export default defineComponent({
 
                     self.playerMovement(this, self.playerSprite);
                 },
-                update: function () {},
+                update: function () { },
             };
 
             const lobbyConfig = {
@@ -975,12 +940,6 @@ export default defineComponent({
                         skin = this.playerSprite;
                     }
 
-                    // if (scene.scene.isActive("lobby")) {
-                    //     console.log("aaaa");
-                    //     this.playerInfoInterval = setInterval(() => {
-                    //         this.addPlayerInfo(scene);
-                    //     }, 1000);
-                    // }
 
                     switch (event.code) {
                         case "ArrowLeft":
@@ -1135,7 +1094,6 @@ export default defineComponent({
 
         viewPlayers(scene) {
             socket.on("viewPlayers", (players) => {
-                console.log("jugadores" + players);
                 for (let i = 0; i < players.length; i++) {
                     if (players[i].id !== this.playerInfo.id) {
                         // Si ya tenemos un sprite para este jugador, lo eliminamos
@@ -1153,7 +1111,6 @@ export default defineComponent({
                         // Almacenamos el sprite en nuestro objeto
                         this.playerSprites[players[i].id] = jugador;
 
-                        console.log("Pintar jugador" + players[i].id);
                     }
                 }
             });
@@ -1243,7 +1200,7 @@ button:hover::after {
     right: 10px;
 }
 
-.boton-cerrar > img {
+.boton-cerrar>img {
     width: 30px;
 }
 
@@ -1380,6 +1337,7 @@ button:hover::after {
 }
 
 @media screen and (min-width: 1150px) {
+
     .controls img,
     .controlsHide img {
         width: 40%;
@@ -1387,6 +1345,7 @@ button:hover::after {
 }
 
 @media screen and (min-width: 1440px) {
+
     .controls img,
     .controlsHide img {
         width: 35%;

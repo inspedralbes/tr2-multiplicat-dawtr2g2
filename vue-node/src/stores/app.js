@@ -118,12 +118,10 @@ export const useAppStore = defineStore('app', {
       return this.isLogged;
     },
     getId() {
-      console.log(this.user.userId);
       return this.user.userId;
     },
 
     addPlayers(players) {
-      console.log(players);
       this.players = players;
     },
   },
