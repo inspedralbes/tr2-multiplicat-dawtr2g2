@@ -3,6 +3,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import comsManager from './comsManager.js';
+import { useAppStore } from './src/stores/app.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -30,7 +31,7 @@ io.on('connection', (socket) => {
           token: response.data.token,
           skin: response.data.skin
         };
-        socket.emit('loginParameters', user);
+        socket.emit('loginParameters', user);     
         socket.emit('success', response);
       })
       .catch(error => {
@@ -46,6 +47,20 @@ io.on('connection', (socket) => {
     comsManager.register(username, email, password, password_confirmation, skin_id)
       .then(response => {
         socket.emit('success', response);
+      })
+      .catch(error => {
+        if (error.response.status === 400) {
+          socket.emit('error400', error.response.data.message);
+        }
+      });
+  });
+
+  socket.on('logout', (token) => {
+    
+    comsManager.logout(token)
+      .then(response => {
+        socket.emit('successLogout', response);
+        socket.emit('logoutEliminarInfo');
       })
       .catch(error => {
         if (error.response.status === 400) {
@@ -229,6 +244,17 @@ io.on('connection', (socket) => {
     comsManager.getSkins()
       .then(response => {
         socket.emit('viewSkins', response);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  });
+
+  socket.on('newSkin', (playerID, newSkin) => {
+    comsManager.updateSkin(playerID, newSkin)
+      .then(response => {
+        console.log(response);
+        socket.emit('skinUpdated', response);
       })
       .catch(error => {
         console.error(error);
