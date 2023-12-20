@@ -149,7 +149,7 @@ io.on("connection", (socket) => {
                         if (roomIndex !== -1) {
                           rooms.splice(roomIndex, 1);
                         }
-                        // io.emit('viewRooms', rooms);
+                        io.emit('viewRooms', rooms);
                       }
                     })
                     .catch((error) => {
@@ -206,7 +206,7 @@ io.on("connection", (socket) => {
 
     socket.join(id);
     socket.emit("roomCreated", room);
-    // io.emit("viewRooms", rooms);
+    io.emit("viewRooms", rooms);
   });
 
   socket.on("joinRoom", (id, user) => {
@@ -252,7 +252,7 @@ io.on("connection", (socket) => {
       socket.join(id);
       socket.emit("joiningGame", room);
       socket.to(id).emit("playerJoined", room);
-      // io.emit("viewRooms", rooms);
+      io.emit("viewRooms", rooms);
       // console.log("Emit Rooms 3");
       // startTimer(room, id);
     }
@@ -296,7 +296,7 @@ io.on("connection", (socket) => {
       rooms.splice(roomIndex, 1);
     }
 
-    // io.emit("viewRooms", rooms);
+    io.emit("viewRooms", rooms);
   });
 
   socket.on("addPlayer", (playerInfo) => {
