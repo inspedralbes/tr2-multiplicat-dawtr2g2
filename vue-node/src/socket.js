@@ -52,7 +52,7 @@ socket.on("loginParameters", (user) => {
 socket.on("logoutEliminarInfo", () => {
   const store = useAppStore();
   store.unsetUser();
-  
+
 });
 
 socket.on("timer", (timer) => {
@@ -68,18 +68,18 @@ socket.on("timeUp", () => {
   console.log(store.respAct);
 });
 
-socket.on("life",(player) =>{
+socket.on("life", (player) => {
   const store = useAppStore();
   store.updateLife(player);
 });
 
-socket.on("startTimer", () => {
-  const store = useAppStore();
-  store.settimeOff();
-  store.canviarTurn();
-});
+// socket.on("startTimer", () => {
+//   const store = useAppStore();
+//   store.settimeOff();
+//   store.canviarTurn();
+// });
 
-socket.on("gameOver",(player) =>{
+socket.on("gameOver", (player) => {
   const store = useAppStore();
   router.push('/endGame');
   store.gameOver(player);

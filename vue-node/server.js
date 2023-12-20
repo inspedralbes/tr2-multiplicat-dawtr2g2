@@ -149,7 +149,7 @@ io.on("connection", (socket) => {
                         if (roomIndex !== -1) {
                           rooms.splice(roomIndex, 1);
                         }
-                        io.emit('viewRooms', rooms);
+                        // io.emit('viewRooms', rooms);
                       }
                     })
                     .catch((error) => {
@@ -181,7 +181,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("getRooms", () => {
-    io.emit("viewRooms", rooms);
+    socket.emit("viewRooms", rooms);
   });
 
   socket.on("createRoom", (name, id, user) => {
@@ -206,7 +206,7 @@ io.on("connection", (socket) => {
 
     socket.join(id);
     socket.emit("roomCreated", room);
-    io.emit("viewRooms", rooms);
+    // io.emit("viewRooms", rooms);
   });
 
   socket.on("joinRoom", (id, user) => {
@@ -230,30 +230,31 @@ io.on("connection", (socket) => {
       i++;
     }
 
-    function startTimer(room, id) {
-      room.timerId = setInterval(() => {
-        if (room.timer > 0) {
-          room.timer--;
-          io.to(id).emit("timer", room.timer);
-        } else {
-          io.to(id).emit("timeUp");
-          clearInterval(room.timerId);
-          console.log("Time's up!");
-          setTimeout(() => {
-            room.timer = 10;
-            io.to(id).emit("startTimer");
-            startTimer(room, id);
-          }, 3000);
-        }
-      }, 1000);
-    }
+    // function startTimer(room, id) {
+    //   room.timerId = setInterval(() => {
+    //     if (room.timer > 0) {
+    //       room.timer--;
+    //       io.to(id).emit("timer", room.timer);
+    //     } else {
+    //       io.to(id).emit("timeUp");
+    //       clearInterval(room.timerId);
+    //       console.log("Time's up!");
+    //       setTimeout(() => {
+    //         room.timer = 10;
+    //         io.to(id).emit("startTimer");
+    //         startTimer(room, id);
+    //       }, 3000);
+    //     }
+    //   }, 1000);
+    // }
 
     if (exist) {
       socket.join(id);
       socket.emit("joiningGame", room);
       socket.to(id).emit("playerJoined", room);
-      io.emit("viewRooms", rooms);
-      startTimer(room, id);
+      // io.emit("viewRooms", rooms);
+      // console.log("Emit Rooms 3");
+      // startTimer(room, id);
     }
   });
 
@@ -281,7 +282,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("exitRoom", (id) => {
-    
+
     io.to(id).emit("disconnectRoom", id);
     const socketsInRoom = io.sockets.adapter.rooms.get(id);
 
@@ -295,8 +296,7 @@ io.on("connection", (socket) => {
       rooms.splice(roomIndex, 1);
     }
 
-    io.emit("viewRooms", rooms);
-    
+    // io.emit("viewRooms", rooms);
   });
 
   socket.on("addPlayer", (playerInfo) => {
