@@ -4,7 +4,7 @@ import router from './router'
 
 
 // "undefined" means the URL will be computed from the `window.location` object
-const URL = "http://localhost:3000";
+const URL = "http://localhost:3817";
 
 export const socket = io(URL);
 
@@ -49,6 +49,12 @@ socket.on("loginParameters", (user) => {
   store.setUser(user);
 });
 
+socket.on("logoutEliminarInfo", () => {
+  const store = useAppStore();
+  store.unsetUser();
+
+});
+
 socket.on("timer", (timer) => {
   const store = useAppStore();
   store.canviarTimer(timer);
@@ -56,11 +62,38 @@ socket.on("timer", (timer) => {
 
 socket.on("timeUp", () => {
   const store = useAppStore();
-  store.settimeUp();
+  store.questAct = {};
+  store.respAct = {};
+  console.log(store.respAct);
 });
 
-socket.on("startTimer", () => {
+socket.on("life", (player) => {
+  const store = useAppStore();
+  store.updateLife(player);
+});
+
+socket.on("changeTurn", () => {
   const store = useAppStore();
   store.settimeOff();
   store.canviarTurn();
+});
+
+socket.on("gameOver", (player) => {
+  const store = useAppStore();
+  router.push('/endGame');
+  store.gameOver(player);
+});
+
+socket.on('disconnectRoom', () => {
+  const store = useAppStore();
+  store.resetRoom();
+});
+
+socket.on("exit", () => {
+  router.push('/rooms');
+});
+
+socket.on("viewPlayers", (players) => {
+  const store = useAppStore();
+  store.addPlayers(players);
 });

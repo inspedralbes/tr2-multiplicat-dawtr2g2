@@ -1,7 +1,9 @@
 <template>
     <div class="char-select">
         <div class="carousel-container">
-            <button type="button" class="nes-btn" v-if="!loading" @click.prevent="scroll('left')">&lt;-</button>
+            <button class="nes-btn" v-if="!loading" @click.prevent="scroll('left')">
+                <img src="../../public/icons/arrow-left.svg" alt="arrow" />
+            </button>
             <div class="carousel">
                 <div v-for="(character, index) in characters" :key="index" class="character"
                     v-if="index === selectedCharacterIndex" @click="selectCharacter(index)">
@@ -19,7 +21,9 @@
                     </div>
                 </div>
             </div>
-            <button class="nes-btn" v-if="!loading" @click.prevent="scroll('right')">-&gt;</button>
+            <button class="nes-btn" v-if="!loading" @click.prevent="scroll('right')">
+                <img src="../../public/icons/arrow-right.svg" alt="arrow" />
+            </button>
         </div>
     </div>
 </template>
@@ -85,6 +89,9 @@ span {
 button {
     border-image-repeat: stretch !important;
     background-color: #ffad5d !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 button::after {
@@ -97,6 +104,10 @@ button:hover {
 
 button:hover::after {
     box-shadow: inset -6px -6px #e46d3a !important;
+}
+
+button>img {
+    width: 50%;
 }
 
 .nes-btn:active:not(.is-disabled)::after {

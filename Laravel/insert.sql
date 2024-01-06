@@ -19,7 +19,10 @@ INSERT INTO `skins` (`id`,`name`) VALUES
 (18,'fueguito');
 
 INSERT INTO `users` (`id`, `username`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `skin_id`) VALUES
-(1, 'Chadous', 'a22rauespgom@inspedralbes.cat', NULL, '$2y$12$sRhv89qWjWkJuKHgYLlYzex7bIWcVlyI5oDvLVk31w290N1lD0aOy', NULL, '2023-12-13 09:35:35', '2023-12-13 09:35:35', 17);
+(1, 'Chadous', 'a22rauespgom@inspedralbes.cat', NULL, '$2y$12$sRhv89qWjWkJuKHgYLlYzex7bIWcVlyI5oDvLVk31w290N1lD0aOy', NULL, '2023-12-13 08:35:35', '2023-12-13 08:35:35', 17),
+(2, 'Ivan', 'a22ivabarsan@inspedralbes.cat', NULL, '$2y$12$/luptSi4pZxhkUjqpmh4oOiMKLwE8WrZ8DdVEJ1EDLve0Oek2PO4G', NULL, '2023-12-18 07:08:39', '2023-12-18 07:08:39', 15),
+(3, 'titis017', 'a20pedgarguz@inspedralbes.cat', NULL, '$2y$12$4dY7Dhw9xnNUxVxHGswh7uSeHbhiYdnv/ml5dynxaP7VBF636fT4C', NULL, '2023-12-18 07:11:41', '2023-12-18 07:11:41', 18),
+(4, 'DGrazz', 'a16margarlop@inspedralbes.cat', NULL, '$2y$12$CSjV4fN7wzCR9CZYBRpEaeKmJ/NFdPl3DPHMgr2uCbG1I/zOMQqF.', NULL, '2023-12-18 07:12:57', '2023-12-18 07:12:57', 16);
 
 INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
 (1, 'Nombres i operacions'),
@@ -29,12 +32,12 @@ INSERT INTO `temes` (`id`, `nom_tematica`) VALUES
 (5, 'Geometria'),
 (6, 'Estadística');
 
-INSERT INTO `dificultats` (`id`, `nom_dificultat`) VALUES
-(1, 'Principiant'),
-(2, 'Bàsic'),
-(3, 'Intermedi'),
-(4, 'Avançat'),
-(5, 'Expert');
+INSERT INTO `dificultats` (`id`, `nom_dificultat`,`punts_damage`) VALUES
+(1, 'Principiant',25),
+(2, 'Bàsic',15),
+(3, 'Intermedi',10),
+(4, 'Avançat',5),
+(5, 'Expert',2);
 
 
 
@@ -54,20 +57,14 @@ INSERT INTO `respostes` (`id`, `resposta`, `tema_id`, `dificultat_id`) VALUES
 (13, 'π×r', 5, 1),
 (14, '2×π×r', 5, 1),
 (15, 'r2', 5, 1),
-(16, '90 graus', 5, 1),
 (17, '45 graus', 5, 1),
-(18, '180 graus', 5, 1),
 (19, 'Cercle', 5, 1),
 (20, 'Quadrat', 5, 1),
 (21, 'Triangle', 5, 1),
 (22, 'Diàmetre', 5, 1),
 (23, 'Radi', 5, 1),
 (24, 'Circumferència', 5, 1),
-(25, 'Radi', 5, 1),
-(26, 'Diàmetre', 5, 1),
-(27, 'Circumferència', 5, 1),
 (28, 'Diagonal', 5, 1),
-(29, 'Bisectriu', 5, 1),
 (30, 'Medianera', 5, 1);
 
 
@@ -108,7 +105,6 @@ INSERT INTO `respostes` (id, `resposta`, `tema_id`, `dificultat_id`) VALUES
 INSERT INTO `respostes` (`id`, `resposta`, `tema_id`, `dificultat_id`) VALUES
 (61, '2base major+base menor×altura', 5, 3),
 (62, 'base major×altura', 5, 3),
-(63, 'base menor×altura', 5, 3),
 (64, 'El perímetre es duplica i l\'àrea es quadruplica', 5, 3),
 (65, 'El perímetre i l\'àrea es duplicen', 5, 3),
 (66, 'El perímetre es quadruplica i làrea es duplica', 5, 3),
@@ -171,44 +167,44 @@ INSERT INTO `respostes` (`id`, `resposta`, `tema_id`, `dificultat_id`) VALUES
 (119, 'La suma dels angles és n×180 graus', 5, 4),
 (120, 'La suma dels angles és (n+2)×180 graus', 5, 4);
 
-INSERT INTO `preguntes` (`id`, `pregunta`, `resposta_correcta_id`, `tema_id`, `dificultat_id`) VALUES
-(1, 'Quina és la suma dels angles interiors d\'un triangle?', 2, 5, 1),
-(2, 'Quin és el nombre de costats d\'un polígon hexagonal?', 5, 5, 1),
-(3, 'Com es diu la línia que divideix un angle a la meitat?', 8, 5, 1),
-(4, 'Què és l\'àrea d\'un rectangle amb una base de 5 unitats i una altura de 8 unitats?', 12, 5, 1),
-(5, 'Quina és la fórmula per calcular el perímetre d\'un cercle?', 14, 5, 1),
-(6, 'Quin és l\'angle entre les agulles d\'un rellotge a les 3 en punt?', 16, 5, 1),
-(7, 'Quina figura té totes les seves cares amb la mateixa mida?', 20, 5, 1),
-(8, 'Quin és el nom de la línia que divideix un cercle en dues parts iguals?', 22, 5, 1),
-(9, 'Com es diu la línia que connecta dos punts del cercle i passa pel seu centre?', 26, 5, 1),
-(10, 'Quin és el nom de la línia que uneix dos vèrtexs no consecutius d\'un polígon?', 28, 5, 1),
-(11, 'Quina és la relació entre el diàmetre i el radi d\'un cercle?', 31, 5, 2),
-(12, 'Quina és l\'àrea d\'un triangle amb una base de 6 cm i una altura de 4 cm?', 35, 5, 2),
-(13, 'Quin és l\'angle entre les agulles d\'un rellotge a les 6 en punt?', 38, 5, 2),
-(14, 'Quina és la fórmula per calcular l\'àrea d\'un cercle?', 42, 5, 2),
-(15, 'Quin és el nom de la línia que divideix un angle a la meitat?', 43, 5, 2),
-(16, 'Quin és l\'àrea d\'un rectangle amb una base de 10 unitats i una altura de 3 unitats?', 46, 5, 2),
-(17, 'Quina és la suma dels angles interiors d\'un quadrat?', 50, 5, 2),
-(18, 'Quina és la fórmula per calcular el perímetre d\'un rectangle?', 54, 5, 2),
-(19, 'Quin és l\'àrea d\'un quadrat amb un costat de 7 cm?', 56, 5, 2),
-(20, 'Quina és la relació entre els angles d\'un triangle?', 59, 5, 2),
-(21, 'Quina és la fórmula per calcular l\'àrea d\'un trapezi?', 61, 5, 3),
-(22, 'Quina és la relació entre el perímetre i l\'àrea d\'un quadrat si la longitud del costat es duplica?', 66, 5, 3),
-(23, 'Quina és la relació entre la circumferència i el diàmetre d\'un cercle?', 68, 5, 3),
-(24, 'Quina és la fórmula per calcular l\'àrea d\'un rombe?', 71, 5, 3),
-(25, 'Quina és la relació entre els angles interiors i exteriors d\'un polígon?', 74, 5, 3),
-(26, 'Quina és la fórmula per calcular l\'àrea d\'un romboide?', 76, 5, 3),
-(27, 'Quina és la relació entre els angles d\'un triangle equilàter?', 79, 5, 3),
-(28, 'Quina és la relació entre l\'àrea d\'un cercle i la de l\'hexàgon regular inscrit en ell?', 82, 5, 3),
-(29, 'Quin és el nom de la línia que divideix un segment en dues parts iguals?', 87, 5, 3),
-(30, 'Quina és la fórmula per calcular l\'àrea d\'un pentàgon regular?', 88, 5, 3),
-(31, 'Quina és la suma dels angles interiors d\'un dodecàgon?', 91, 5, 4),
-(32, 'Quina és l\'àrea d\'un cercle amb un radi de 10 cm (arrodoneix a dues xifres decimals)?', 96, 5, 4),
-(33, 'Quina és la fórmula per calcular l\'àrea d\'un sector circular?', 97, 5, 4),
-(34, 'Quina és la relació entre el radi de la circumferència i la seva longitud?', 102, 5, 4),
-(35, 'Quin dels següents teoremes s\'utilitza per calcular l\'àrea d\'un triangle amb dos costats i l\'angle entre ells?', 105, 5, 4),
-(36, 'Quina és la relació entre els angles d\'un triangle en un espai euclidià?', 106, 5, 4),
-(37, 'Quin és el nom de la línia que es dibuixa des del vèrtex d\'un triangle perpendicular a la base?', 110, 5, 4),
-(38, 'Quina és la relació entre els radis de dues circumferències tangents externament?', 112, 5, 4),
-(39, 'Quina és la fórmula per calcular l\'àrea d\'un quadrat inscrit en un cercle de radi r?', 117, 5, 4),
-(40, 'Quina és la relació entre els angles interiors d\'un polígon amb n costats?', 118, 5, 4);
+INSERT INTO `preguntes` (`id`, `pregunta`, `created_at`, `updated_at`, `resposta_correcta_id`, `tema_id`, `dificultat_id`) VALUES
+(1, 'Quina és la suma dels angles interiors d\'un triangle?', NULL, NULL, 2, 5, 1),
+(2, 'Quin és el nombre de costats d\'un polígon hexagonal?', NULL, NULL, 5, 5, 1),
+(3, 'Com es diu la línia que divideix un angle a la meitat?', NULL, NULL, 8, 5, 1),
+(4, 'Què és l\'àrea d\'un rectangle amb una base de 5 unitats i una altura de 8 unitats?', NULL, NULL, 12, 5, 1),
+(5, 'Quina és la fórmula per calcular el perímetre d\'un cercle?', NULL, NULL, 14, 5, 1),
+(6, 'Quin és l\'angle entre les agulles d\'un rellotge a les 3 en punt?', NULL, NULL, 1, 5, 1),
+(7, 'Quina figura té totes les seves cares amb la mateixa mida?', NULL, NULL, 20, 5, 1),
+(8, 'Quin és el nom de la línia que divideix un cercle en dues parts iguals?', NULL, NULL, 22, 5, 1),
+(9, 'Com es diu la línia que connecta dos punts del cercle i passa pel seu centre?', NULL, NULL, 22, 5, 1),
+(10, 'Quin és el nom de la línia que uneix dos vèrtexs no consecutius d\'un polígon?', NULL, NULL, 28, 5, 1),
+(11, 'Quina és la relació entre el diàmetre i el radi d\'un cercle?', NULL, NULL, 31, 5, 2),
+(12, 'Quina és l\'àrea d\'un triangle amb una base de 6 cm i una altura de 4 cm?', NULL, NULL, 35, 5, 2),
+(13, 'Quin és l\'angle entre les agulles d\'un rellotge a les 6 en punt?', NULL, NULL, 38, 5, 2),
+(14, 'Quina és la fórmula per calcular l\'àrea d\'un cercle?', NULL, NULL, 42, 5, 2),
+(15, 'Quin és el nom de la línia que divideix un angle a la meitat?', NULL, NULL, 43, 5, 2),
+(16, 'Quin és l\'àrea d\'un rectangle amb una base de 10 unitats i una altura de 3 unitats?', NULL, NULL, 46, 5, 2),
+(17, 'Quina és la suma dels angles interiors d\'un quadrat?', NULL, NULL, 50, 5, 2),
+(18, 'Quina és la fórmula per calcular el perímetre d\'un rectangle?', NULL, NULL, 54, 5, 2),
+(19, 'Quin és l\'àrea d\'un quadrat amb un costat de 7 cm?', NULL, NULL, 56, 5, 2),
+(20, 'Quina és la relació entre els angles d\'un triangle?', NULL, NULL, 59, 5, 2),
+(21, 'Quina és la fórmula per calcular l\'àrea d\'un trapezi?', NULL, NULL, 61, 5, 3),
+(22, 'Quina és la relació entre el perímetre i l\'àrea d\'un quadrat si la longitud del costat es duplica?', NULL, NULL, 66, 5, 3),
+(23, 'Quina és la relació entre la circumferència i el diàmetre d\'un cercle?', NULL, NULL, 68, 5, 3),
+(24, 'Quina és la fórmula per calcular l\'àrea d\'un rombe?', NULL, NULL, 71, 5, 3),
+(25, 'Quina és la relació entre els angles interiors i exteriors d\'un polígon?', NULL, NULL, 74, 5, 3),
+(26, 'Quina és la fórmula per calcular l\'àrea d\'un romboide?', NULL, NULL, 76, 5, 3),
+(27, 'Quina és la relació entre els angles d\'un triangle equilàter?', NULL, NULL, 79, 5, 3),
+(28, 'Quina és la relació entre l\'àrea d\'un cercle i la de l\'hexàgon regular inscrit en ell?', NULL, NULL, 82, 5, 3),
+(29, 'Quin és el nom de la línia que divideix un segment en dues parts iguals?', NULL, NULL, 87, 5, 3),
+(30, 'Quina és la fórmula per calcular l\'àrea d\'un pentàgon regular?', NULL, NULL, 88, 5, 3),
+(31, 'Quina és la suma dels angles interiors d\'un dodecàgon?', NULL, NULL, 91, 5, 4),
+(32, 'Quina és l\'àrea d\'un cercle amb un radi de 10 cm (arrodoneix a dues xifres decimals)?', NULL, NULL, 96, 5, 4),
+(33, 'Quina és la fórmula per calcular l\'àrea d\'un sector circular?', NULL, NULL, 97, 5, 4),
+(34, 'Quina és la relació entre el radi de la circumferència i la seva longitud?', NULL, NULL, 102, 5, 4),
+(35, 'Quin dels següents teoremes s\'utilitza per calcular l\'àrea d\'un triangle amb dos costats i l\'angle entre ells?', NULL, NULL, 105, 5, 4),
+(36, 'Quina és la relació entre els angles d\'un triangle en un espai euclidià?', NULL, NULL, 106, 5, 4),
+(37, 'Quin és el nom de la línia que es dibuixa des del vèrtex d\'un triangle perpendicular a la base?', NULL, NULL, 110, 5, 4),
+(38, 'Quina és la relació entre els radis de dues circumferències tangents externament?', NULL, NULL, 112, 5, 4),
+(39, 'Quina és la fórmula per calcular l\'àrea d\'un quadrat inscrit en un cercle de radi r?', NULL, NULL, 117, 5, 4),
+(40, 'Quina és la relació entre els angles interiors d\'un polígon amb n costats?', NULL, NULL, 118, 5, 4);

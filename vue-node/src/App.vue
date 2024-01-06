@@ -1,7 +1,14 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { ref, onMounted } from "vue";
+import { RouterLink, RouterView } from "vue-router";
+import music from "./components/music.vue";
+
 </script>
 
 <template>
-  <RouterView />
+    <music />
+    <RouterView />
 </template>
+
+
+

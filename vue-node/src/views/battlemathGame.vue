@@ -1,5 +1,16 @@
 <template>
     <div class="game-container">
+        <!-- <div class="profile">
+            <button class="nes-btn profile-button" @click="toggleProfile">
+                <img src="../../public/icons/profile.svg" alt="">
+            </button>
+            <div class="modal nes-container is-rounded" :class="{ 'not-visible': !this.navigation_menus.profile }">
+                <button v-if="!isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
+                <button v-if="!isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
+                <button v-if="isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">Surt</button>
+            </div>
+        </div> -->
+
         <div class="modal-overlay" v-if="navigation_menus.showCharSelectModal">
             <div class="modal nes-container is-rounded">
                 <p class="title">Selecciona el personatge</p>
@@ -10,34 +21,57 @@
             </div>
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
-            <div class="npcFace-container">
-                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="">
+            <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
+                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
             <div class="modal nes-container is-rounded textBox">
+                <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
+                    <img src="../../public/icons/cross.svg" alt="" />
+                </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
-                <div class="woman-btn" v-if="npc.npcImage === 'Woman'">
-                    <button class="nes-btn" @click="navigation_menus.loginModal = true">Login</button>
-                    <button class="nes-btn" @click="navigation_menus.registerModal = true">Registra't</button>
+                <div class="woman-btn" v-if="npc.npcImage === 'Woman' &&
+                    !this.npc.interactingWithDoor
+                    ">
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">
+                        Login
+                    </button>
+                    <button v-if="this.isLogged" class="nes-btn" @click="logout">
+                        Surt
+                    </button>
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">
+                        Registra't
+                    </button>
+                </div>
+                <div class="woman-btn" v-if="npc.npcImage === 'Samurai' && isLogged">
+                    <button class="npc-btn nes-btn" @click="openCharSelectModal">
+                        Si
+                    </button>
+                    <button class="npc-btn nes-btn" @click="closeNPCModal">
+                        No
+                    </button>
                 </div>
             </div>
         </div>
 
-
         <div v-if="navigation_menus.loginModal" class="login-modal">
             <div class="modal nes-container is-rounded">
-                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">X</button>
+                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">
+                    <img src="../../public/icons/cross.svg" alt="" />
+                </button>
                 <login @user="loginUser" />
             </div>
         </div>
 
         <div v-if="navigation_menus.registerModal" class="register-modal">
             <div class="modal nes-container is-rounded">
-                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar">X</button>
+                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar">
+                    <img src="../../public/icons/cross.svg" alt="" />
+                </button>
                 <register @user="registerUser" />
             </div>
         </div>
 
-        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+        <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
@@ -53,7 +87,10 @@ import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
-
+import { socket } from '@/socket';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+import { useAppStore } from "../stores/app";
 
 export default defineComponent({
     name: "battlemathGame",
@@ -61,14 +98,23 @@ export default defineComponent({
         char_select,
         textBox,
         login,
-        register
+        register,
     },
     data() {
         return {
+            player: {
+                skinID: "",
+                playerID: "",
+            },
             game: null,
+            playerInfoInterval: 0,
             player: null,
-            username: '',
-            playerSprite: '',
+            username: "",
+            token: "",
+            success: false,
+            message: "",
+            isLogged: false,
+            playerSprite: "",
             canMove: true,
             speed: 30,
             pHouse_layers: {
@@ -96,22 +142,53 @@ export default defineComponent({
             navigation_menus: {
                 showCharSelectModal: false,
                 loginModal: false,
-                registerModal: false
+                registerModal: false,
+                sceneStart: 1,
             },
             npc: {
                 npcs: [],
                 interactingWithNPC: false,
-                npcText: '',
-                npcImage: '',
+                interactingWithDoor: false,
+                npcText: "",
+                npcImage: "",
                 playerInTrigger: false,
+                profile: false,
             },
             firstTime: true,
             controlsHidden: false,
+
+            playerInfo: {
+                id: null,
+                username: "",
+                skin: "",
+                x: "",
+                y: "",
+            },
+            playerSprites: {},
         };
     },
     mounted() {
-        this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
+        const store = useAppStore();
+        this.isLogged = store.getIsLogged();
+        if (this.isLogged) {
+            this.username = store.getUsername();
+            this.token = store.getToken();
+            this.playerSprite = store.getSkin();
+        } else {
+            this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
+        }
+
+        this.recibirsuccessLogout();
+        if (store.getLastRoute() === '/rooms') {
+            this.navigation_menus.sceneStart = 2;
+            setTimeout(() => {
+                this.navigation_menus.sceneStart = 1;
+            }, 1000);
+        } else {
+            this.navigation_menus.sceneStart = 1;
+        }
         this.initializeGame();
+        store.setLastRoute("/game");
     },
     watch: {
         playerSprite(newSkin) {
@@ -119,10 +196,15 @@ export default defineComponent({
                 this.createPlayerAnims(this.game.scene.scenes[0], newSkin);
                 this.player.setTexture(newSkin);
                 const currentAnimKey = this.player.anims.currentAnim.key;
-                const parts = currentAnimKey.split('_');
+                const parts = currentAnimKey.split("_");
 
                 parts[0] = newSkin;
                 this.player.anims.play(parts.join("_"));
+            }
+        },
+        success() {
+            if (this.success) {
+                this.toastNotification();
             }
         },
     },
@@ -137,28 +219,28 @@ export default defineComponent({
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
                     self.preloadSkins(this);
-                    this.load.image('door', '/objects/door.png')
-                    this.load.image('dialogBox', '/img/DialogBoxFaceset.png')
+                    this.load.image("door", "/objects/door.png");
+                    this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
                 },
                 create: function () {
+                    ///Create map
                     self.createPlayerHouse(this);
                     self.createParticleHouse(this, 664, 723);
                     self.createParticleHouse(this, 856, 723);
                     self.createParticleHouse(this, 920, 723);
 
-                    self.createNPC(this, 700, 800, 'npcWoman', 0);
-                    self.createNPC(this, 715, 720, 'npcSamurai', 0);
+                    self.createNPC(this, 700, 800, "npcWoman", 0);
+                    self.createNPC(this, 712, 724, "npcSamurai", 0);
 
                     ///Create player
-                    if (self.firstTime) {
-                        self.firstTime = false;
+                    if (!self.isLogged) {
                         self.playerCreate(this, 720, 774, self.playerSprite);
                     } else {
-                        self.playerCreate(this, 793, 856, self.playerSprite);
+                        self.playerCreate(this, 793, 840, self.playerSprite);
                     }
 
+                    self.createNPC(this, 792, 870, "npcdoorPHouse", 0);
                     self.triggerWithNPC(this);
-
 
                     self.addHouseCollisions(this);
 
@@ -167,10 +249,10 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
-                },
-                update: function () {
+
                     self.playerMovement(this, self.playerSprite);
                 },
+                update: function () { },
             };
 
             const lobbyConfig = {
@@ -178,21 +260,22 @@ export default defineComponent({
                 preload: function () {
                     self.player = null;
                     self.preloadLobby(this);
-                    this.load.spritesheet(
-                        "player",
-                        `characters/${self.playerSprite}.png`,
-                        { frameWidth: 16, frameHeight: 16 }
-                    );
+                    self.preloadNPC(this);
+                    self.preloadSkins(this);
                 },
                 create: function () {
                     self.createLobby(this);
 
+                    self.createNPC(this, 910, 420, 'npcRyu', 0);
                     ///Create player
-                    if (!self.player) {
+                    if (self.navigation_menus.sceneStart === 1) {
                         self.playerCreate(this, 888, 390, self.playerSprite);
                     } else {
-                        this.player.setVelocity(0, 0);
+                        self.playerCreate(this, 687, 554, self.playerSprite);
                     }
+
+
+                    self.triggerWithNPC(this);
                     self.addLobbyCollisions(this);
                     this.cameras.main.startFollow(self.player, true);
                     self.createLobby_foreground(this);
@@ -200,9 +283,10 @@ export default defineComponent({
                         self.player,
                         self.lobby_layers.fg
                     );
+
+                    self.playerMovement(this, self.playerSprite);
                 },
                 update: function () {
-                    self.playerMovement(this, self.playerSprite);
                 },
             };
 
@@ -224,25 +308,21 @@ export default defineComponent({
                     default: "arcade",
                     arcade: {
                         gravity: { y: 0 },
-                        debug: false
-                    }
+                        debug: false,
+                    },
                 },
-            }
-
+            };
 
             self.game = this.game = new Phaser.Game(config);
             this.game.loop.targetFps = 30;
             this.game.scene.add("playerHouse", playerHouseConfig, false);
             this.game.scene.add("lobby", lobbyConfig, false);
 
-            const sceneStart = 1;
-
-            if (sceneStart === 1) {
+            if (self.navigation_menus.sceneStart === 1) {
                 this.game.scene.start("playerHouse");
             } else {
                 this.game.scene.start("lobby");
             }
-
         },
         registerUser(user) {
             this.username = user.username;
@@ -253,22 +333,70 @@ export default defineComponent({
         },
         loginUser(user) {
             this.username = user.user.username;
+            this.player.playerID = user.user.id;
+            this.token = user.token;
             this.playerSprite = user.skin;
             this.npc.interactingWithNPC = false;
+            this.isLogged = true;
             this.canMove = true;
             this.navigation_menus.loginModal = false;
-
+        },
+        logout() {
+            this.isLogged = false;
+            this.username = "";
+            this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
+            this.closeNPCModal();
+            socket.emit("logout", this.token);
+        },
+        recibirsuccessLogout() {
+            socket.on("successLogout", (response) => {
+                this.success = true;
+                this.message = response.success;
+            });
+        },
+        toastNotification() {
+            toast.success(this.message, {
+                position: "top-right",
+                timeout: 2000,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: false,
+                closeButton: "button",
+                icon: true,
+                rtl: false,
+            });
         },
         randomStartSkin(skin1, skin2) {
             const randomIndex = Math.random() < 0.5 ? 0 : 1;
             return randomIndex === 0 ? skin1 : skin2;
         },
         selectSkin(character) {
+            const store = useAppStore();
+
+            this.player.skinID = character.id;
             this.playerSprite = character.name;
+            store.setNewSkin(character.name);
+
+        },
+        openCharSelectModal() {
+            this.npc.interactingWithNPC = false;
+            this.navigation_menus.showCharSelectModal = true;
+            this.canMove = false;
         },
         closeCharSelectModal() {
             this.navigation_menus.showCharSelectModal = false;
             this.canMove = true;
+            socket.emit("newSkin", this.player.playerID, this.player.skinID);
+        },
+        closeNPCModal() {
+            this.npc.interactingWithNPC = false;
+            this.canMove = true;
+        },
+        toggleProfile() {
+            this.navigation_menus.profile = !this.navigation_menus.profile;
         },
         rescaleCamera() {
             const screenWidth = window.innerWidth;
@@ -414,6 +542,10 @@ export default defineComponent({
             });
         },
         preloadPlayerHouse(scene) {
+            scene.load.spritesheet("npcdoorPHouse", "objects/door.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
             scene.load.image("pHouse_Furniture", "tiles/TilesetElement.png");
             scene.load.image(
                 "pHouse_Walls",
@@ -452,15 +584,6 @@ export default defineComponent({
                 collides: true,
             });
 
-            this.objects.doors = scene.physics.add.staticGroup();
-            const doorLayer = map.getObjectLayer("Doors");
-            doorLayer.objects.forEach((doorsObj) => {
-                this.objects.doors.create(
-                    doorsObj.x + doorsObj.width / 2,
-                    doorsObj.y - doorsObj.height / 1.99,
-                    "door"
-                );
-            });
             // this.debugCollision(scene);
         },
         createPlayerHouse_foreground(scene) {
@@ -478,21 +601,24 @@ export default defineComponent({
                 this.pHouse_layers.furniture
             );
             scene.physics.add.collider(this.player, this.objects.doors);
-
-            scene.physics.add.overlap(this.player, this.objects.doors, () => {
-                if (this.tecla(scene, "E")) {
-                    this.cambiarEscena(scene, "lobby", 793, 856);
-                }
-            });
         },
         preloadLobby(scene) {
-            scene.load.image('TilesetLobby', 'tiles/lobby_map/TilesetLobby.png');
-            scene.load.image('TilesetElement', 'tiles/TilesetElement.png');
-            scene.load.image('dojo_door_left', '/objects/dojo_door_left.png');
-            scene.load.image('dojo_door_right', '/objects/dojo_door_right.png');
-            scene.load.image('phouse_door', '/objects/phouse_door.png');
-            scene.load.spritesheet('leaves', 'particles/Leaf.png', { frameWidth: 16, frameHeight: 16 });
-            scene.load.tilemapTiledJSON('lobby', 'tiles/lobby_map/lobbyMap.json');
+            scene.load.image(
+                "TilesetLobby",
+                "tiles/lobby_map/TilesetLobby.png"
+            );
+            scene.load.image("TilesetElement", "tiles/TilesetElement.png");
+            scene.load.image("dojo_door_left", "/objects/dojo_door_left.png");
+            scene.load.image("dojo_door_right", "/objects/dojo_door_right.png");
+            scene.load.image("phouse_door", "/objects/phouse_door.png");
+            scene.load.spritesheet("leaves", "particles/Leaf.png", {
+                frameWidth: 16,
+                frameHeight: 16,
+            });
+            scene.load.tilemapTiledJSON(
+                "lobby",
+                "tiles/lobby_map/lobbyMap.json"
+            );
         },
         createLobby(scene) {
             const map = scene.make.tilemap({ key: "lobby" });
@@ -586,17 +712,20 @@ export default defineComponent({
             scene.physics.add.collider(this.player, this.lobby_layers.buildTop);
             scene.physics.add.collider(this.player, this.lobby_layers.furnTop);
 
-
-            scene.physics.add.overlap(this.player, this.objects.doors, (player, door) => {
-                if (door.name === 'player_door') {
-                    this.cambiarEscena(scene, 'playerHouse', 793, 856);
-                } else {
-                    if (this.game) {
-                        this.game.destroy(true);
+            scene.physics.add.overlap(
+                this.player,
+                this.objects.doors,
+                (player, door) => {
+                    if (door.name === "player_door") {
+                        this.cambiarEscena(scene, "playerHouse");
+                    } else {
+                        if (this.game) {
+                            this.game.destroy(true);
+                        }
+                        Router.push("/rooms");
                     }
-                    Router.push('/rooms');
                 }
-            });
+            );
         },
         createNPC(scene, x, y, npc, frame) {
             this.npc.playerInTrigger = false;
@@ -608,7 +737,7 @@ export default defineComponent({
             for (let i = 0; i < this.npc.npcs.length; i++) {
                 let npc = this.npc.npcs[i];
                 let npcName = npc.texture.key;
-
+                let dialogInfo = "";
 
                 scene.physics.add.collider(npc, this.player);
                 npc.body.setSize(npc.width, npc.height);
@@ -616,76 +745,145 @@ export default defineComponent({
                 npc.setVelocity(0, 0);
                 npc.body.immovable = true;
 
-
-                const trigger = scene.physics.add.sprite(npc.x, npc.y, null).setAlpha(0);
+                const trigger = scene.physics.add
+                    .sprite(npc.x, npc.y, null)
+                    .setAlpha(0);
                 trigger.body.setSize(npc.width * 1.8, npc.height * 1.8);
                 trigger.body.setAllowGravity(false);
+                trigger.child = npc.texture.key;
 
-                const dialogInfo = scene.physics.add.sprite(npc.x, npc.y - 20, 'DialogInfo', 0);
+                if (npcName != "npcdoorPHouse") {
+                    dialogInfo = scene.physics.add.sprite(
+                        npc.x,
+                        npc.y - 20,
+                        "DialogInfo",
+                        0
+                    );
 
-                dialogInfo.anims.create({
-                    key: `DialogInfoAnim`,
-                    frames: scene.anims.generateFrameNumbers('DialogInfo', {
-                        frames: [0, 1, 2, 3]
-                    }),
-                    repeat: -1,
-                    frameRate: 2,
-                });
-                dialogInfo.setAlpha(0);
+                    dialogInfo.anims.create({
+                        key: `DialogInfoAnim`,
+                        frames: scene.anims.generateFrameNumbers("DialogInfo", {
+                            frames: [0, 1, 2, 3],
+                        }),
+                        repeat: -1,
+                        frameRate: 2,
+                    });
+                    dialogInfo.setAlpha(0);
 
-                dialogInfo.anims.play(`DialogInfoAnim`, true);
+                    dialogInfo.anims.play(`DialogInfoAnim`, true);
+                }
 
-                scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
-                    if (trigger.body.touching.none) {
-                        this.npc.playerInTrigger = true;
-                        dialogInfo.setAlpha(1);
-                        scene.input.keyboard.on('keydown-SPACE', () => {
-                            if (!this.interactingWithNPC && this.canMove && this.npc.playerInTrigger) {
-                                const distX = this.player.x - npc.x;
-                                const distY = this.player.y - npc.y;
+                let dialogoMostrado = false;
 
-                                if (Math.abs(distX) > Math.abs(distY)) {
-                                    if (distX > 0) {
-                                        npc.setFrame(3);
-                                    } else {
-                                        npc.setFrame(2);
-                                    }
-                                } else {
-                                    if (distY > 0) {
-                                        npc.setFrame(0);
-                                    } else if (distY < 0) {
-                                        npc.setFrame(1);
-                                    } else {
-                                        npc.setFrame(0);
-                                    }
-                                }
-                                setTimeout(() => {
-                                    this.dialogo(npcName);
-                                }, 100);
+                scene.physics.add.overlap(
+                    this.player,
+                    trigger,
+                    (player, trigger) => {
+                        if (trigger.body.touching.none) {
+                            this.npc.playerInTrigger = true;
+                            if (trigger.child != "npcdoorPHouse") {
+                                dialogInfo.setAlpha(1);
                             }
-                        });
-                    } else {
-                        dialogInfo.setAlpha(0);
-                        this.npc.playerInTrigger = false;
+                            if (!dialogoMostrado) {
+                                if (
+                                    this.isLogged &&
+                                    trigger.child === "npcdoorPHouse"
+                                ) {
+                                    this.cambiarEscena(scene, "lobby");
+                                } else if (
+                                    !this.isLogged &&
+                                    trigger.child === "npcdoorPHouse"
+                                ) {
+                                    this.dialogo(scene, trigger.child);
+                                }
+                                dialogoMostrado = true;
+                                this.interactWithNPC(scene, npc);
+                            }
+                        } else {
+                            if (trigger.child != "npcdoorPHouse") {
+                                dialogInfo.setAlpha(0);
+                            }
+                            this.npc.playerInTrigger = false;
+                            scene.input.keyboard.off("keydown-SPACE");
+                            dialogoMostrado = false;
+                        }
                     }
-                });
-
-
-
+                );
             }
         },
-        dialogo(npc) {
+        interactWithNPC(scene, npc) {
+            scene.input.keyboard.on("keydown-SPACE", () => {
+                if (
+                    !this.interactingWithNPC &&
+                    this.canMove &&
+                    this.npc.playerInTrigger
+                ) {
+                    const distX = this.player.x - npc.x;
+                    const distY = this.player.y - npc.y;
+
+                    if (Math.abs(distX) > Math.abs(distY)) {
+                        if (distX > 0) {
+                            npc.setFrame(3);
+                        } else {
+                            npc.setFrame(2);
+                        }
+                    } else {
+                        if (distY > 0) {
+                            npc.setFrame(0);
+                        } else if (distY < 0) {
+                            npc.setFrame(1);
+                        } else {
+                            npc.setFrame(0);
+                        }
+                    }
+                    this.dialogo(scene, npc.texture.key);
+                }
+            });
+        },
+        dialogo(scene, npc) {
+            this.npc.npcImage = "";
+            this.npc.npcText = "";
             let parts = npc.split("npc");
             let splittedNPC = parts[1];
             this.canMove = false;
             this.npc.interactingWithNPC = true;
+            this.npc.interactingWithDoor = false;
             this.npc.npcImage = splittedNPC;
             switch (splittedNPC) {
                 case "Woman":
-                    this.npc.npcText = [`Ens coneixem d'abans?`];
+                    if (this.isLogged) {
+                        this.npc.npcText = [
+                            `Hola ${this.username}, com estas?`,
+                        ];
+                    } else {
+                        this.npc.npcText = [`Ens coneixem d'abans?`];
+                    }
                     break;
                 case "Samurai":
-                    this.npc.npcText = [`Que en vols canviar d'estil?`];
+                    if (!this.isLogged) {
+                        this.npc.npcText = [
+                            `Qui ets? Deuries parlar amb l'altra dona.`,
+                        ];
+                    } else {
+                        this.npc.npcText = [
+                            `Hola ${this.username}, que en vols canviar d'estil?`,
+                        ];
+                    }
+                    break;
+                case "doorPHouse":
+                    this.npc.interactingWithDoor = true;
+                    if (!this.isLogged) {
+                        this.npc.npcImage = "Woman";
+                        this.npc.npcText = [`Qui ets? Vine aquí.`];
+                    } else {
+                        this.closeNPCModal();
+                    }
+                    break;
+                case "Ryu":
+                    this.npc.npcText = [`Hola ${this.username}, hauries d'anar al Dojo.`,
+                        `Allà podràs lluitar contra altres jugadors.`, `Es l'edifici amb el terrat vermell.`];
+                    break;
+                default:
                     break;
             }
         },
@@ -694,26 +892,31 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
-                if (this.npc.npcImage === 'Samurai') {
-                    this.canMove = false;
-                    this.navigation_menus.showCharSelectModal = true;
-                }
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
-            this.createPlayerAnims(scene, skin);
-            this.player = scene.physics.add.sprite(x, y, skin);
+            const store = useAppStore();
+            if (this.navigation_menus.sceneStart === 2) {
+                const skin2 = store.getSkin();
+                this.createPlayerAnims(scene, skin2);
+                this.player = scene.physics.add.sprite(x, y, skin2);
+                this.player.anims.play(`${skin2}_idle_down`);
+            } else {
+                this.createPlayerAnims(scene, skin);
+                this.player = scene.physics.add.sprite(x, y, skin);
+                this.player.anims.play(`${skin}_idle_down`);
+            }
 
-            this.player.anims.play(`${skin}_idle_down`);
             this.player.body.setSize(
-                this.player.width * 0.6,
+                this.player.width * 1,
                 this.player.height * 0.2
             );
             this.player.body.setOffset(
-                this.player.width * 0.2,
+                this.player.width * 0,
                 this.player.height * 0.8
             );
             scene.physics.world.enable(this.player);
+
         },
         debugCollision(scene) {
             const debugGraphics = scene.add.graphics().setAlpha(0.75);
@@ -725,54 +928,68 @@ export default defineComponent({
                 tileColor: null,
                 collidingTileColor: new Phaser.Display.Color(100, 134, 48, 255),
             });
-            this.objects.doors.children.iterate((door) => {
-                debugGraphics.fillRect(
-                    door.x - door.width / 2,
-                    door.y - door.height / 2,
-                    door.width,
-                    door.height
-                );
-            });
         },
         playerMovement(scene, skin) {
             const speed = 30;
             const runSpeedMultiplier = 1.5;
 
             let currentSpeed = speed;
-
-            if (
-                !this.playerMoved &&
-                (this.tecla(scene, "LEFT") ||
-                    this.tecla(scene, "RIGHT") ||
-                    this.tecla(scene, "UP") ||
-                    this.tecla(scene, "DOWN"))
-            ) {
+            scene.input.keyboard.on("keydown", (event) => {
                 this.controlsHidden = true;
-            }
+                if (this.canMove) {
+                    if (skin != this.playerSprite) {
+                        skin = this.playerSprite;
+                    }
 
-            if (this.canMove) {
-                if (this.tecla(scene, 'LEFT')) {
-                    this.player.setVelocity(-currentSpeed, 0);
-                    this.player.anims.play(`${skin}_move_left`, true);
-                } else if (this.tecla(scene, 'RIGHT')) {
-                    this.player.setVelocity(currentSpeed, 0);
-                    this.player.anims.play(`${skin}_move_right`, true);
-                } else if (this.tecla(scene, 'UP')) {
-                    this.player.setVelocity(0, -currentSpeed);
-                    this.player.anims.play(`${skin}_move_up`, true);
-                } else if (this.tecla(scene, 'DOWN')) {
-                    this.player.setVelocity(0, currentSpeed);
-                    this.player.anims.play(`${skin}_move_down`, true);
-                } else {
-                    const parts = this.player.anims.currentAnim.key.split("_");
-                    parts[1] = "idle";
-                    this.player.anims.play(parts.join("_"));
-                    this.player.setVelocity(0, 0);
+
+                    switch (event.code) {
+                        case "ArrowLeft":
+                            this.player.anims.play(`${skin}_move_left`, true);
+                            this.player.setVelocity(-currentSpeed, 0);
+                            break;
+                        case "ArrowRight":
+                            this.player.anims.play(`${skin}_move_right`, true);
+                            this.player.setVelocity(currentSpeed, 0);
+                            break;
+                        case "ArrowUp":
+                            this.player.anims.play(`${skin}_move_up`, true);
+                            this.player.setVelocity(0, -currentSpeed);
+                            break;
+                        case "ArrowDown":
+                            this.player.anims.play(`${skin}_move_down`, true);
+                            this.player.setVelocity(0, currentSpeed);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-            }
+            });
+
+            scene.input.keyboard.on("keyup", (event) => {
+                switch (event.code) {
+                    default:
+                        // clearInterval(this.playerInfoInterval);
+                        if (scene.scene.isActive("lobby")) {
+                            this.addPlayerInfo(scene);
+                        }
+                        const parts =
+                            this.player.anims.currentAnim.key.split("_");
+                        parts[1] = "idle";
+                        this.player.anims.play(parts.join("_"));
+                        this.player.setVelocity(0, 0);
+
+                        break;
+                }
+            });
         },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
+            const store = useAppStore();
+
+            if (this.navigation_menus.sceneStart === 2) {
+                skin = store.getSkin();
+            }
+
 
             scene.anims.create({
                 key: `${skin}_idle_down`,
@@ -842,8 +1059,7 @@ export default defineComponent({
                 Phaser.Input.Keyboard.KeyCodes[key]
             ).isDown;
         },
-        cambiarEscena(scene, escena, x, y) {
-            this.player.setPosition(x, y);
+        cambiarEscena(scene, escena) {
             if (escena === "lobby") {
                 scene.scene.stop("playerHouse");
                 scene.scene.start("lobby");
@@ -866,6 +1082,62 @@ export default defineComponent({
 
             return emitter;
         },
+        addPlayerInfo(scene) {
+            const store = useAppStore();
+            this.playerInfo.id = store.getId();
+            this.playerInfo.username = store.getUsername();
+            this.playerInfo.skin = this.playerSprite;
+            this.playerInfo.x = this.player.x;
+            this.playerInfo.y = this.player.y;
+
+            socket.emit("addPlayer", this.playerInfo);
+            this.viewPlayers(scene);
+        },
+
+        viewPlayers(scene) {
+            socket.on("viewPlayers", (players) => {
+                for (let i = 0; i < players.length; i++) {
+                    if (players[i].id !== this.playerInfo.id) {
+                        // Si ya tenemos un sprite para este jugador, lo eliminamos
+                        if (this.playerSprites[players[i].id]) {
+                            this.playerSprites[players[i].id].sprite.destroy();
+                            this.playerSprites[players[i].id].text.destroy();
+                        }
+
+                        //Añadimos el username encima del personaje
+                        const text = scene.add.text(
+                            players[i].x - 10,
+                            players[i].y - 20,
+                            players[i].username,
+                            {
+                                fontFamily: "Arial",
+                                fontSize: 10,
+                                color: "#fff",
+                                // backgroundColor: "#00000069",
+                                // padding: {
+                                //     left: 2,
+                                //     right: 2,
+                                //     top: 1,
+                                //     bottom: 1,
+                                // },
+                                
+                            }
+                        );
+
+                        // Creamos un nuevo sprite para el jugador
+                        const jugador = scene.physics.add.sprite(
+                            players[i].x,
+                            players[i].y,
+                            players[i].skin
+                        );
+
+                        // Almacenamos el sprite y el texto en nuestro objeto
+                        this.playerSprites[players[i].id] = { sprite: jugador, text: text };
+                    }
+                }
+            });
+        }
+
     },
 });
 </script>
@@ -896,6 +1168,49 @@ button:hover::after {
     box-shadow: inset 4px 4px #e46d3a !important;
 }
 
+.npc-btn {
+    width: 20%;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+.profile button {
+    margin: 20px;
+}
+
+.profile div.not-visible {
+    display: none;
+}
+
+.profile div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 20px;
+    max-height: 100%;
+}
+
+.profile div button {
+    width: 100%;
+}
+
+.profile-button img {
+    width: 50px;
+}
+
+.profile-button {
+    width: 200px;
+}
+
 .boton-cerrar {
     position: absolute;
     font-size: 25px;
@@ -906,6 +1221,23 @@ button:hover::after {
     justify-content: center;
     top: 10px;
     right: 10px;
+}
+
+.boton-cerrar>img {
+    width: 30px;
+}
+
+.boton-cerrar-npc {
+    position: absolute;
+    font-size: 25px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
 }
 
 .game-container {
@@ -936,7 +1268,7 @@ button:hover::after {
 .modal {
     display: flex;
     border-image-repeat: stretch !important;
-    border-image-source: url('/img/border.svg') !important;
+    border-image-source: url("/img/border.svg") !important;
     border-image-slice: 6 !important;
     border-image-width: 3 !important;
     background-color: #f2eaf1;
@@ -964,7 +1296,7 @@ button:hover::after {
 .npcFace-container {
     border-width: 10px;
     border-style: solid;
-    border-image-source: url('/img/FacesetBox.png');
+    border-image-source: url("/img/FacesetBox.png");
     border-image-slice: 5;
     border-image-repeat: stretch;
 }
@@ -1033,7 +1365,6 @@ button:hover::after {
     .controlsHide img {
         width: 40%;
     }
-
 }
 
 @media screen and (min-width: 1440px) {
@@ -1045,9 +1376,6 @@ button:hover::after {
 
     .controls {
         bottom: -150px;
-
     }
-
 }
 </style>
-
