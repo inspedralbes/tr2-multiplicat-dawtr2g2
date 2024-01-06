@@ -4,7 +4,7 @@ import router from './router'
 
 
 // "undefined" means the URL will be computed from the `window.location` object
-const URL = "http://localhost:3817";
+const URL = "hhttp://battlemath.daw.inspedralbes.cat:3817";
 
 export const socket = io(URL);
 

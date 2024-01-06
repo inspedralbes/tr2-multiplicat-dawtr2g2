@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://127.0.0.1:8000/api/";
+const url = "http://battlemath.daw.inspedralbes.cat/Laravel/public/api/";
 
 async function login(email, password) {
     try {
