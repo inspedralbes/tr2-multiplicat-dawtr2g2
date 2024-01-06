@@ -62,7 +62,6 @@ socket.on("timer", (timer) => {
 
 socket.on("timeUp", () => {
   const store = useAppStore();
-  store.settimeUp();
   store.questAct = {};
   store.respAct = {};
   console.log(store.respAct);
@@ -73,11 +72,11 @@ socket.on("life", (player) => {
   store.updateLife(player);
 });
 
-// socket.on("startTimer", () => {
-//   const store = useAppStore();
-//   store.settimeOff();
-//   store.canviarTurn();
-// });
+socket.on("changeTurn", () => {
+  const store = useAppStore();
+  store.settimeOff();
+  store.canviarTurn();
+});
 
 socket.on("gameOver", (player) => {
   const store = useAppStore();

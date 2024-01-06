@@ -5,10 +5,10 @@
             <div class="box">
                 <div class="options">
                     <button class="option" :class="{ active: screen === 0 }" @click="changeScreen(0)">
-                        LISTA PARTIDAS
+                        LLISTA PARTIDES
                     </button>
                     <button class="option" :class="{ active: screen === 1 }" @click="changeScreen(1)">
-                        CREAR PARTIDAS
+                        CREAR PARTIDES
                     </button>
                 </div>
                 <div class="rooms" v-if="screen == 0">
@@ -20,7 +20,7 @@
                                 {{ room.players.length }}/2
                             </h4>
                             <button class="join-btn" value="{{room.id}}" @click="joinRoom(room.id)">
-                                Unirse
+                                Unir-se
                             </button>
                         </div>
                     </div>
@@ -29,37 +29,11 @@
                     <div class="info__container">
                         <div class="room__info">
                             <div class="info__box">
-                                <label for="name">Nombre de la Sala:</label>
+                                <label for="name">Nom de la sala:</label>
                                 <input type="text" v-model="this.room" />
                             </div>
-                            <div class="info__box">
-                                <label for="password">Contraseña:</label>
-                                <input type="password" />
-                            </div>
-                        </div>
-                        <div class="info__box">
-                            <label for="category">Categoria:</label>
-                            <select name="category" id="category">
-                                <option value="1">Calcul</option>
-                                <option value="2">Geometria</option>
-                                <option value="3">Mesures</option>
-                            </select>
-                        </div>
-                        <div class="info__box">
-                            <label for="dificult">Dificultad:</label>
-                            <select name="dificult" id="dificult">
-                                <option value="1">Facil</option>
-                                <option value="2">Mitj</option>
-                                <option value="3">Dificil</option>
-                            </select>
                         </div>
                         <div class="privacity">
-                            <div class="info__box">
-                                <select name="privacity" id="privacity">
-                                    <option value="1">Publica</option>
-                                    <option value="2">Privada</option>
-                                </select>
-                            </div>
                             <button class="create-btn" @click="createRoom()">
                                 Crear
                             </button>
