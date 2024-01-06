@@ -86,10 +86,14 @@ socket.on("gameOver", (player) => {
 });
 
 socket.on('disconnectRoom', () => {
-  router.push('/rooms');
   const store = useAppStore();
   store.resetRoom();
 });
+
+socket.on("exit", () => {
+  router.push('/rooms');
+});
+
 socket.on("viewPlayers", (players) => {
   const store = useAppStore();
   store.addPlayers(players);

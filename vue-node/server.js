@@ -3,7 +3,6 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import comsManager from "./comsManager.js";
-import { useAppStore } from "./src/stores/app.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -282,21 +281,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("exitRoom", (id) => {
-
     io.to(id).emit("disconnectRoom", id);
+    io.to(id).emit("exit", id);
     const socketsInRoom = io.sockets.adapter.rooms.get(id);
-
+  
+    
     for (const socketId of socketsInRoom) {
       const socket = io.sockets.sockets.get(socketId);
       socket.leave(id);
     }
-
+    
+  
     const roomIndex = rooms.findIndex((room) => room.id === id);
     if (roomIndex !== -1) {
       rooms.splice(roomIndex, 1);
     }
-
-    io.emit("viewRooms", rooms);
+    io.emit('viewRooms', rooms);
   });
 
   socket.on("addPlayer", (playerInfo) => {
