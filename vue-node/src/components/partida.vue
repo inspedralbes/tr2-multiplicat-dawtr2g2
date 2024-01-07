@@ -46,6 +46,7 @@
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
+                    <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
                     <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}
                     </h4>
                 </div>
@@ -100,7 +101,7 @@ export default {
 
     data() {
         return {
-            quest: '',
+            quest: 'Esperant jugador...',
             ans: [],
             room: {},
             numQuest: 10,
@@ -172,6 +173,7 @@ export default {
 
         socket.on('startTimer', () => {
             this.timer = 10;
+            this.quest = '';
             this.startTimer();
         });
 
