@@ -136,6 +136,7 @@ export default {
     padding: 15px 10px;
     border: 2px solid #e58d08;
     border-radius: 15px;
+    margin-left: 10px;
 }
 
 .rooms {
