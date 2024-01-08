@@ -17,10 +17,9 @@
                 </div>
 
                 <div class="timer">
-                    <p class="time">{{ timer }}</p>
-                    <div class="title">
-                        <p>TIME</p>
-                    </div>
+                    <transition name="fade" mode="out-in">
+                        <p :key="timer" class="time" :style="timerColor">{{ timer }}</p>
+                    </transition>
                 </div>
 
                 <div class="player player2" v-if="room.players.length == 2">
@@ -165,7 +164,7 @@ export default {
             this.timer = 10;
             this.showEstForThreeSeconds();
         });
-        
+
 
 
         socket.on('startTimer', () => {
@@ -207,22 +206,35 @@ export default {
         },
         startTimer() {
             this.intervalId = setInterval(() => {
-            if (this.timer > 0) {
-                this.timer--;
-            } else {
-                this.stopTimer();
-                socket.emit('timerUp', this.room.id);
-            }
+                if (this.timer > 0) {
+                    this.timer--;
+                } else {
+                    this.stopTimer();
+                    socket.emit('timerUp', this.room.id);
+                }
             }, 1000);
         },
         stopTimer() {
             if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+                clearInterval(this.intervalId);
+                this.intervalId = null;
             }
         },
 
     },
+    computed: {
+        timerColor() {
+            if (this.timer < 4) {
+                return {
+                    color: 'red'
+                }
+            } else {
+                return {
+                    color: 'black'
+                }
+            }
+        }
+    }
 
 };
 </script>
@@ -610,6 +622,17 @@ main {
 
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
+}
+
+/* TRANSITIONS */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
   
