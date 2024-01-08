@@ -16,11 +16,13 @@
                     </div>
                 </div>
 
-                <div class="timer">
-                    <transition name="fade" mode="out-in">
-                        <p :key="timer" class="time" :style="timerColor">{{ timer }}</p>
-                    </transition>
-                </div>
+                <TransitionGroup name="beat" mode="out-in">
+                    <div class="timer">
+                        <transition name="fade" mode="out-in">
+                            <p :key="timer" class="time" :style="timerColor">{{ timer }}</p>
+                        </transition>
+                    </div>
+                </TransitionGroup>
 
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
@@ -407,8 +409,8 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     color: black;
     background-color: #fff;
     border-radius: 50%;
@@ -416,7 +418,7 @@ export default {
 }
 
 .timer .time {
-    font-size: 40px;
+    font-size: 60px;
     font-weight: bold;
     width: 35px;
     height: 35px;
@@ -627,7 +629,12 @@ main {
 /* TRANSITIONS */
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.5s;
+    transition: all .5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 
 .fade-enter,
