@@ -65,7 +65,7 @@
                 <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()"
                     v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
-                    <p class="card-level">3</p>
+                    <p class="card-level">{{ Math.floor(Math.random() * 4) + 1 }}</p>
                     <img class="image" src="/img/geometry.png" alt="">
                     <h3 class="title">Geometria</h3>
                 </div>

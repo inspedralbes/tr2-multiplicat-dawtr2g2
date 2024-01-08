@@ -94,6 +94,7 @@ io.on("connection", (socket) => {
       const quest = {
         id: questData.id,
         pregunta: questData.pregunta,
+        dificultat: questData.dificultat_id,
       };
 
       io.to(id).emit("viewQuest", quest);
