@@ -1294,6 +1294,7 @@ button:hover::after {
 
 .textBox {
     width: 40vw;
+    height: 150px;
 }
 
 .npcFace-container {
