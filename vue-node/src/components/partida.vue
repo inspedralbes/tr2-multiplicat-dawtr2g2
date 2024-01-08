@@ -1,7 +1,4 @@
 <template>
-    <head>
-        <link rel="stylesheet" href="style.css">
-    </head>
     <div class="container__game">
         <button class="nes-btn sortir" @click="sortir">Surt</button>
 
@@ -527,7 +524,7 @@ main {
     align-items: center;
     flex-direction: column;
     overflow: hidden;
-    background-image: url(img/card-background.jpg);
+    background-image: url(/img/card-background.jpg);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
