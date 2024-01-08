@@ -64,7 +64,6 @@ socket.on("timeUp", () => {
   const store = useAppStore();
   store.questAct = {};
   store.respAct = {};
-  console.log(store.respAct);
 });
 
 socket.on("life", (player) => {
