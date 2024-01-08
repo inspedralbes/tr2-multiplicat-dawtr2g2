@@ -65,7 +65,7 @@
                 <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()"
                     v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
-                    <p class="card-level">{{ Math.floor(Math.random() * 4) + 1 }}</p>
+                    <p class="card-level">1</p>
                     <img class="image" src="/img/geometry.png" alt="">
                     <h3 class="title">Geometria</h3>
                 </div>
@@ -137,7 +137,7 @@ export default {
 
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
-            this.timer = 10;
+            this.timer = 15;
             if (this.turn == true) {
                 this.mostResp = false;
             }
@@ -154,7 +154,7 @@ export default {
         socket.on('correct', () => {
             this.quest = '';
             this.est = 'Correcte'
-            this.timer = 10;
+            this.timer = 15;
             this.showEstForThreeSeconds();
 
         });
@@ -162,14 +162,14 @@ export default {
         socket.on('incorrect', () => {
             this.quest = '';
             this.est = 'Incorrecte'
-            this.timer = 10;
+            this.timer = 15;
             this.showEstForThreeSeconds();
         });
         
 
 
         socket.on('startTimer', () => {
-            this.timer = 10;
+            this.timer = 15;
             this.quest = '';
             this.startTimer();
         });
@@ -184,6 +184,7 @@ export default {
         this.stopTimer();
     },
     methods: {
+        
         genQuest() {
             this.est = '';
             this.numQuest--;
@@ -206,19 +207,23 @@ export default {
             socket.emit('exitRoom', this.room.id);
         },
         startTimer() {
+            const store = useAppStore();
             this.intervalId = setInterval(() => {
             if (this.timer > 0) {
                 this.timer--;
             } else {
                 this.stopTimer();
                 socket.emit('timerUp', this.room.id);
+                if (this.turn == true && this.ans.length == 4) {
+                    socket.emit('noAnswer', this.room.id,this.player);
+                }
             }
             }, 1000);
         },
         stopTimer() {
             if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+                clearInterval(this.intervalId);
+                this.intervalId = null;
             }
         },
 

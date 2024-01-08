@@ -96,3 +96,13 @@ socket.on("viewPlayers", (players) => {
   const store = useAppStore();
   store.addPlayers(players);
 });
+
+socket.on("correct", () => {
+  const store = useAppStore();
+  store.room.respAct = {};
+});
+
+socket.on("incorrect", () => {
+  const store = useAppStore();
+  store.room.respAct = {};
+});

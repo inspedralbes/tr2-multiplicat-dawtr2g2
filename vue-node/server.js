@@ -129,7 +129,6 @@ io.on("connection", (socket) => {
                     .getDamage(response.dificultat_id)
                     .then((response) => {
                       player.life = player.life - response;
-                      console.log(player.life);
                       io.to(id).emit("life", player);
                       if (player.life <= 0) {
                         io.to(id).emit("gameOver", player);
@@ -297,6 +296,22 @@ io.on("connection", (socket) => {
     io.emit("viewPlayers", players);
   });
 
+  socket.on("noAnswer", (id,user) => {
+    const room = rooms.find((room) => room.id === id);
+    if (room) {
+      let c = 0;
+      while (c < room.players.length) {
+        const player = room.players[c];
+        if (player.name === user) {
+          player.life = player.life - 10;
+          io.to(id).emit("life", player);
+        }
+        c++;
+      }
+    } else {
+      console.log(`No se encontró la sala con el ID ${id}`);
+    }
+  });
 
 
   socket.on("disconnect", (playerInfo) => {
@@ -304,8 +319,6 @@ io.on("connection", (socket) => {
     io.emit("viewPlayers", players);
     console.log("Client desconectat");
   });
-
-
 });
 
 const PORT = process.env.PORT || 3817;
