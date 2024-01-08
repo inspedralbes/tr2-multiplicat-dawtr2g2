@@ -170,7 +170,7 @@ export default defineComponent({
         this.isLogged = store.getIsLogged();
         if (this.isLogged) {
             this.username = store.getUsername();
-            this.token = store.getToken();
+            this.token = store.user.token;
             this.playerSprite = store.getSkin();
         } else {
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
@@ -345,11 +345,13 @@ export default defineComponent({
             this.navigation_menus.loginModal = false;
         },
         logout() {
+            const store = useAppStore();
+
             this.isLogged = false;
             this.username = "";
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
             this.closeNPCModal();
-            socket.emit("logout", this.token);
+            socket.emit("logout", store.getToken());
         },
         recibirsuccessLogout() {
             socket.on("successLogout", (response) => {
