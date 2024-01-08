@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
 import login from '@/components/Login.vue';
 import register from '@/components/Register.vue';
@@ -154,9 +154,7 @@ export default defineComponent({
                 playerInTrigger: false,
                 profile: false,
             },
-            firstTime: true,
             controlsHidden: false,
-
             playerInfo: {
                 id: null,
                 username: "",
@@ -211,6 +209,7 @@ export default defineComponent({
     methods: {
         initializeGame() {
             const self = this;
+            const store = useAppStore();
 
             const playerHouseConfig = {
                 key: "playerHouse",
@@ -285,6 +284,10 @@ export default defineComponent({
                     );
 
                     self.playerMovement(this, self.playerSprite);
+                    if (store.firstTime) {
+                        self.dialogo(this, 'npcRyu');
+                        store.firstTime = false;
+                    }
                 },
                 update: function () {
                 },
@@ -1120,7 +1123,7 @@ export default defineComponent({
                                 //     top: 1,
                                 //     bottom: 1,
                                 // },
-                                
+
                             }
                         );
 
@@ -1291,6 +1294,7 @@ button:hover::after {
 
 .textBox {
     width: 40vw;
+    height: 150px;
 }
 
 .npcFace-container {

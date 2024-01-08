@@ -3,7 +3,6 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import comsManager from "./comsManager.js";
-import { useAppStore } from "./src/stores/app.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -100,7 +99,6 @@ io.on("connection", (socket) => {
       io.to(id).emit("viewQuest", quest);
       socket.to(id).emit("viewResp", respData);
 
-      room.timer = 10;
 
       return { questData, respData };
     } catch (error) {
@@ -117,7 +115,6 @@ io.on("connection", (socket) => {
         var data = response.resposta_correcta_id;
         if (data == resp) {
           io.to(id).emit("correct");
-          console.log("Correcte");
         } else {
           let x = 0;
           while (x < rooms.length) {
@@ -135,8 +132,6 @@ io.on("connection", (socket) => {
                       io.to(id).emit("life", player);
                       if (player.life <= 0) {
                         io.to(id).emit("gameOver", player);
-                        clearInterval(element.timerId);
-
                         io.to(id).emit("disconnectRoom", id);
                         const socketsInRoom = io.sockets.adapter.rooms.get(id);
 
@@ -163,17 +158,8 @@ io.on("connection", (socket) => {
           }
 
           io.to(id).emit("incorrect");
-          console.log("Incorrecte");
         }
 
-        let a = 0;
-        while (a < rooms.length) {
-          const element = rooms[a];
-          if (id === element.id) {
-            element.timer = 10;
-          }
-          a++;
-        }
       })
       .catch((error) => {
         console.error(error);
@@ -181,7 +167,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("getRooms", () => {
-    io.emit("viewRooms", rooms);
+    socket.emit("viewRooms", rooms);
   });
 
   socket.on("createRoom", (name, id, user) => {
@@ -189,8 +175,6 @@ io.on("connection", (socket) => {
       name: name,
       id: id,
       players: [],
-      timer: 10,
-      timerId: null,
       timeUp: false,
       quests: [],
     };
@@ -229,33 +213,24 @@ io.on("connection", (socket) => {
       }
       i++;
     }
-
-    function startTimer(room, id) {
-      room.timerId = setInterval(() => {
-        if (room.timer > 0) {
-          room.timer--;
-          io.to(id).emit("timer", room.timer);
-        } else {
-          io.to(id).emit("timeUp");
-          clearInterval(room.timerId);
-          console.log("Time's up!");
-          setTimeout(() => {
-            room.timer = 10;
-            io.to(id).emit("startTimer");
-            startTimer(room, id);
-          }, 3000);
-        }
-      }, 1000);
-    }
-
     if (exist) {
       socket.join(id);
       socket.emit("joiningGame", room);
       socket.to(id).emit("playerJoined", room);
+      io.to(id).emit("startTimer");
       io.emit("viewRooms", rooms);
-      startTimer(room, id);
     }
   });
+
+  socket.on("timerUp", (id) => {
+    socket.to(id).emit("timeUp");
+    setTimeout(() => {
+      socket.to(id).emit("changeTurn");
+      socket.to(id).emit("startTimer");
+    }, 3000);
+  });
+
+  
 
   socket.on("getSkins", () => {
     comsManager
@@ -281,22 +256,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("exitRoom", (id) => {
-    
     io.to(id).emit("disconnectRoom", id);
+    io.to(id).emit("exit", id);
     const socketsInRoom = io.sockets.adapter.rooms.get(id);
-
+  
+    
     for (const socketId of socketsInRoom) {
       const socket = io.sockets.sockets.get(socketId);
       socket.leave(id);
     }
-
+    
+  
     const roomIndex = rooms.findIndex((room) => room.id === id);
     if (roomIndex !== -1) {
       rooms.splice(roomIndex, 1);
     }
-
-    io.emit("viewRooms", rooms);
-    
+    io.emit('viewRooms', rooms);
   });
 
   socket.on("addPlayer", (playerInfo) => {

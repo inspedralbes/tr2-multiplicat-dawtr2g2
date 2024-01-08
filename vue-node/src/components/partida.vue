@@ -16,7 +16,6 @@
                             </div>
                         </div>
                         <p class="name">{{ room.players[0].name }}</p>
-                        <p class="level">Lvl 7</p>
                     </div>
                 </div>
 
@@ -35,7 +34,6 @@
                             </div>
                         </div>
                         <p class="name">{{ room.players[1].name }}</p>
-                        <p class="level">Lvl 9</p>
                     </div>
                     <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
                 </div>
@@ -48,6 +46,7 @@
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
+                    <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
                     <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}
                     </h4>
                 </div>
@@ -102,12 +101,13 @@ export default {
 
     data() {
         return {
-            quest: '',
+            quest: 'Esperant jugador...',
             ans: [],
             room: {},
             numQuest: 10,
             turn: true,
             timer: 10,
+            intervalId: null,
             player: "",
             mostResp: false,
             est: '',
@@ -131,14 +131,6 @@ export default {
             this.quest = request;
         });
 
-        watch(() => store.getTimer(), time => {
-            this.timer = time;
-        });
-
-        watch(() => store.getTimeUp(), timing => {
-            this.room.timeUp = timing;
-        });
-
         watch(() => store.room, newRoom => {
             this.room = newRoom;
         })
@@ -148,6 +140,7 @@ export default {
 
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
+            this.timer = 10;
             if (this.turn == true) {
                 this.mostResp = false;
             }
@@ -164,6 +157,7 @@ export default {
         socket.on('correct', () => {
             this.quest = '';
             this.est = 'Correcte'
+            this.timer = 10;
             this.showEstForThreeSeconds();
 
         });
@@ -171,7 +165,16 @@ export default {
         socket.on('incorrect', () => {
             this.quest = '';
             this.est = 'Incorrecte'
+            this.timer = 10;
             this.showEstForThreeSeconds();
+        });
+        
+
+
+        socket.on('startTimer', () => {
+            this.timer = 10;
+            this.quest = '';
+            this.startTimer();
         });
 
         watch(() => this.numQuest, newVal => {
@@ -179,6 +182,9 @@ export default {
                 this.numQuest = 10;
             }
         });
+    },
+    beforeDestroy() {
+        this.stopTimer();
     },
     methods: {
         genQuest() {
@@ -201,7 +207,23 @@ export default {
         },
         sortir() {
             socket.emit('exitRoom', this.room.id);
-        }
+        },
+        startTimer() {
+            this.intervalId = setInterval(() => {
+            if (this.timer > 0) {
+                this.timer--;
+            } else {
+                this.stopTimer();
+                socket.emit('timerUp', this.room.id);
+            }
+            }, 1000);
+        },
+        stopTimer() {
+            if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+            }
+        },
 
     },
 
