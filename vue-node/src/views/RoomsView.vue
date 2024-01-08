@@ -30,7 +30,7 @@
                         <div class="room__info">
                             <div class="info__box">
                                 <label for="name">Nom de la sala:</label>
-                                <input type="text" v-model="this.room" />
+                                <input type="text" maxlength="20" v-model="this.room" />
                             </div>
                         </div>
                         <div class="privacity">
