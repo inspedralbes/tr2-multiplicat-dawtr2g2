@@ -16,12 +16,13 @@
                     </div>
                 </div>
 
-                <div class="timer">
-                    <p class="time">{{ timer }}</p>
-                    <div class="title">
-                        <p>TIME</p>
+                <TransitionGroup name="beat" mode="out-in">
+                    <div class="timer">
+                        <transition name="fade" mode="out-in">
+                            <p :key="timer" class="time" :style="timerColor">{{ timer }}</p>
+                        </transition>
                     </div>
-                </div>
+                </TransitionGroup>
 
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
@@ -165,7 +166,7 @@ export default {
             this.timer = 15;
             this.showEstForThreeSeconds();
         });
-        
+
 
 
         socket.on('startTimer', () => {
@@ -228,6 +229,19 @@ export default {
         },
 
     },
+    computed: {
+        timerColor() {
+            if (this.timer < 4) {
+                return {
+                    color: 'red'
+                }
+            } else {
+                return {
+                    color: 'black'
+                }
+            }
+        }
+    }
 
 };
 </script>
@@ -400,8 +414,8 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     color: black;
     background-color: #fff;
     border-radius: 50%;
@@ -409,7 +423,7 @@ export default {
 }
 
 .timer .time {
-    font-size: 40px;
+    font-size: 60px;
     font-weight: bold;
     width: 35px;
     height: 35px;
@@ -615,6 +629,22 @@ main {
 
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
+}
+
+/* TRANSITIONS */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all .5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
   
