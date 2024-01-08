@@ -844,7 +844,6 @@ export default defineComponent({
             });
         },
         dialogo(scene, npc) {
-            console.log(npc);
             this.npc.npcImage = "";
             this.npc.npcText = "";
             let parts = npc.split("npc");
