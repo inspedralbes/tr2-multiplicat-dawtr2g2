@@ -231,7 +231,7 @@ io.on("connection", (socket) => {
     }, 3000);
   });
 
-  
+
 
   socket.on("getSkins", () => {
     comsManager
@@ -260,14 +260,14 @@ io.on("connection", (socket) => {
     io.to(id).emit("disconnectRoom", id);
     io.to(id).emit("exit", id);
     const socketsInRoom = io.sockets.adapter.rooms.get(id);
-  
-    
+
+
     for (const socketId of socketsInRoom) {
       const socket = io.sockets.sockets.get(socketId);
       socket.leave(id);
     }
-    
-  
+
+
     const roomIndex = rooms.findIndex((room) => room.id === id);
     if (roomIndex !== -1) {
       rooms.splice(roomIndex, 1);
