@@ -91,6 +91,7 @@ import { socket } from '@/socket';
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useAppStore } from "../stores/app";
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 
 export default defineComponent({
     name: "battlemathGame",
@@ -220,6 +221,7 @@ export default defineComponent({
                     self.preloadSkins(this);
                     this.load.image("door", "/objects/door.png");
                     this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
+
                 },
                 create: function () {
                     ///Create map
@@ -248,6 +250,31 @@ export default defineComponent({
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
+
+                    if (self.isMobileDevice()) {
+                        const baseColor = 0x888888; // Color gris para la base
+                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
+
+                        const base = this.add.circle(0, 0, 30, baseColor);
+                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
+
+                        const thumb = this.add.circle(0, 0, 15, thumbColor);
+                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
+
+                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
+                            x: 50,
+                            y: 150,
+                            radius: 30,
+                            base: base,
+                            thumb: thumb,
+                        });
+
+                        joystick.on('update', () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        });
+                    }
 
                     self.playerMovement(this, self.playerSprite);
                 },
@@ -283,6 +310,31 @@ export default defineComponent({
                         self.lobby_layers.fg
                     );
 
+                    if (self.isMobileDevice()) {
+                        const baseColor = 0x888888; // Color gris para la base
+                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
+
+                        const base = this.add.circle(0, 0, 30, baseColor);
+                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
+
+                        const thumb = this.add.circle(0, 0, 15, thumbColor);
+                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
+
+                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
+                            x: 50,
+                            y: 150,
+                            radius: 30,
+                            base: base,
+                            thumb: thumb,
+                        });
+
+                        joystick.on('update', () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        });
+                    }
+
                     self.playerMovement(this, self.playerSprite);
                     if (store.firstTime) {
                         self.dialogo(this, 'npcRyu');
@@ -313,6 +365,13 @@ export default defineComponent({
                         gravity: { y: 0 },
                         debug: false,
                     },
+                },
+                plugins: {
+                    global: [{
+                        key: 'rexVirtualJoystick',
+                        plugin: VirtualJoystickPlugin,
+                        start: true
+                    }],
                 },
             };
 
@@ -987,6 +1046,41 @@ export default defineComponent({
                 }
             });
         },
+        playerMovementWithJoystick(scene, skin, directionX, directionY) {
+            const speed = 30;
+            const runSpeedMultiplier = 1.5;
+
+            let currentSpeed = speed;
+
+
+            if (Math.abs(directionX) > Math.abs(directionY)) {
+                // Movimiento horizontal
+                if (directionX > 0) {
+                    this.player.anims.play(`${skin}_move_right`, true);
+                    this.player.setVelocity(currentSpeed, 0);
+                } else if (directionX < 0) {
+                    this.player.anims.play(`${skin}_move_left`, true);
+                    this.player.setVelocity(-currentSpeed, 0);
+                }
+            } else {
+                // Movimiento vertical
+                if (directionY > 0) {
+                    this.player.anims.play(`${skin}_move_down`, true);
+                    this.player.setVelocity(0, currentSpeed);
+                } else if (directionY < 0) {
+                    this.player.anims.play(`${skin}_move_up`, true);
+                    this.player.setVelocity(0, -currentSpeed);
+                }
+            }
+
+            // Si el joystick está en reposo, detener al jugador
+            if (directionX === 0 && directionY === 0) {
+                const parts = this.player.anims.currentAnim.key.split("_");
+                parts[1] = "idle";
+                this.player.anims.play(parts.join("_"));
+                this.player.setVelocity(0, 0);
+            }
+        },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
             const store = useAppStore();
@@ -1141,6 +1235,20 @@ export default defineComponent({
                     }
                 }
             });
+        },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
         }
 
     },
