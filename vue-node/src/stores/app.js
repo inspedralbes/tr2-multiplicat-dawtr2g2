@@ -47,7 +47,7 @@ export const useAppStore = defineStore('app', {
       this.isLogged = false;
     },
     getToken() {
-      return this.user.tokens;
+      return this.user.token;
     },
     setTurnOn() {
       this.turn = true;

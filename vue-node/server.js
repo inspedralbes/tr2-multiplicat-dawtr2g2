@@ -94,6 +94,7 @@ io.on("connection", (socket) => {
       const quest = {
         id: questData.id,
         pregunta: questData.pregunta,
+        dificultat: questData.dificultat_id,
       };
 
       io.to(id).emit("viewQuest", quest);
@@ -128,7 +129,6 @@ io.on("connection", (socket) => {
                     .getDamage(response.dificultat_id)
                     .then((response) => {
                       player.life = player.life - response;
-                      console.log(player.life);
                       io.to(id).emit("life", player);
                       if (player.life <= 0) {
                         io.to(id).emit("gameOver", player);
@@ -230,7 +230,7 @@ io.on("connection", (socket) => {
     }, 3000);
   });
 
-  
+
 
   socket.on("getSkins", () => {
     comsManager
@@ -259,14 +259,14 @@ io.on("connection", (socket) => {
     io.to(id).emit("disconnectRoom", id);
     io.to(id).emit("exit", id);
     const socketsInRoom = io.sockets.adapter.rooms.get(id);
-  
-    
+
+
     for (const socketId of socketsInRoom) {
       const socket = io.sockets.sockets.get(socketId);
       socket.leave(id);
     }
-    
-  
+
+
     const roomIndex = rooms.findIndex((room) => room.id === id);
     if (roomIndex !== -1) {
       rooms.splice(roomIndex, 1);
@@ -297,6 +297,22 @@ io.on("connection", (socket) => {
     io.emit("viewPlayers", players);
   });
 
+  socket.on("noAnswer", (id,user) => {
+    const room = rooms.find((room) => room.id === id);
+    if (room) {
+      let c = 0;
+      while (c < room.players.length) {
+        const player = room.players[c];
+        if (player.name === user) {
+          player.life = player.life - 10;
+          io.to(id).emit("life", player);
+        }
+        c++;
+      }
+    } else {
+      console.log(`No se encontró la sala con el ID ${id}`);
+    }
+  });
 
 
   socket.on("disconnect", (playerInfo) => {
@@ -304,8 +320,6 @@ io.on("connection", (socket) => {
     io.emit("viewPlayers", players);
     console.log("Client desconectat");
   });
-
-
 });
 
 const PORT = process.env.PORT || 3817;

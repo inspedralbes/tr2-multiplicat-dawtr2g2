@@ -52,7 +52,6 @@ socket.on("loginParameters", (user) => {
 socket.on("logoutEliminarInfo", () => {
   const store = useAppStore();
   store.unsetUser();
-
 });
 
 socket.on("timer", (timer) => {
@@ -95,4 +94,14 @@ socket.on("exit", () => {
 socket.on("viewPlayers", (players) => {
   const store = useAppStore();
   store.addPlayers(players);
+});
+
+socket.on("correct", () => {
+  const store = useAppStore();
+  store.room.respAct = {};
+});
+
+socket.on("incorrect", () => {
+  const store = useAppStore();
+  store.room.respAct = {};
 });
