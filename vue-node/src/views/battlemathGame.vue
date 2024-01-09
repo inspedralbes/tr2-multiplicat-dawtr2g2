@@ -74,7 +74,6 @@
         <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
-
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -222,10 +221,11 @@ export default defineComponent({
                     this.load.image("door", "/objects/door.png");
                     this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
 
-                    this.load.image("button_up", "/icons/direction.png");
-                    this.load.image("button_down", "/icons/direction.png");
-                    this.load.image("button_left", "/icons/direction.png");
-                    this.load.image("button_right", "/icons/direction.png");
+                    this.load.image("button_up", "/icons/button_up.png");
+                    this.load.image("button_down", "/icons/button_down.png");
+                    this.load.image("button_left", "/icons/button_left.png");
+                    this.load.image("button_right", "/icons/button_right.png");
+                    this.load.image("button_interact", "/icons/button_interact.png");
 
                 },
                 create: function () {
@@ -256,15 +256,6 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
 
-                    const buttonUp = this.add.sprite(100, 100, 'button_up').setInteractive();
-                    const buttonDown = this.add.sprite(80, 300, 'button_down').setInteractive();
-                    const buttonLeft = this.add.sprite(30, 250, 'button_left').setInteractive();
-                    const buttonRight = this.add.sprite(130, 250, 'button_right').setInteractive();
-
-
-                    if (self.isMobileDevice()) {
-
-                    }
 
                     self.playerMovement(this, self.playerSprite);
                 },
@@ -1470,5 +1461,72 @@ button:hover::after {
     .controls {
         bottom: -150px;
     }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                  DPAD                                      */
+/* -------------------------------------------------------------------------- */
+
+.mobile-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 150px;
+}
+
+.dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    width: 150px;
+    height: 150px;
+}
+
+.dpad .dpad-button {
+    background: transparent !important;
+    border: none;
+    outline: none;
+    padding: 0;
+    width: auto;
+    height: auto;
+    /* margin: 5px; */
+}
+
+.left-right {
+    display: flex;
+    height: auto;
+}
+
+.up img,
+.down img {
+    cursor: pointer !important;
+    height: 50px;
+}
+
+.left-right img {
+    cursor: pointer !important;
+    width: 50px;
+}
+
+.interact-button {
+    background-color: transparent !important;
+    border: none;
+    outline: none;
+    margin: 20px;
+}
+
+.interact-button:hover {
+    background-color: transparent !important;
+}
+
+.interact-button img {
+    width: 50px;
+    cursor: pointer !important;
 }
 </style>
