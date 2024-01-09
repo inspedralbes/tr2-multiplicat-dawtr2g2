@@ -251,18 +251,30 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
 
-                    const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                        x: 100, // Posición X del joystick
-                        y: 100, // Posición Y del joystick
-                        radius: 50, // Radio del joystick
-                        // Otras opciones/configuraciones del joystick
-                    });
+                    if (self.isMobileDevice()) {
+                        const baseColor = 0x888888; // Color gris para la base
+                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
 
-                    joystick.on('update', () => {
-                        const directionX = joystick.forceX;
-                        const directionY = joystick.forceY;
-                        self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
-                    });
+                        const base = this.add.circle(0, 0, 30, baseColor);
+                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
+
+                        const thumb = this.add.circle(0, 0, 15, thumbColor);
+                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
+
+                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
+                            x: 50,
+                            y: 150,
+                            radius: 30,
+                            base: base,
+                            thumb: thumb,
+                        });
+
+                        joystick.on('update', () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        });
+                    }
 
                     self.playerMovement(this, self.playerSprite);
                 },
@@ -297,6 +309,31 @@ export default defineComponent({
                         self.player,
                         self.lobby_layers.fg
                     );
+
+                    if (self.isMobileDevice()) {
+                        const baseColor = 0x888888; // Color gris para la base
+                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
+
+                        const base = this.add.circle(0, 0, 30, baseColor);
+                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
+
+                        const thumb = this.add.circle(0, 0, 15, thumbColor);
+                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
+
+                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
+                            x: 50,
+                            y: 150,
+                            radius: 30,
+                            base: base,
+                            thumb: thumb,
+                        });
+
+                        joystick.on('update', () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        });
+                    }
 
                     self.playerMovement(this, self.playerSprite);
                     if (store.firstTime) {
@@ -1198,6 +1235,20 @@ export default defineComponent({
                     }
                 }
             });
+        },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
         }
 
     },
