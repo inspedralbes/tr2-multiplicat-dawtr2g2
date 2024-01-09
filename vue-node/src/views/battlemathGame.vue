@@ -87,7 +87,7 @@ import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
-import { socket } from '@/socket';
+import { socket } from "@/socket";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useAppStore } from "../stores/app";
