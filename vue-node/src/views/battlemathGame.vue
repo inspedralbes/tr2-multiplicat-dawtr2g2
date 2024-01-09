@@ -268,6 +268,7 @@ export default defineComponent({
                     self.createNPC(this, 910, 420, 'npcRyu', 0);
                     ///Create player
                     if (self.navigation_menus.sceneStart === 1) {
+
                         self.playerCreate(this, 888, 390, self.playerSprite);
                     } else {
                         self.playerCreate(this, 687, 554, self.playerSprite);
@@ -1093,6 +1094,7 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
+            console.log("Estoy en el emit addPlayer");
             socket.emit("addPlayer", this.playerInfo);
             this.viewPlayers(scene);
         },
@@ -1106,7 +1108,6 @@ export default defineComponent({
                             this.playerSprites[players[i].id].sprite.destroy();
                             this.playerSprites[players[i].id].text.destroy();
                         }
-
                         //Añadimos el username encima del personaje
                         const text = scene.add.text(
                             players[i].x - 10,

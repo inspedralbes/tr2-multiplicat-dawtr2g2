@@ -275,6 +275,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addPlayer", (playerInfo) => {
+    console.log("Entra?");
     if (players.length === 0) {
       players.push(playerInfo);
     } else {
