@@ -222,6 +222,11 @@ export default defineComponent({
                     this.load.image("door", "/objects/door.png");
                     this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
 
+                    this.load.image("button_up", "/icons/direction.png");
+                    this.load.image("button_down", "/icons/direction.png");
+                    this.load.image("button_left", "/icons/direction.png");
+                    this.load.image("button_right", "/icons/direction.png");
+
                 },
                 create: function () {
                     ///Create map
@@ -251,29 +256,14 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
 
+                    const buttonUp = this.add.sprite(100, 100, 'button_up').setInteractive();
+                    const buttonDown = this.add.sprite(80, 300, 'button_down').setInteractive();
+                    const buttonLeft = this.add.sprite(30, 250, 'button_left').setInteractive();
+                    const buttonRight = this.add.sprite(130, 250, 'button_right').setInteractive();
+
+
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
 
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
-
-                        joystick.on('update', () => {
-                            const directionX = joystick.forceX;
-                            const directionY = joystick.forceY;
-                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
-                        });
                     }
 
                     self.playerMovement(this, self.playerSprite);
@@ -312,28 +302,17 @@ export default defineComponent({
                     );
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
 
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
+                        const buttonUp = this.add.sprite(80, 200, 'button_up').setInteractive();
+                        const buttonDown = this.add.sprite(80, 300, 'button_down').setInteractive();
+                        const buttonLeft = this.add.sprite(30, 250, 'button_left').setInteractive();
+                        const buttonRight = this.add.sprite(130, 250, 'button_right').setInteractive();
 
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
-
-                        joystick.on('update', () => {
-                            const directionX = joystick.forceX;
-                            const directionY = joystick.forceY;
-                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
-                        });
+                        // joystick.on('update', () => {
+                        //     const directionX = joystick.forceX;
+                        //     const directionY = joystick.forceY;
+                        //     self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        // });
                     }
 
                     self.playerMovement(this, self.playerSprite);
@@ -1190,7 +1169,6 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
-            console.log("Estoy en el emit addPlayer");
             socket.emit("addPlayer", this.playerInfo);
             this.viewPlayers(scene);
         },
