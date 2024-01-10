@@ -24,10 +24,10 @@
         </div>
 
         <button type="submit" class="button button--icon is-warning is-rounded is-responsive mt-4">
-            <p>MODIFICAR LLIBRE</p>
+            <p>Modificar pregunta</p>
         </button>
         <a href="{{ route('preguntes') }}" class="button button--icon is-danger is-rounded is-responsive mt-4">
-            <p>CANCEL·LAR</p>
+            <p>Cancel·lar</p>
         </a>
     </form>
 </div>
