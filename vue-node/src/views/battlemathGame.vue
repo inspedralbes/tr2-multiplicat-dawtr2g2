@@ -71,6 +71,9 @@
             </div>
         </div>
 
+
+        <button class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
+
         <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
@@ -1250,7 +1253,15 @@ export default defineComponent({
             ];
 
             return mobileKeywords.some(keyword => userAgent.includes(keyword));
-        }
+        },
+
+        toggleControls() {
+            if (this.controlsHidden) {
+                this.controlsHidden = false;
+            }else{
+                this.controlsHidden = true;
+            }
+        },
 
     },
 });
@@ -1431,13 +1442,20 @@ button:hover::after {
 /* -------------------------------------------------------------------------- */
 /*                                  CONTROLS                                  */
 /* -------------------------------------------------------------------------- */
+
+.controls-btn{
+    position: absolute;
+    top: 30px;
+    left: 100px;
+}
+
 .controls {
     width: 100%;
     text-align: center;
     position: absolute;
     bottom: -100px;
-    animation: animControlsUp 1s ease-in-out 1s both;
     background-color: #141b1ba4;
+    animation: animControlsUp 1s ease-in-out .3s both;
 }
 
 .controlsHide {
