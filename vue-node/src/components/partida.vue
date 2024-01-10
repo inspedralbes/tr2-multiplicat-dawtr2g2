@@ -45,7 +45,7 @@
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                     <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
-                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected">Et toca tirar</h3>
+                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected && room.players.length == 2">Et toca tirar</h3>
                     <h3 class=" turn" v-if="!turn && !questionSelected && room.players.length == 2">Esperant atac</h3>
                     <h3 class=" turn" v-if="!turn && questionSelected && room.players.length == 2">Esperant resposta</h3>
 
