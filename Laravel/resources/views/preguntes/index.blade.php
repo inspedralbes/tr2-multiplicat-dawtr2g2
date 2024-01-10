@@ -22,8 +22,8 @@
             <th>Pregunta</th>
             <th>resposta_correcta_id</th>
             <th>resposta</th>
-            <th>dificultat_id</th>
-            <th>tema_id</th>
+            <th>Dificultat</th>
+            <th>Tema</th>
             <th></th>
         </tr>
         @foreach ($preguntes as $pregunta)
@@ -32,8 +32,8 @@
             <td><a href="{{ route('view-modificar-pregunta', ['id' => $pregunta->id]) }}">{{ $pregunta->pregunta }}</a></td>
             <td>{{ $pregunta->resposta_correcta_id}}</td>
             <td> {{ $pregunta->resposta }}</td>
-            <td>{{ $pregunta->dificultat_id }}</td>
-            <td>{{ $pregunta->tema_id }}</td>
+            <td>{{$pregunta->dificultat}}</td>
+            <td>T.{{ $pregunta->tema_id }}: {{$pregunta->tema}}</td>
             <td>
                 <form action="{{ route('eliminar-pregunta', ['id' => $pregunta->id]) }}" method="POST">
                     @method('DELETE')

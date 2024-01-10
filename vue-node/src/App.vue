@@ -10,5 +10,3 @@ import music from "./components/music.vue";
     <RouterView />
 </template>
 
-
-
