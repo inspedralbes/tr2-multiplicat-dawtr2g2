@@ -1253,6 +1253,23 @@ export default defineComponent({
         }
 
     },
+    createJoystick(scene, pointer) {
+        const baseColor = 0x888888; // Color gris para la base
+        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
+
+        const base = scene.add.circle(0, 0, 40, baseColor); // Reducir el tamaño de la base a un radio de 40
+        const thumb = scene.add.circle(0, 0, 20, thumbColor); // Reducir el tamaño del "thumb" a un radio de 20
+
+        // Posicionar el joystick en las coordenadas del toque
+        const joystick = scene.plugins.get('rexVirtualJoystick').add(scene, {
+            x: pointer.x,
+            y: pointer.y,
+            radius: 40, // Cambiar el radio del joystick a 40
+            base: base,
+            thumb: thumb,
+            // Otras opciones...
+        });
+    }
 });
 </script>
 
