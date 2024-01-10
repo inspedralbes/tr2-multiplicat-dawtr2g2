@@ -263,8 +263,8 @@ export default defineComponent({
                         });
                     }
 
-
                     self.playerMovement(this, self.playerSprite);
+
                 },
                 update: function () { },
             };
@@ -314,6 +314,8 @@ export default defineComponent({
                         self.dialogo(this, 'npcRyu');
                         store.firstTime = false;
                     }
+
+
                 },
                 update: function () {
                 },
@@ -878,37 +880,6 @@ export default defineComponent({
                     this.dialogo(scene, npc.texture.key);
                 }
             });
-
-            watch(() => this.mobileButton, newVal => {
-                if (newVal) {
-                    if (
-                        !this.interactingWithNPC &&
-                        this.canMove &&
-                        this.npc.playerInTrigger
-                    ) {
-                        this.mobileButton = true;
-                        const distX = this.player.x - npc.x;
-                        const distY = this.player.y - npc.y;
-
-                        if (Math.abs(distX) > Math.abs(distY)) {
-                            if (distX > 0) {
-                                npc.setFrame(3);
-                            } else {
-                                npc.setFrame(2);
-                            }
-                        } else {
-                            if (distY > 0) {
-                                npc.setFrame(0);
-                            } else if (distY < 0) {
-                                npc.setFrame(1);
-                            } else {
-                                npc.setFrame(0);
-                            }
-                        }
-                        this.dialogo(scene, npc.texture.key);
-                    }
-                }
-            });
         },
         dialogo(scene, npc) {
             this.npc.npcImage = "";
@@ -1286,12 +1257,17 @@ export default defineComponent({
             return joystick;
         },
         mobileClick() {
-            if (this.npc.playerInTrigger) {
-                this.mobileButton = true;
-                setTimeout(() => {
-                    this.mobileButton = false;
-                }, 200);
-            }
+            // Emulando la tecla "Space" al hacer clic en el botón
+            const event = new KeyboardEvent('keydown', {
+                key: ' ',
+                code: 'Space',
+                keyCode: 32,
+                which: 32,
+                bubbles: true,
+            });
+
+            // Simulando la propagación del evento hacia arriba en el DOM
+            this.$el.dispatchEvent(event);
         }
     }
 });
@@ -1476,7 +1452,7 @@ button:hover::after {
     /* Ocupa 1/3 del ancho de la pantalla */
     height: 100vh;
     /* Ocupa la altura completa de la pantalla */
-    background-color: rgba(255, 0, 0, .5) !important;
+    background-color: rgba(255, 0, 0, 0) !important;
     position: absolute;
     top: 0;
     right: 0;
