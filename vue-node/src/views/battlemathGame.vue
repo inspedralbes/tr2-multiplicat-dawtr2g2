@@ -75,12 +75,13 @@
             <img src="/img/Tuto.png" alt="">
         </div>
 
+        <button v-if="$route.path === '/game'" class="interactMobile" @click="mobileClick"></button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
 
 <script>
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import char_select from '@/components/char_select.vue';
 import login from '@/components/Login.vue';
 import register from '@/components/Register.vue';
@@ -164,6 +165,7 @@ export default defineComponent({
                 y: "",
             },
             playerSprites: {},
+            mobileButton: false
         };
     },
     mounted() {
@@ -260,6 +262,7 @@ export default defineComponent({
                             self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
                         });
                     }
+
 
                     self.playerMovement(this, self.playerSprite);
                 },
@@ -769,6 +772,10 @@ export default defineComponent({
             this.npc.npcs.push(NPC);
         },
         triggerWithNPC(scene) {
+            if (!scene) {
+                scene = this;
+            }
+
             for (let i = 0; i < this.npc.npcs.length; i++) {
                 let npc = this.npc.npcs[i];
                 let npcName = npc.texture.key;
@@ -810,39 +817,36 @@ export default defineComponent({
 
                 let dialogoMostrado = false;
 
-                scene.physics.add.overlap(
-                    this.player,
-                    trigger,
-                    (player, trigger) => {
-                        if (trigger.body.touching.none) {
-                            this.npc.playerInTrigger = true;
-                            if (trigger.child != "npcdoorPHouse") {
-                                dialogInfo.setAlpha(1);
-                            }
-                            if (!dialogoMostrado) {
-                                if (
-                                    this.isLogged &&
-                                    trigger.child === "npcdoorPHouse"
-                                ) {
-                                    this.cambiarEscena(scene, "lobby");
-                                } else if (
-                                    !this.isLogged &&
-                                    trigger.child === "npcdoorPHouse"
-                                ) {
-                                    this.dialogo(scene, trigger.child);
-                                }
-                                dialogoMostrado = true;
-                                this.interactWithNPC(scene, npc);
-                            }
-                        } else {
-                            if (trigger.child != "npcdoorPHouse") {
-                                dialogInfo.setAlpha(0);
-                            }
-                            this.npc.playerInTrigger = false;
-                            scene.input.keyboard.off("keydown-SPACE");
-                            dialogoMostrado = false;
+                scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
+                    if (trigger.body.touching.none) {
+                        this.npc.playerInTrigger = true;
+                        if (trigger.child != "npcdoorPHouse") {
+                            dialogInfo.setAlpha(1);
                         }
+                        if (!dialogoMostrado) {
+                            if (
+                                this.isLogged &&
+                                trigger.child === "npcdoorPHouse"
+                            ) {
+                                this.cambiarEscena(scene, "lobby");
+                            } else if (
+                                !this.isLogged &&
+                                trigger.child === "npcdoorPHouse"
+                            ) {
+                                this.dialogo(scene, trigger.child);
+                            }
+                            dialogoMostrado = true;
+                            this.interactWithNPC(scene, npc);
+                        }
+                    } else {
+                        if (trigger.child != "npcdoorPHouse") {
+                            dialogInfo.setAlpha(0);
+                        }
+                        this.npc.playerInTrigger = false;
+                        scene.input.keyboard.off("keydown-SPACE");
+                        dialogoMostrado = false;
                     }
+                }
                 );
             }
         },
@@ -872,6 +876,37 @@ export default defineComponent({
                         }
                     }
                     this.dialogo(scene, npc.texture.key);
+                }
+            });
+
+            watch(() => this.mobileButton, newVal => {
+                if (newVal) {
+                    if (
+                        !this.interactingWithNPC &&
+                        this.canMove &&
+                        this.npc.playerInTrigger
+                    ) {
+                        this.mobileButton = true;
+                        const distX = this.player.x - npc.x;
+                        const distY = this.player.y - npc.y;
+
+                        if (Math.abs(distX) > Math.abs(distY)) {
+                            if (distX > 0) {
+                                npc.setFrame(3);
+                            } else {
+                                npc.setFrame(2);
+                            }
+                        } else {
+                            if (distY > 0) {
+                                npc.setFrame(0);
+                            } else if (distY < 0) {
+                                npc.setFrame(1);
+                            } else {
+                                npc.setFrame(0);
+                            }
+                        }
+                        this.dialogo(scene, npc.texture.key);
+                    }
                 }
             });
         },
@@ -927,6 +962,7 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
+                this.mobileButton = false;
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
@@ -1163,7 +1199,6 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
-            console.log("Estoy en el emit addPlayer");
             socket.emit("addPlayer", this.playerInfo);
             this.viewPlayers(scene);
         },
@@ -1227,10 +1262,8 @@ export default defineComponent({
             const baseColor = 0x888888;
             const thumbColor = 0xCCCCCC;
 
-            const gameWidth = scene.sys.game.config.width;
             const gameHeight = scene.sys.game.config.height;
 
-            const joystickWidth = gameWidth * 0.2;
             const joystickHeight = gameHeight * 0.2;
 
             const joystickX = 60;
@@ -1251,8 +1284,16 @@ export default defineComponent({
             });
 
             return joystick;
+        },
+        mobileClick() {
+            if (this.npc.playerInTrigger) {
+                this.mobileButton = true;
+                setTimeout(() => {
+                    this.mobileButton = false;
+                }, 200);
+            }
         }
-    },
+    }
 });
 </script>
 
@@ -1377,6 +1418,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 3;
 }
 
 .modal {
@@ -1401,6 +1443,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .textBox {
@@ -1426,6 +1469,20 @@ button:hover::after {
     width: 100%;
     padding-left: 20px;
     gap: 2rem;
+}
+
+.interactMobile {
+    width: 50vw;
+    /* Ocupa 1/3 del ancho de la pantalla */
+    height: 100vh;
+    /* Ocupa la altura completa de la pantalla */
+    background-color: rgba(255, 0, 0, .5) !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none !important;
+    outline: none !important;
+    z-index: 0;
 }
 
 /* -------------------------------------------------------------------------- */
