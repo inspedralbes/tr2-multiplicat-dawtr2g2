@@ -45,9 +45,10 @@
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                     <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
-                    <h3 class="question" v-if="turn && !quest.pregunta && !questionSelected">Et toca tirar</h3>
-                    <h3 class="question" v-else-if="!turn && !questionSelected && room.players.length == 2">Esperant atac</h3>
-                    <h3 class="question" v-if="!turn && questionSelected && room.players.length == 2">Esperant resposta</h3>
+                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected">Et toca tirar</h3>
+                    <h3 class=" turn" v-if="!turn && !questionSelected && room.players.length == 2">Esperant atac</h3>
+                    <h3 class=" turn" v-if="!turn && questionSelected && room.players.length == 2">Esperant resposta</h3>
+
                     <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}
                     </h4>
                 </div>
@@ -262,6 +263,17 @@ export default {
 .incorrect {
     color: red;
     font-size: 30px;
+}
+
+.turn{
+    font-size: 30px;
+    animation: blink 1.3s linear infinite;
+}
+
+@keyframes blink {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
 }
 
 * {
