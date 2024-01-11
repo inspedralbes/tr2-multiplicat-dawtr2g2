@@ -18,7 +18,7 @@ class AuthController extends Controller
         if ($existUser) {
             return response()->json(['message' => 'El correu ja s\'està utilitzant '], 400);
         }elseif ($existUsername) {
-            return response()->json(['message' => 'El nombre de usuario ya está siendo utilizado.'], 400);
+            return response()->json(['message' => 'El nom d\'usuari ja està sent utilitzat.'], 400);
         } elseif (strcmp($request->password, $request->password_confirmation) !== 0) {
             return response()->json(['message' => 'La contrasenya no coincideix '], 400);
         } else{
