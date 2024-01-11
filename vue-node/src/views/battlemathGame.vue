@@ -1259,6 +1259,19 @@ export default defineComponent({
             });
 
             return joystick;
+        },
+        mobileClick() {
+            // Emulando la tecla "Space" al hacer clic en el botón
+            const event = new KeyboardEvent('keydown', {
+                key: ' ',
+                code: 'Space',
+                keyCode: 32,
+                which: 32,
+                bubbles: true,
+            });
+
+            // Simulando la propagación del evento hacia arriba en el DOM
+            this.$el.dispatchEvent(event);
         }
 
     },
