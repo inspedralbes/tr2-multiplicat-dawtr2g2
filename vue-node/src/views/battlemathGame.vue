@@ -78,7 +78,7 @@
             <img src="/img/Tuto.png" alt="">
         </div>
 
-        <button v-if="$route.path === '/game' && !isMobileDevice" class="interactMobile" @click="mobileClick"></button>
+        <button v-if="$route.path === '/game' && isMobileDevice" class="interactMobile" @click="mobileClick"></button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
