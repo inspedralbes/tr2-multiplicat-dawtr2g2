@@ -296,7 +296,6 @@ export default defineComponent({
                 },
                 create: function () {
                     const store = useAppStore();
-
                     self.createLobby(this);
 
                     self.createNPC(this, 910, 420, "npcRyu", 0);
@@ -1207,7 +1206,6 @@ export default defineComponent({
                             this.playerSprites[players[i].id].text.destroy();
                         }
 
-
                         //Añadimos el username encima del personaje
                         const text = scene.add.text(
                             players[i].x - 10,
@@ -1219,6 +1217,7 @@ export default defineComponent({
                                 color: "#fff",
                             }
                         );
+
 
                         // Creamos un nuevo sprite para el jugador
                         const jugador = scene.physics.add.sprite(
