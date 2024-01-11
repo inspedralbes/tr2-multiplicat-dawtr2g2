@@ -260,7 +260,7 @@ export default defineComponent({
 
                     self.addHouseCollisions(this);
 
-                    this.cameras.main.centerOn(780, 774);
+                    this.cameras.main.centerOn(790, 795);
                     self.createPlayerHouse_foreground(this);
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);

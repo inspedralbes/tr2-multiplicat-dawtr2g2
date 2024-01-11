@@ -521,7 +521,7 @@ main {
 .cards {
     display: flex;
     gap: 10px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .card {
