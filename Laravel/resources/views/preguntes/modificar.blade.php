@@ -16,31 +16,26 @@
         </div>
         <div class="field">
             <label for="tema_id" class="label">Tema</label>
-            
-
-
-                    <p value="{{ $tema->id }}">Geometria</option>
-
-
+            <p value="">Geometria</option>
         </div>
         <div class="field">
             <label for="dificultat" class="label">Dificultat</label>
-            
+
             <select name="dificultat_id" id="">
                 @foreach($dificultats as $dificultat)
-                    <option value="{{ $dificultat->id }}">{{ $dificultat->nom_dificultat }}</option>
+                <option value="{{ $dificultat->id }}">{{ $dificultat->nom_dificultat }}</option>
                 @endforeach
             </select>
-           
+
         </div>
 
         <button type="submit" class="button button--icon is-warning is-rounded is-responsive mt-4">
             <p>Modificar pregunta</p>
         </button>
         <div class="control">
-                <a href="{{ route('preguntes') }}" class="button is-danger">
-                    <span>Cancel·lar</span>
-                </a>
+            <a href="{{ route('preguntes') }}" class="button is-danger">
+                <span>Cancel·lar</span>
+            </a>
         </div>
 
     </form>
@@ -125,7 +120,5 @@
     .is-warning:hover {
         background-color: #ffeb89;
     }
-
-    
 </style>
 @endsection

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Resposta;
+use App\Models\Dificultat;
+use Illuminate\Support\Facades\DB;
 
 
 class RespostaController extends Controller
@@ -76,6 +78,13 @@ class RespostaController extends Controller
     {
         $respostes = Resposta::all();
 
+        foreach ($respostes as $resposta) {
+            $dificultat = Dificultat::where('id', $resposta->dificultat_id)->first();
+            $tema = DB::table('temes')->where('id', $resposta->tema_id)->first();
+    
+            $resposta->dificultat = $dificultat ? $dificultat->nom_dificultat : null;
+            $resposta->tema = $tema ? $tema->nom_tematica : null;
+        }
         return view('respostes.index', ['respostes' => $respostes]);
     }
 
@@ -94,13 +103,21 @@ class RespostaController extends Controller
         $resposta->dificultat_id = $request->dificultat_id;
         $resposta->save();
 
-        return redirect()->route('view-afegir-resposta')->with('success', 'Pregunta afegida correctament');
+        return redirect()->route('view-afegir-resposta')->with('success', 'Resposta afegida correctament');
     }
 
     public function adminShow($id)
     {
         $resposta = Resposta::find($id);
-        return view('respostes.modificar', ['resposta' => $resposta]);
+        
+        $dificultat = Dificultat::where('id', $resposta->dificultat_id)->first();
+        $resposta->dificultat = $dificultat ? $dificultat->nom_dificultat : null;
+        
+        $dificultats = Dificultat::all();
+
+
+        $resposta->dificultat = $dificultats->pluck('nom_dificultat');
+        return view('respostes.modificar', ['resposta' => $resposta, 'dificultats' => $dificultats, 'dificultat' => $dificultat]);
     }
 
     public function adminUpdate(Request $request, $id)
@@ -111,7 +128,7 @@ class RespostaController extends Controller
 
 
 
-        return redirect()->route('view-modificar-resposta', ['id' => $resposta->id])->with('success', 'La resposta a estat actualitzada correctament');
+        return redirect()->route('respostes', ['id' => $resposta->id])->with('success', 'La resposta a estat actualitzada correctament');
     }
 
     public function adminDelete($id)
