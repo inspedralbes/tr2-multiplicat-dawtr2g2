@@ -523,6 +523,8 @@ main {
     gap: 10px;
     overflow: auto;
     width: 90%;
+    justify-content: center;
+    align-items: center;
 }
 
 .card {
