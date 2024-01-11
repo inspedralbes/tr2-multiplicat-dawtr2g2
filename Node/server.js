@@ -32,6 +32,7 @@ io.on("connection", (socket) => {
           token: response.data.token,
           skin: response.data.skin,
         };
+
         socket.emit("loginParameters", user);
         socket.emit("success", response);
       })
@@ -275,29 +276,32 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addPlayer", (playerInfo) => {
-    console.log("Entra?");
     if (players.length === 0) {
+
       players.push(playerInfo);
+      players[players.length - 1].socketID = socket.id;
+
     } else {
       var i = 0;
       while (i < players.length && !exist) {
         var exist = false;
         if (players[i].id === playerInfo.id) {
           players[i] = playerInfo;
+          players[i].socketID = socket.id;
           exist = true;
         }
         i++;
       }
       if (!exist) {
         players.push(playerInfo);
+        players[players.length - 1].socketID = socket.id;
       }
     }
 
-    console.log(players);
     io.emit("viewPlayers", players);
   });
 
-  socket.on("noAnswer", (id,user) => {
+  socket.on("noAnswer", (id, user) => {
     const room = rooms.find((room) => room.id === id);
     if (room) {
       let c = 0;
@@ -316,9 +320,14 @@ io.on("connection", (socket) => {
 
 
   socket.on("disconnect", (playerInfo) => {
-    players = players.filter(player => player.id !== playerInfo.id);
+    let playerToDelete = players.findIndex(player => player.socketID !== socket.id);
+    if (playerToDelete !== -1) {
+      console.log(`Player ${players[playerToDelete].username} disconnected`);
+      players.splice(playerToDelete, 1);
+    } else {
+      console.log("Player not found");
+    }
     io.emit("viewPlayers", players);
-    console.log("Client desconectat");
   });
 });
 
