@@ -16,7 +16,7 @@
         </button>
     </form>
 
-    <table class="table is-striped is-hoverable is-fullwidth">
+    <table class="table is-striped is-hoverable is-fullwidth is-gray-bg">
         <tr>
             <th>ID</th>
             <th>Pregunta</th>
@@ -45,5 +45,52 @@
         @endforeach
     </table>
 </div>
+
+<style>
+/* Estilos para la tabla */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+/* Estilos para las celdas de encabezado */
+th {
+    background-color: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Estilos para las celdas de datos */
+td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+/* Alternar colores de fondo para filas impares */
+.is-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Cambiar el color de fondo al pasar el ratón sobre las filas */
+.is-hoverable tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Fondo gris para filas impares */
+.is-gray-bg tbody tr:nth-child(odd) {
+    background-color: #ddd;
+}
+
+/* Estilos para el botón de eliminar */
+.eliminar {
+    margin-top: 8px;
+}
+
+/* Puedes ajustar los estilos según tus preferencias y diseño general */
+
+</style>
+
 
 @endsection
