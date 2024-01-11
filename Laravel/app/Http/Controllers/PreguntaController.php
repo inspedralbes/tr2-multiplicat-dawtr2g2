@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pregunta;
 use App\Models\Resposta;
-use App\Http\Controllers\RespostaController;
 use App\Models\Dificultat;
 use Illuminate\Support\Facades\DB;
 
 class PreguntaController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
+{   
+    
+
     public function index()
     {
         $preguntes = Pregunta::all();
@@ -24,8 +22,12 @@ class PreguntaController extends Controller
     public function showPregDif($dif)
     {
         $mostrarPreg = Pregunta::where('dificultat_id', $dif)->get();
+        $count = Pregunta::where('dificultat_id', $dif)->count();
 
-        return response()->json($mostrarPreg);
+        return response()->json([
+            'preguntas' => $mostrarPreg,
+            'count' => $count
+        ]); 
     }
 
     /**
@@ -90,8 +92,12 @@ class PreguntaController extends Controller
         
         foreach ($preguntes as $pregunta) {
             $resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->first();
-    
+            $dificultat = Dificultat::where('id', $pregunta->dificultat_id)->first();
+            $tema = DB::table('temes')->where('id', $pregunta->tema_id)->first();
             $pregunta->resposta = $resposta ? $resposta->resposta : null;
+            $pregunta->dificultat = $dificultat ? $dificultat->nom_dificultat : null;
+            $pregunta->tema = $tema ? $tema->nom_tematica : null;
+            
         }
         return view('preguntes.index', [
             'preguntes' => $preguntes
@@ -99,6 +105,7 @@ class PreguntaController extends Controller
 
 
     }
+
 
     public function adminStore(Request $request)
     {
@@ -128,28 +135,46 @@ class PreguntaController extends Controller
     public function adminShow($id)
     {
         $pregunta = Pregunta::find($id);
-        $pregunta->resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->pluck('resposta')->first();
 
-        return view('preguntes.modificar', ['pregunta' => $pregunta]);
+        $resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->first(); 
+        $pregunta->resposta = $resposta ? $resposta->resposta : null;
+       
+        $tema = DB::table('temes')->where('id', $pregunta->tema_id)->first();
+        $pregunta->tema = $tema ? $tema->nom_tematica : null;
+        
+        $dificultat = Dificultat::where('id', $pregunta->dificultat_id)->first();
+        $pregunta->dificultat = $dificultat ? $dificultat->nom_dificultat : null;
+        
+        $dificultats = Dificultat::all();
+
+
+        $pregunta->dificultat = $dificultats->pluck('nom_dificultat');
+
+
+        return view('preguntes.modificar', ['pregunta' => $pregunta, 'dificultats' => $dificultats, 'dificultat' => $dificultat, 'tema' => $tema]);
     }
+    
 
     public function adminUpdate(Request $request, $id)
-    {
-        $pregunta = Pregunta::find($id); 
-        $resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->pluck('resposta')->first();
-    
-        // Actualizar los atributos de la pregunta
-        $pregunta->update([
-            'pregunta' => $request->pregunta,
-            'tema_id' => $request->tema_id,
-            'dificultat_id' => $request->dificultat_id,
-        ]);
-    
-        // Actualizar la respuesta correspondiente
+{
+    $pregunta = Pregunta::find($id); 
+
+    // Actualizar los campos de la pregunta
+    $pregunta->update([
+        'pregunta' => $request->pregunta,
+        'tema_id' => $request->tema_id,
+        'dificultat_id' => $request->dificultat_id,
+    ]);
+
+    // Encontrar y actualizar la respuesta correspondiente
+    $resposta = Resposta::find($pregunta->resposta_correcta_id);
+    if ($resposta) {
         $resposta->update(['resposta' => $request->resposta]);
-    
-        return redirect()->route('preguntes')->with('success', 'La pregunta ha sido actualizada correctamente');
     }
+
+    return redirect()->route('preguntes')->with('success', 'La pregunta ha sido actualizada correctamente');
+}
+
     
 
     public function adminDelete($id)

@@ -1,7 +1,4 @@
 <template>
-    <head>
-        <link rel="stylesheet" href="style.css">
-    </head>
     <div class="container__game">
         <button class="nes-btn sortir" @click="sortir">Surt</button>
 
@@ -19,12 +16,13 @@
                     </div>
                 </div>
 
-                <div class="timer">
-                    <p class="time">{{ timer }}</p>
-                    <div class="title">
-                        <p>TIME</p>
+                <TransitionGroup name="beat" mode="out-in">
+                    <div class="timer">
+                        <transition name="fade" mode="out-in">
+                            <p :key="timer" class="time" :style="timerColor">{{ timer }}</p>
+                        </transition>
                     </div>
-                </div>
+                </TransitionGroup>
 
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
@@ -47,6 +45,10 @@
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                     <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
+                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected && room.players.length == 2">Et toca tirar</h3>
+                    <h3 class=" turn" v-if="!turn && !questionSelected && room.players.length == 2">Esperant atac</h3>
+                    <h3 class=" turn" v-if="!turn && questionSelected && room.players.length == 2">Esperant resposta</h3>
+
                     <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}
                     </h4>
                 </div>
@@ -68,7 +70,7 @@
                 <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()"
                     v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
-                    <p class="card-level">3</p>
+                    <p class="card-level">{{ Math.floor(Math.random() * 4) + 1 }}</p>
                     <img class="image" src="/img/geometry.png" alt="">
                     <h3 class="title">Geometria</h3>
                 </div>
@@ -112,6 +114,7 @@ export default {
             mostResp: false,
             est: '',
             showEst: false,
+            questionSelected: false,
         };
     },
     created() {
@@ -140,7 +143,7 @@ export default {
 
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
-            this.timer = 10;
+            this.timer = 15;
             if (this.turn == true) {
                 this.mostResp = false;
             }
@@ -155,24 +158,25 @@ export default {
         });
 
         socket.on('correct', () => {
+            this.questionSelected = false;
             this.quest = '';
             this.est = 'Correcte'
-            this.timer = 10;
+            this.timer = 15;
             this.showEstForThreeSeconds();
 
         });
 
         socket.on('incorrect', () => {
+            this.questionSelected = false;
             this.quest = '';
             this.est = 'Incorrecte'
-            this.timer = 10;
+            this.timer = 15;
             this.showEstForThreeSeconds();
         });
-        
-
 
         socket.on('startTimer', () => {
-            this.timer = 10;
+            this.questionSelected = false;
+            this.timer = 15;
             this.quest = '';
             this.startTimer();
         });
@@ -187,13 +191,16 @@ export default {
         this.stopTimer();
     },
     methods: {
+        
         genQuest() {
+            this.questionSelected = true;
             this.est = '';
             this.numQuest--;
             socket.emit('genQuest', this.room.id);
             this.mostResp = true;
         },
         compAns(quest, ans) {
+            this.questionSelected = false;
             this.mostResp = false;
             this.ans = [];
             this.est = '';
@@ -209,23 +216,40 @@ export default {
             socket.emit('exitRoom', this.room.id);
         },
         startTimer() {
+            const store = useAppStore();
             this.intervalId = setInterval(() => {
             if (this.timer > 0) {
                 this.timer--;
             } else {
                 this.stopTimer();
                 socket.emit('timerUp', this.room.id);
+                if (this.turn == true && this.ans.length == 4) {
+                    socket.emit('noAnswer', this.room.id,this.player);
+                }
             }
             }, 1000);
         },
         stopTimer() {
             if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+                clearInterval(this.intervalId);
+                this.intervalId = null;
             }
         },
 
     },
+    computed: {
+        timerColor() {
+            if (this.timer < 4) {
+                return {
+                    color: 'red'
+                }
+            } else {
+                return {
+                    color: 'black'
+                }
+            }
+        }
+    }
 
 };
 </script>
@@ -239,6 +263,17 @@ export default {
 .incorrect {
     color: red;
     font-size: 30px;
+}
+
+.turn{
+    font-size: 30px;
+    animation: blink 1.3s linear infinite;
+}
+
+@keyframes blink {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
 }
 
 * {
@@ -398,8 +433,8 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     color: black;
     background-color: #fff;
     border-radius: 50%;
@@ -407,7 +442,7 @@ export default {
 }
 
 .timer .time {
-    font-size: 40px;
+    font-size: 60px;
     font-weight: bold;
     width: 35px;
     height: 35px;
@@ -527,7 +562,7 @@ main {
     align-items: center;
     flex-direction: column;
     overflow: hidden;
-    background-image: url(img/card-background.jpg);
+    background-image: url(/img/card-background.jpg);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -613,6 +648,22 @@ main {
 
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
+}
+
+/* TRANSITIONS */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all .5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
   

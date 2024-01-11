@@ -71,26 +71,31 @@
             </div>
         </div>
 
-        <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+
+        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
+
+        <div v-if="!isMobileDevice()" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
+        <button v-if="$route.path === '/game' && isMobileDevice()" class="interactMobile" @click="mobileClick"></button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import char_select from '@/components/char_select.vue';
 import login from '@/components/Login.vue';
 import register from '@/components/Register.vue';
 import textBox from '@/components/textBox.vue';
 import Phaser from 'phaser';
 import Router from '../router';
-import { socket } from '@/socket';
+import { socket } from "@/socket";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useAppStore } from "../stores/app";
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 
 export default defineComponent({
     name: "battlemathGame",
@@ -154,9 +159,7 @@ export default defineComponent({
                 playerInTrigger: false,
                 profile: false,
             },
-            firstTime: true,
             controlsHidden: false,
-
             playerInfo: {
                 id: null,
                 username: "",
@@ -167,26 +170,29 @@ export default defineComponent({
             playerSprites: {},
         };
     },
+    created() {
+        const store = useAppStore();
+        if (store.getLastRoute() === '/rooms') {
+            this.navigation_menus.sceneStart = 2;
+            setTimeout(() => {
+                this.navigation_menus.sceneStart = 1;
+            }, 2000);
+        } else {
+            this.navigation_menus.sceneStart = 1;
+        }
+    },
     mounted() {
         const store = useAppStore();
         this.isLogged = store.getIsLogged();
         if (this.isLogged) {
             this.username = store.getUsername();
-            this.token = store.getToken();
+            this.token = store.user.token;
             this.playerSprite = store.getSkin();
         } else {
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
         }
 
         this.recibirsuccessLogout();
-        if (store.getLastRoute() === '/rooms') {
-            this.navigation_menus.sceneStart = 2;
-            setTimeout(() => {
-                this.navigation_menus.sceneStart = 1;
-            }, 1000);
-        } else {
-            this.navigation_menus.sceneStart = 1;
-        }
         this.initializeGame();
         store.setLastRoute("/game");
     },
@@ -211,6 +217,7 @@ export default defineComponent({
     methods: {
         initializeGame() {
             const self = this;
+            const store = useAppStore();
 
             const playerHouseConfig = {
                 key: "playerHouse",
@@ -221,6 +228,7 @@ export default defineComponent({
                     self.preloadSkins(this);
                     this.load.image("door", "/objects/door.png");
                     this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
+
                 },
                 create: function () {
                     ///Create map
@@ -250,6 +258,16 @@ export default defineComponent({
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
 
+                    if (self.isMobileDevice()) {
+                        let joystick = self.createJoystick(this);
+
+                        joystick.on('update', () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        });
+                    }
+
                     self.playerMovement(this, self.playerSprite);
                 },
                 update: function () { },
@@ -264,13 +282,17 @@ export default defineComponent({
                     self.preloadSkins(this);
                 },
                 create: function () {
+                    const store = useAppStore();
+
                     self.createLobby(this);
 
                     self.createNPC(this, 910, 420, 'npcRyu', 0);
                     ///Create player
                     if (self.navigation_menus.sceneStart === 1) {
                         self.playerCreate(this, 888, 390, self.playerSprite);
-                    } else {
+                    } else if (self.navigation_menus.sceneStart === 2) {
+                        self.playerCreate(this, 687, 554, self.playerSprite);
+                    } else if (store.lastRoute === '/rooms') {
                         self.playerCreate(this, 687, 554, self.playerSprite);
                     }
 
@@ -284,7 +306,21 @@ export default defineComponent({
                         self.lobby_layers.fg
                     );
 
+                    if (self.isMobileDevice()) {
+                        let joystick = self.createJoystick(this);
+
+                        joystick.on('update', () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                        });
+                    }
+
                     self.playerMovement(this, self.playerSprite);
+                    if (store.firstTime) {
+                        self.dialogo(this, 'npcRyu');
+                        store.firstTime = false;
+                    }
                 },
                 update: function () {
                 },
@@ -310,6 +346,13 @@ export default defineComponent({
                         gravity: { y: 0 },
                         debug: false,
                     },
+                },
+                plugins: {
+                    global: [{
+                        key: 'rexVirtualJoystick',
+                        plugin: VirtualJoystickPlugin,
+                        start: true
+                    }],
                 },
             };
 
@@ -342,11 +385,13 @@ export default defineComponent({
             this.navigation_menus.loginModal = false;
         },
         logout() {
+            const store = useAppStore();
+
             this.isLogged = false;
             this.username = "";
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
             this.closeNPCModal();
-            socket.emit("logout", this.token);
+            socket.emit("logout", store.getToken());
         },
         recibirsuccessLogout() {
             socket.on("successLogout", (response) => {
@@ -982,6 +1027,41 @@ export default defineComponent({
                 }
             });
         },
+        playerMovementWithJoystick(scene, skin, directionX, directionY) {
+            const speed = 30;
+            const runSpeedMultiplier = 1.5;
+
+            let currentSpeed = speed;
+
+
+            if (Math.abs(directionX) > Math.abs(directionY)) {
+                // Movimiento horizontal
+                if (directionX > 0) {
+                    this.player.anims.play(`${skin}_move_right`, true);
+                    this.player.setVelocity(currentSpeed, 0);
+                } else if (directionX < 0) {
+                    this.player.anims.play(`${skin}_move_left`, true);
+                    this.player.setVelocity(-currentSpeed, 0);
+                }
+            } else {
+                // Movimiento vertical
+                if (directionY > 0) {
+                    this.player.anims.play(`${skin}_move_down`, true);
+                    this.player.setVelocity(0, currentSpeed);
+                } else if (directionY < 0) {
+                    this.player.anims.play(`${skin}_move_up`, true);
+                    this.player.setVelocity(0, -currentSpeed);
+                }
+            }
+
+            // Si el joystick está en reposo, detener al jugador
+            if (directionX === 0 && directionY === 0) {
+                const parts = this.player.anims.currentAnim.key.split("_");
+                parts[1] = "idle";
+                this.player.anims.play(parts.join("_"));
+                this.player.setVelocity(0, 0);
+            }
+        },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
             const store = useAppStore();
@@ -1103,7 +1183,6 @@ export default defineComponent({
                             this.playerSprites[players[i].id].sprite.destroy();
                             this.playerSprites[players[i].id].text.destroy();
                         }
-
                         //Añadimos el username encima del personaje
                         const text = scene.add.text(
                             players[i].x - 10,
@@ -1120,7 +1199,7 @@ export default defineComponent({
                                 //     top: 1,
                                 //     bottom: 1,
                                 // },
-                                
+
                             }
                         );
 
@@ -1136,6 +1215,68 @@ export default defineComponent({
                     }
                 }
             });
+        },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
+        },
+
+        toggleControls() {
+            if (this.controlsHidden) {
+                this.controlsHidden = false;
+            } else {
+                this.controlsHidden = true;
+            }
+        },
+        createJoystick(scene) {
+            const baseColor = 0x888888;
+            const thumbColor = 0xCCCCCC;
+
+            const gameHeight = scene.sys.game.config.height;
+
+            const joystickHeight = gameHeight * 0.2;
+
+            const joystickX = 60;
+            const joystickY = gameHeight - joystickHeight - 20;
+
+            const base = scene.add.circle(0, 0, 30, baseColor);
+            base.setFillStyle(baseColor, 0.5);
+
+            const thumb = scene.add.circle(0, 0, 15, thumbColor);
+            thumb.setFillStyle(thumbColor, 0.5);
+
+            const joystick = scene.plugins.get('rexVirtualJoystick').add(scene, {
+                x: joystickX,
+                y: joystickY,
+                radius: 30,
+                base: base,
+                thumb: thumb,
+            });
+
+            return joystick;
+        },
+        mobileClick() {
+            // Emulando la tecla "Space" al hacer clic en el botón
+            const event = new KeyboardEvent('keydown', {
+                key: ' ',
+                code: 'Space',
+                keyCode: 32,
+                which: 32,
+                bubbles: true,
+            });
+
+            // Simulando la propagación del evento hacia arriba en el DOM
+            this.$el.dispatchEvent(event);
         }
 
     },
@@ -1263,6 +1404,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 3;
 }
 
 .modal {
@@ -1287,10 +1429,12 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .textBox {
     width: 40vw;
+    height: 150px;
 }
 
 .npcFace-container {
@@ -1313,16 +1457,37 @@ button:hover::after {
     gap: 2rem;
 }
 
+.interactMobile {
+    width: 50vw;
+    /* Ocupa 1/3 del ancho de la pantalla */
+    height: 100vh;
+    /* Ocupa la altura completa de la pantalla */
+    background-color: rgba(255, 0, 0, 0) !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none !important;
+    outline: none !important;
+    z-index: 0;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                  CONTROLS                                  */
 /* -------------------------------------------------------------------------- */
+
+.controls-btn {
+    position: absolute;
+    top: 30px;
+    left: 100px;
+}
+
 .controls {
     width: 100%;
     text-align: center;
     position: absolute;
     bottom: -100px;
-    animation: animControlsUp 1s ease-in-out 1s both;
     background-color: #141b1ba4;
+    animation: animControlsUp 1s ease-in-out .3s both;
 }
 
 .controlsHide {

@@ -11,9 +11,10 @@ export const useAppStore = defineStore('app', {
     turn: true,
     lastRoute: '',
     players: [],
+    firstTime: true,
   }),
   persist: {
-    paths: ['user', 'isLogged', 'lastRoute', 'players']
+    paths: ['user', 'isLogged', 'lastRoute', 'players', 'firstTime']
   },
   actions: {
     addRoom(room) {
@@ -46,7 +47,7 @@ export const useAppStore = defineStore('app', {
       this.isLogged = false;
     },
     getToken() {
-      return this.user.tokens;
+      return this.user.token;
     },
     setTurnOn() {
       this.turn = true;

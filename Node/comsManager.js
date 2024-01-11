@@ -29,7 +29,6 @@ async function register(username, email, password, password_confirmation, skin_i
 }
 
 async function logout(token) {
-
     try {
         const response = await axios.post(`${url}logout`, {}, {
             headers: {

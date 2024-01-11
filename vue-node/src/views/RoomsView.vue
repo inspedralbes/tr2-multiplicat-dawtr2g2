@@ -30,7 +30,7 @@
                         <div class="room__info">
                             <div class="info__box">
                                 <label for="name">Nom de la sala:</label>
-                                <input type="text" v-model="this.room" />
+                                <input type="text" maxlength="20" v-model="this.room" />
                             </div>
                         </div>
                         <div class="privacity">
@@ -63,14 +63,19 @@ export default {
             }
         };
     },
+    created() {
+        const store = useAppStore();
+        if (!store.isLogged) {
+            this.$router.push("/");
+        }
 
+
+        store.setLastRoute("/rooms");
+    },
     mounted() {
         socket.emit("getRooms");
         const store = useAppStore();
 
-        if (!store.isLogged) {
-            this.$router.push("/");
-        }
 
         watch(
             () => store.rooms,
@@ -80,7 +85,6 @@ export default {
         );
         this.player.name = store.getUsername();
         this.player.skin = store.getSkin();
-        store.setLastRoute("/rooms");
     },
     methods: {
         createRoom() {
@@ -136,6 +140,7 @@ export default {
     padding: 15px 10px;
     border: 2px solid #e58d08;
     border-radius: 15px;
+    margin-left: 20px;
 }
 
 .rooms {

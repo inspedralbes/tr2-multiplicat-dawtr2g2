@@ -24,7 +24,7 @@
             </div>
 
             <div class="input-group">
-                <label for="password">Contraseña</label>
+                <label for="password">Contrasenya</label>
                 <div class="password-input">
                     <input type="password" id="password" name="password" v-model="password" required
                         placeholder="Contrasenya">
@@ -264,8 +264,8 @@ h2 {
 
 .register-container {
     width: 35vw;
-    height: 92vh;
-
+    height: 80vh;
+    overflow-y: scroll;
 }
 
 .register-form {
