@@ -20,70 +20,36 @@
                 </button>
             </div>
         </div>
-        <div
-            :class="['npc-modal', { 'npc-modal-mobile': isMobileDevice() }]"
-            v-if="npc.interactingWithNPC"
-        >
+        <div :class="['npc-modal', { 'npc-modal-mobile': isMobileDevice() }]" v-if="npc.interactingWithNPC">
             <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
-                <img
-                    class="npcFace"
-                    :src="`/npc/face_${npc.npcImage}.png`"
-                    alt=""
-                />
+                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
-            <div
-                :class="[
-                    'modal',
-                    'nes-container',
-                    'is-rounded',
-                    'textBox',
-                    { 'textBox-mobile': isMobileDevice() },
-                ]"
-            >
-                <button
-                    @click="closeNPCModal"
-                    class="nes-btn boton-cerrar boton-cerrar-npc"
-                >
+            <div :class="[
+                'modal',
+                'nes-container',
+                'is-rounded',
+                'textBox',
+                { 'textBox-mobile': isMobileDevice() },
+            ]">
+                <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
                 <textBox :text="npc.npcText" @closeText="cerrarDialogo" />
-                <div
-                    class="woman-btn"
-                    v-if="
-                        npc.npcImage === 'Woman' &&
-                        !this.npc.interactingWithDoor
-                    "
-                >
-                    <button
-                        v-if="!this.isLogged"
-                        class="nes-btn"
-                        @click="navigation_menus.loginModal = true"
-                    >
+                <div class="woman-btn" v-if="npc.npcImage === 'Woman' &&
+                    !this.npc.interactingWithDoor
+                    ">
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.loginModal = true">
                         Login
                     </button>
-                    <button
-                        v-if="this.isLogged"
-                        class="nes-btn"
-                        @click="logout"
-                    >
+                    <button v-if="this.isLogged" class="nes-btn" @click="logout">
                         Surt
                     </button>
-                    <button
-                        v-if="!this.isLogged"
-                        class="nes-btn"
-                        @click="navigation_menus.registerModal = true"
-                    >
+                    <button v-if="!this.isLogged" class="nes-btn" @click="navigation_menus.registerModal = true">
                         Registra't
                     </button>
                 </div>
-                <div
-                    class="woman-btn"
-                    v-if="npc.npcImage === 'Samurai' && isLogged"
-                >
-                    <button
-                        class="npc-btn nes-btn"
-                        @click="openCharSelectModal"
-                    >
+                <div class="woman-btn" v-if="npc.npcImage === 'Samurai' && isLogged">
+                    <button class="npc-btn nes-btn" @click="openCharSelectModal">
                         Si
                     </button>
                     <button class="npc-btn nes-btn" @click="closeNPCModal">
@@ -95,10 +61,7 @@
 
         <div v-if="navigation_menus.loginModal" class="login-modal">
             <div class="modal nes-container is-rounded">
-                <button
-                    @click="navigation_menus.loginModal = false"
-                    class="nes-btn boton-cerrar"
-                >
+                <button @click="navigation_menus.loginModal = false" class="nes-btn boton-cerrar">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
                 <login @user="loginUser" />
@@ -107,36 +70,23 @@
 
         <div v-if="navigation_menus.registerModal" class="register-modal">
             <div class="modal nes-container is-rounded">
-                <button
-                    @click="navigation_menus.registerModal = false"
-                    class="nes-btn boton-cerrar"
-                >
+                <button @click="navigation_menus.registerModal = false" class="nes-btn boton-cerrar">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
                 <register @user="registerUser" />
             </div>
         </div>
 
-        <button
-            v-if="!isMobileDevice()"
-            class="nes-btn controls-btn"
-            @click="toggleControls()"
-        >
+        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">
             Controls
         </button>
 
-        <div
-            v-if="!isMobileDevice()"
-            :class="{ controls: !controlsHidden, controlsHide: controlsHidden }"
-        >
+        <div v-if="!isMobileDevice()" :class="{ controls: !controlsHidden, controlsHide: controlsHidden }">
             <img src="/img/Tuto.png" alt="" />
         </div>
 
-        <button
-            v-if="$route.path === '/game' && isMobileDevice()"
-            class="interactMobile"
-            @click="mobileClick"
-        ></button>
+        <button v-if="$route.path === '/game' && isMobileDevice()" class="nes-btn interactMobile"
+            @click="mobileClick">Acció</button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -332,7 +282,7 @@ export default defineComponent({
 
                     self.playerMovement(this, self.playerSprite);
                 },
-                update: function () {},
+                update: function () { },
             };
 
             const lobbyConfig = {
@@ -389,7 +339,7 @@ export default defineComponent({
                     }
                     self.viewPlayers(this);
                 },
-                update: function () {},
+                update: function () { },
             };
 
             const config = {
@@ -1054,7 +1004,7 @@ export default defineComponent({
                     if (skin != this.playerSprite) {
                         skin = this.playerSprite;
                     }
-                    
+
                     if (scene.scene.isActive("lobby")) {
                         this.addPlayerInfo(scene);
                     }
@@ -1430,7 +1380,7 @@ button:hover::after {
     right: 10px;
 }
 
-.boton-cerrar > img {
+.boton-cerrar>img {
     width: 30px;
 }
 
@@ -1533,17 +1483,15 @@ button:hover::after {
 }
 
 .interactMobile {
-    width: 50vw;
+    width: 20%;
     /* Ocupa 1/3 del ancho de la pantalla */
-    height: 100vh;
+    height: 10%;
     /* Ocupa la altura completa de la pantalla */
-    background-color: rgba(255, 0, 0, 0) !important;
     position: absolute;
-    top: 0;
-    right: 0;
-    border: none !important;
-    outline: none !important;
+    bottom: 50px;
+    right: 50px;
     z-index: 0;
+    opacity: .5;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1600,6 +1548,7 @@ button:hover::after {
 }
 
 @media screen and (min-width: 1150px) {
+
     .controls img,
     .controlsHide img {
         width: 40%;
@@ -1607,6 +1556,7 @@ button:hover::after {
 }
 
 @media screen and (min-width: 1440px) {
+
     .controls img,
     .controlsHide img {
         width: 35%;
