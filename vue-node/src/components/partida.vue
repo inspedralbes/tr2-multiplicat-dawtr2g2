@@ -5,7 +5,7 @@
         <div class="game">
             <header class="header">
                 <div class="player player1">
-                    <img :src="`/characters/${room.players[0].skin}_face.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[0].skin}_face.png`" alt="">
                     <div class="info">
                         <div class="bar">
                             <div class="progress" :class="{ 'low-life': room.players[0].life < 30 }"
@@ -33,13 +33,13 @@
                         </div>
                         <p class="name">{{ room.players[1].name }}</p>
                     </div>
-                    <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[1].skin}_face.png`" alt="">
                 </div>
             </header>
 
             <main>
                 <div class="character">
-                    <img :src="`/characters/${room.players[0].skin}_fight.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[0].skin}_fight.png`" alt="">
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
@@ -53,7 +53,7 @@
                     </h4>
                 </div>
                 <div class="character" v-if="room.players.length == 2" style="transform: scaleX(-1);">
-                    <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[1].skin}_fight.png`" alt="">
                 </div>
             </main>
 

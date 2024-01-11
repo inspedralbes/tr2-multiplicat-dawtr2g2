@@ -14,7 +14,7 @@
         <div class="lose-container" v-if="win == false">
             <div class="lose">
                 <h1>DERROTA</h1>
-                <img :src="`/characters/${skin}_fight.png`" alt="">
+                <img :src="`/vue/characters/${skin}_fight.png`" alt="">
                 <button class="nes-btn" @click="tornarRooms()">Tornar</button>
                 <img class="lluvia" src="/img/lluvia.gif" alt="">
             </div>

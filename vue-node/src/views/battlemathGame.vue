@@ -22,7 +22,7 @@
         </div>
         <div class="npc-modal" v-if="npc.interactingWithNPC">
             <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
-                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="" />
+                <img class="npcFace" :src="`/vue/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
             <div class="modal nes-container is-rounded textBox">
                 <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
@@ -226,8 +226,8 @@ export default defineComponent({
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
                     self.preloadSkins(this);
-                    this.load.image("door", "/objects/door.png");
-                    this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
+                    this.load.image("door", "/vue/objects/door.png");
+                    this.load.image("dialogBox", "/vue/img/DialogBoxFaceset.png");
 
                 },
                 create: function () {
@@ -499,15 +499,15 @@ export default defineComponent({
             });
 
             ///Preload facesets
-            scene.load.image("npcWoman_face", "npc/face_Woman.png");
-            scene.load.image("npcVillager1_face", "npc/face_Villager1.png");
-            scene.load.image("npcVillager2_face", "npc/face_Villager2.png");
-            scene.load.image("npcVillager3_face", "npc/face_Villager3.png");
-            scene.load.image("npcVillager4_face", "npc/face_Villager4.png");
-            scene.load.image("npcMaster_face", "npc/face_Master.png");
-            scene.load.image("npcRyu_face", "npc/face_Ryu.png");
-            scene.load.image("npcSamurai_face", "npc/face_Samurai.png");
-            scene.load.image("npcBlueSamurai_face", "npc/face_BlueSamurai.png");
+            scene.load.image("npcWoman_face", "/vue/npc/face_Woman.png");
+            scene.load.image("npcVillager1_face", "/vue/npc/face_Villager1.png");
+            scene.load.image("npcVillager2_face", "/vue/npc/face_Villager2.png");
+            scene.load.image("npcVillager3_face", "/vue/npc/face_Villager3.png");
+            scene.load.image("npcVillager4_face", "/vue/npc/face_Villager4.png");
+            scene.load.image("npcMaster_face", "/vue/npc/face_Master.png");
+            scene.load.image("npcRyu_face", "/vue/npc/face_Ryu.png");
+            scene.load.image("npcSamurai_face", "/vue/npc/face_Samurai.png");
+            scene.load.image("npcBlueSamurai_face", "/vue/npc/face_BlueSamurai.png");
         },
         preloadSkins(scene) {
             scene.load.spritesheet("eggBoy", "characters/eggBoy.png", {
@@ -653,9 +653,9 @@ export default defineComponent({
                 "tiles/lobby_map/TilesetLobby.png"
             );
             scene.load.image("TilesetElement", "tiles/TilesetElement.png");
-            scene.load.image("dojo_door_left", "/objects/dojo_door_left.png");
-            scene.load.image("dojo_door_right", "/objects/dojo_door_right.png");
-            scene.load.image("phouse_door", "/objects/phouse_door.png");
+            scene.load.image("dojo_door_left", "/vue/objects/dojo_door_left.png");
+            scene.load.image("dojo_door_right", "/vue/objects/dojo_door_right.png");
+            scene.load.image("phouse_door", "/vue/objects/phouse_door.png");
             scene.load.spritesheet("leaves", "particles/Leaf.png", {
                 frameWidth: 16,
                 frameHeight: 16,
