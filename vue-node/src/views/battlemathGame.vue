@@ -170,6 +170,17 @@ export default defineComponent({
             playerSprites: {},
         };
     },
+    created() {
+        const store = useAppStore();
+        if (store.getLastRoute() === '/rooms') {
+            this.navigation_menus.sceneStart = 2;
+            setTimeout(() => {
+                this.navigation_menus.sceneStart = 1;
+            }, 2000);
+        } else {
+            this.navigation_menus.sceneStart = 1;
+        }
+    },
     mounted() {
         const store = useAppStore();
         this.isLogged = store.getIsLogged();
@@ -182,14 +193,6 @@ export default defineComponent({
         }
 
         this.recibirsuccessLogout();
-        if (store.getLastRoute() === '/rooms') {
-            this.navigation_menus.sceneStart = 2;
-            setTimeout(() => {
-                this.navigation_menus.sceneStart = 1;
-            }, 1000);
-        } else {
-            this.navigation_menus.sceneStart = 1;
-        }
         this.initializeGame();
         store.setLastRoute("/game");
     },
@@ -279,14 +282,17 @@ export default defineComponent({
                     self.preloadSkins(this);
                 },
                 create: function () {
+                    const store = useAppStore();
+
                     self.createLobby(this);
 
                     self.createNPC(this, 910, 420, 'npcRyu', 0);
                     ///Create player
                     if (self.navigation_menus.sceneStart === 1) {
-
                         self.playerCreate(this, 888, 390, self.playerSprite);
-                    } else {
+                    } else if (self.navigation_menus.sceneStart === 2) {
+                        self.playerCreate(this, 687, 554, self.playerSprite);
+                    } else if (store.lastRoute === '/rooms') {
                         self.playerCreate(this, 687, 554, self.playerSprite);
                     }
 
@@ -1164,7 +1170,6 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
-            console.log("Estoy en el emit addPlayer");
             socket.emit("addPlayer", this.playerInfo);
             this.viewPlayers(scene);
         },
