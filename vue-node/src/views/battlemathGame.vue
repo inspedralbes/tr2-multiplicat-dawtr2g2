@@ -1006,9 +1006,7 @@ export default defineComponent({
                         skin = this.playerSprite;
                     }
 
-                    if (scene.scene.isActive("lobby")) {
-                        this.addPlayerInfo(scene);
-                    }
+
 
                     switch (event.code) {
                         case "ArrowLeft":
@@ -1036,11 +1034,17 @@ export default defineComponent({
             scene.input.keyboard.on("keyup", (event) => {
                 switch (event.code) {
                     default:
+
+
                         const parts =
                             this.player.anims.currentAnim.key.split("_");
                         parts[1] = "idle";
                         this.player.anims.play(parts.join("_"));
                         this.player.setVelocity(0, 0);
+
+                        if (scene.scene.isActive("lobby")) {
+                            this.addPlayerInfo(scene);
+                        }
 
                         break;
                 }
