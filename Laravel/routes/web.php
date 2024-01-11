@@ -20,7 +20,9 @@ Route::get('/', function () {
     return view('login');
 })->name('login');
 
+
 Route::post('/login', [LoginController::class, 'login'])->name('loginAdmin');
+
 
 
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="text-box" ref="textBox" @keydown.space="nextText" tabindex="0">
+    <div :class="['text-box']" ref="textBox" @keydown.space="nextText" tabindex="0">
         <div class="npc-DialogBox">
             <p>{{ text[currentIndex] }}</p>
         </div>
@@ -34,6 +34,20 @@ export default {
                 }
             }
         },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
+        }
     },
     watch: {
         text(newVal) {

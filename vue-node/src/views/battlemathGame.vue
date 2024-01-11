@@ -20,11 +20,17 @@
                 </button>
             </div>
         </div>
-        <div class="npc-modal" v-if="npc.interactingWithNPC">
+        <div :class="['npc-modal', { 'npc-modal-mobile': isMobileDevice() }]" v-if="npc.interactingWithNPC">
             <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
                 <img class="npcFace" :src="`/vue/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
-            <div class="modal nes-container is-rounded textBox">
+            <div :class="[
+                'modal',
+                'nes-container',
+                'is-rounded',
+                'textBox',
+                { 'textBox-mobile': isMobileDevice() },
+            ]">
                 <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
@@ -71,31 +77,33 @@
             </div>
         </div>
 
+        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">
+            Controls
+        </button>
 
-        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
-
-        <div v-if="!isMobileDevice()" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
-            <img src="/img/Tuto.png" alt="">
+        <div v-if="!isMobileDevice()" :class="{ controls: !controlsHidden, controlsHide: controlsHidden }">
+            <img src="/img/Tuto.png" alt="" />
         </div>
 
-        <button v-if="$route.path === '/game' && isMobileDevice()" class="interactMobile" @click="mobileClick"></button>
+        <button v-if="$route.path === '/game' && isMobileDevice()" class="nes-btn interactMobile"
+            @click="mobileClick">Acció</button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
 
 <script>
-import { computed, defineComponent } from 'vue';
-import char_select from '@/components/char_select.vue';
-import login from '@/components/Login.vue';
-import register from '@/components/Register.vue';
-import textBox from '@/components/textBox.vue';
-import Phaser from 'phaser';
-import Router from '../router';
+import { computed, defineComponent } from "vue";
+import char_select from "@/components/char_select.vue";
+import login from "@/components/Login.vue";
+import register from "@/components/Register.vue";
+import textBox from "@/components/textBox.vue";
+import Phaser from "phaser";
+import Router from "../router";
 import { socket } from "@/socket";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useAppStore } from "../stores/app";
-import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
+import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
 export default defineComponent({
     name: "battlemathGame",
@@ -172,7 +180,7 @@ export default defineComponent({
     },
     created() {
         const store = useAppStore();
-        if (store.getLastRoute() === '/rooms') {
+        if (store.getLastRoute() === "/rooms") {
             this.navigation_menus.sceneStart = 2;
             setTimeout(() => {
                 this.navigation_menus.sceneStart = 1;
@@ -261,10 +269,15 @@ export default defineComponent({
                     if (self.isMobileDevice()) {
                         let joystick = self.createJoystick(this);
 
-                        joystick.on('update', () => {
+                        joystick.on("update", () => {
                             const directionX = joystick.forceX;
                             const directionY = joystick.forceY;
-                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                            self.playerMovementWithJoystick(
+                                this,
+                                self.playerSprite,
+                                directionX,
+                                directionY
+                            );
                         });
                     }
 
@@ -286,16 +299,15 @@ export default defineComponent({
 
                     self.createLobby(this);
 
-                    self.createNPC(this, 910, 420, 'npcRyu', 0);
+                    self.createNPC(this, 910, 420, "npcRyu", 0);
                     ///Create player
                     if (self.navigation_menus.sceneStart === 1) {
                         self.playerCreate(this, 888, 390, self.playerSprite);
                     } else if (self.navigation_menus.sceneStart === 2) {
                         self.playerCreate(this, 687, 554, self.playerSprite);
-                    } else if (store.lastRoute === '/rooms') {
+                    } else if (store.lastRoute === "/rooms") {
                         self.playerCreate(this, 687, 554, self.playerSprite);
                     }
-
 
                     self.triggerWithNPC(this);
                     self.addLobbyCollisions(this);
@@ -309,21 +321,26 @@ export default defineComponent({
                     if (self.isMobileDevice()) {
                         let joystick = self.createJoystick(this);
 
-                        joystick.on('update', () => {
+                        joystick.on("update", () => {
                             const directionX = joystick.forceX;
                             const directionY = joystick.forceY;
-                            self.playerMovementWithJoystick(this, self.playerSprite, directionX, directionY);
+                            self.playerMovementWithJoystick(
+                                this,
+                                self.playerSprite,
+                                directionX,
+                                directionY
+                            );
                         });
                     }
 
                     self.playerMovement(this, self.playerSprite);
                     if (store.firstTime) {
-                        self.dialogo(this, 'npcRyu');
+                        self.dialogo(this, "npcRyu");
                         store.firstTime = false;
                     }
+                    self.viewPlayers(this);
                 },
-                update: function () {
-                },
+                update: function () { },
             };
 
             const config = {
@@ -348,11 +365,13 @@ export default defineComponent({
                     },
                 },
                 plugins: {
-                    global: [{
-                        key: 'rexVirtualJoystick',
-                        plugin: VirtualJoystickPlugin,
-                        start: true
-                    }],
+                    global: [
+                        {
+                            key: "rexVirtualJoystick",
+                            plugin: VirtualJoystickPlugin,
+                            start: true,
+                        },
+                    ],
                 },
             };
 
@@ -424,7 +443,6 @@ export default defineComponent({
             this.player.skinID = character.id;
             this.playerSprite = character.name;
             store.setNewSkin(character.name);
-
         },
         openCharSelectModal() {
             this.npc.interactingWithNPC = false;
@@ -925,8 +943,11 @@ export default defineComponent({
                     }
                     break;
                 case "Ryu":
-                    this.npc.npcText = [`Hola ${this.username}, hauries d'anar al Dojo.`,
-                        `Allà podràs lluitar contra altres jugadors.`, `Es l'edifici amb el terrat vermell.`];
+                    this.npc.npcText = [
+                        `Hola ${this.username}, hauries d'anar al Dojo.`,
+                        `Allà podràs lluitar contra altres jugadors.`,
+                        `Es l'edifici amb el terrat vermell.`,
+                    ];
                     break;
                 default:
                     break;
@@ -961,7 +982,6 @@ export default defineComponent({
                 this.player.height * 0.8
             );
             scene.physics.world.enable(this.player);
-
         },
         debugCollision(scene) {
             const debugGraphics = scene.add.graphics().setAlpha(0.75);
@@ -986,6 +1006,9 @@ export default defineComponent({
                         skin = this.playerSprite;
                     }
 
+                    if (scene.scene.isActive("lobby")) {
+                        this.addPlayerInfo(scene);
+                    }
 
                     switch (event.code) {
                         case "ArrowLeft":
@@ -1013,10 +1036,6 @@ export default defineComponent({
             scene.input.keyboard.on("keyup", (event) => {
                 switch (event.code) {
                     default:
-                        // clearInterval(this.playerInfoInterval);
-                        if (scene.scene.isActive("lobby")) {
-                            this.addPlayerInfo(scene);
-                        }
                         const parts =
                             this.player.anims.currentAnim.key.split("_");
                         parts[1] = "idle";
@@ -1032,7 +1051,6 @@ export default defineComponent({
             const runSpeedMultiplier = 1.5;
 
             let currentSpeed = speed;
-
 
             if (Math.abs(directionX) > Math.abs(directionY)) {
                 // Movimiento horizontal
@@ -1060,6 +1078,9 @@ export default defineComponent({
                 parts[1] = "idle";
                 this.player.anims.play(parts.join("_"));
                 this.player.setVelocity(0, 0);
+                if (scene.scene.isActive("lobby")) {
+                    this.addPlayerInfo(scene);
+                }
             }
         },
         createPlayerAnims(scene, skin) {
@@ -1069,7 +1090,6 @@ export default defineComponent({
             if (this.navigation_menus.sceneStart === 2) {
                 skin = store.getSkin();
             }
-
 
             scene.anims.create({
                 key: `${skin}_idle_down`,
@@ -1171,7 +1191,6 @@ export default defineComponent({
             this.playerInfo.y = this.player.y;
 
             socket.emit("addPlayer", this.playerInfo);
-            this.viewPlayers(scene);
         },
 
         viewPlayers(scene) {
@@ -1192,14 +1211,6 @@ export default defineComponent({
                                 fontFamily: "Arial",
                                 fontSize: 10,
                                 color: "#fff",
-                                // backgroundColor: "#00000069",
-                                // padding: {
-                                //     left: 2,
-                                //     right: 2,
-                                //     top: 1,
-                                //     bottom: 1,
-                                // },
-
                             }
                         );
 
@@ -1211,7 +1222,10 @@ export default defineComponent({
                         );
 
                         // Almacenamos el sprite y el texto en nuestro objeto
-                        this.playerSprites[players[i].id] = { sprite: jugador, text: text };
+                        this.playerSprites[players[i].id] = {
+                            sprite: jugador,
+                            text: text,
+                        };
                     }
                 }
             });
@@ -1219,16 +1233,18 @@ export default defineComponent({
         isMobileDevice() {
             const userAgent = navigator.userAgent;
             const mobileKeywords = [
-                'Android',
-                'webOS',
-                'iPhone',
-                'iPad',
-                'iPod',
-                'BlackBerry',
-                'Windows Phone'
+                "Android",
+                "webOS",
+                "iPhone",
+                "iPad",
+                "iPod",
+                "BlackBerry",
+                "Windows Phone",
             ];
 
-            return mobileKeywords.some(keyword => userAgent.includes(keyword));
+            return mobileKeywords.some((keyword) =>
+                userAgent.includes(keyword)
+            );
         },
 
         toggleControls() {
@@ -1240,7 +1256,7 @@ export default defineComponent({
         },
         createJoystick(scene) {
             const baseColor = 0x888888;
-            const thumbColor = 0xCCCCCC;
+            const thumbColor = 0xcccccc;
 
             const gameHeight = scene.sys.game.config.height;
 
@@ -1255,21 +1271,23 @@ export default defineComponent({
             const thumb = scene.add.circle(0, 0, 15, thumbColor);
             thumb.setFillStyle(thumbColor, 0.5);
 
-            const joystick = scene.plugins.get('rexVirtualJoystick').add(scene, {
-                x: joystickX,
-                y: joystickY,
-                radius: 30,
-                base: base,
-                thumb: thumb,
-            });
+            const joystick = scene.plugins
+                .get("rexVirtualJoystick")
+                .add(scene, {
+                    x: joystickX,
+                    y: joystickY,
+                    radius: 30,
+                    base: base,
+                    thumb: thumb,
+                });
 
             return joystick;
         },
         mobileClick() {
             // Emulando la tecla "Space" al hacer clic en el botón
-            const event = new KeyboardEvent('keydown', {
-                key: ' ',
-                code: 'Space',
+            const event = new KeyboardEvent("keydown", {
+                key: " ",
+                code: "Space",
                 keyCode: 32,
                 which: 32,
                 bubbles: true,
@@ -1277,8 +1295,7 @@ export default defineComponent({
 
             // Simulando la propagación del evento hacia arriba en el DOM
             this.$el.dispatchEvent(event);
-        }
-
+        },
     },
 });
 </script>
@@ -1398,8 +1415,8 @@ button:hover::after {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.784);
     display: flex;
     justify-content: center;
@@ -1432,8 +1449,17 @@ button:hover::after {
     z-index: 2;
 }
 
+.npc-modal-mobile {
+    height: 50vh;
+}
+
 .textBox {
     width: 40vw;
+    height: 150px;
+}
+
+.textBox-mobile {
+    width: 80vw;
     height: 150px;
 }
 
@@ -1458,17 +1484,15 @@ button:hover::after {
 }
 
 .interactMobile {
-    width: 50vw;
+    width: 20%;
     /* Ocupa 1/3 del ancho de la pantalla */
-    height: 100vh;
+    height: 10%;
     /* Ocupa la altura completa de la pantalla */
-    background-color: rgba(255, 0, 0, 0) !important;
     position: absolute;
-    top: 0;
-    right: 0;
-    border: none !important;
-    outline: none !important;
+    bottom: 50px;
+    right: 50px;
     z-index: 0;
+    opacity: .5;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1487,7 +1511,7 @@ button:hover::after {
     position: absolute;
     bottom: -100px;
     background-color: #141b1ba4;
-    animation: animControlsUp 1s ease-in-out .3s both;
+    animation: animControlsUp 1s ease-in-out 0.3s both;
 }
 
 .controlsHide {

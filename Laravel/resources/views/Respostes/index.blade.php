@@ -19,16 +19,16 @@
         <tr class="list-header">
             <th>ID</th>
             <th>Resposta</th>
-            <th>dificultat_id</th>
-            <th>tema_id</th>
+            <th>Dificultat</th>
+            <th>Tematica</th>
             <th></th>
         </tr>
         @foreach ($respostes as $resposta)
         <tr>
             <td>{{ $resposta->id }}</td>
             <td><a href="{{ route('view-modificar-resposta', ['id' => $resposta->id]) }}">{{ $resposta->resposta }}</a></td>
-            <td>{{ $resposta->dificultat_id }}</td>
-            <td>{{ $resposta->tema_id }}</td>
+            <td>{{ $resposta->dificultat}}</td>
+            <td>T. {{ $resposta->tema_id }}. : {{$resposta->tema}}</td>
             <td>
                 <form action="{{ route('eliminar-resposta', ['id' => $resposta->id]) }}" method="POST">
                     @method('DELETE')
@@ -42,7 +42,18 @@
 </div>
 
 <style>
-    * {
+
+  .notification.is-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      padding: .75rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid transparent;
+      border-radius: .25rem;
+  }
+
+  * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
@@ -50,7 +61,7 @@
     list-style: none;
     background: none;
     border: none;
-}
+  }
 
 p {
     margin: 0;
@@ -113,7 +124,6 @@ td {
     border-bottom: 2px solid #388E3C; /* Añade una línea debajo del encabezado */
     font-size: 1.2em; /* Aumenta el tamaño del texto */
 }
-
 
 </style>
 @endsection

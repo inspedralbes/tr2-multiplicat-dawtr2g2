@@ -1,5 +1,5 @@
 <template>
-    <div class="login-container">
+    <div :class="['login-container', { 'login-container-mobile': isMobileDevice() }]">
         <form class="login-form" method="POST">
             <div class="titulo">
                 <h2>BattleMath</h2>
@@ -85,6 +85,20 @@ export default {
                 icon: true,
                 rtl: false,
             });
+        },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
         }
 
     },
@@ -105,7 +119,6 @@ export default {
 };
 </script>
 <style scoped>
-
 .password-input {
     position: relative;
 }
@@ -197,7 +210,11 @@ h2 {
 
 .login-container {
     width: 35vw;
+}
 
+.login-container-mobile {
+    overflow-y: scroll;
+    height: 80vh;
 }
 
 button {
@@ -265,4 +282,5 @@ button:hover::after {
 
 .input-group input:focus::placeholder {
     color: transparent;
-}</style>
+}
+</style>
