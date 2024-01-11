@@ -63,14 +63,19 @@ export default {
             }
         };
     },
+    created() {
+        const store = useAppStore();
+        if (!store.isLogged) {
+            this.$router.push("/");
+        }
 
+
+        store.setLastRoute("/rooms");
+    },
     mounted() {
         socket.emit("getRooms");
         const store = useAppStore();
 
-        if (!store.isLogged) {
-            this.$router.push("/");
-        }
 
         watch(
             () => store.rooms,
@@ -80,7 +85,6 @@ export default {
         );
         this.player.name = store.getUsername();
         this.player.skin = store.getSkin();
-        store.setLastRoute("/rooms");
     },
     methods: {
         createRoom() {
