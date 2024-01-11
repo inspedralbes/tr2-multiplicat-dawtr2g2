@@ -20,11 +20,11 @@
                 </button>
             </div>
         </div>
-        <div class="npc-modal" v-if="npc.interactingWithNPC">
+        <div :class="['npc-modal', { 'npc-modal-mobile': isMobileDevice() }]" v-if="npc.interactingWithNPC">
             <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
                 <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
-            <div class="modal nes-container is-rounded textBox">
+            <div :class="['modal', 'nes-container', 'is-rounded', 'textBox', { 'textBox-mobile': isMobileDevice() }]">
                 <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
@@ -1398,8 +1398,8 @@ button:hover::after {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.784);
     display: flex;
     justify-content: center;
@@ -1432,8 +1432,17 @@ button:hover::after {
     z-index: 2;
 }
 
+.npc-modal-mobile {
+    height: 50vh;
+}
+
 .textBox {
     width: 40vw;
+    height: 150px;
+}
+
+.textBox-mobile {
+    width: 80vw;
     height: 150px;
 }
 

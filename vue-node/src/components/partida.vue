@@ -45,7 +45,8 @@
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                     <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
-                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected && room.players.length == 2">Et toca tirar</h3>
+                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected && room.players.length == 2">Et
+                        toca tirar</h3>
                     <h3 class=" turn" v-if="!turn && !questionSelected && room.players.length == 2">Esperant atac</h3>
                     <h3 class=" turn" v-if="!turn && questionSelected && room.players.length == 2">Esperant resposta</h3>
 
@@ -58,32 +59,16 @@
             </main>
 
             <footer class="cards" v-if="room.players.length == 2 && room.timeUp == false">
-                <!--
-                <div class="card red">
-                  <div class="level-bg"></div>
-                  <p class="card-level">2</p>
-                  <img class="image" src="img/mesures.png" alt="">
-                  <h3 class="title">Mesures</h3>
-              </div>
-              -->
-
-                <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()"
-                    v-if="turn && this.mostResp == false">
+                <div :class="['card', 'yellow', { 'card-mobile': isMobileDevice() }]" v-for="i in numQuest" :key="i"
+                    @click="genQuest()" v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
                     <p class="card-level">{{ Math.floor(Math.random() * 4) + 1 }}</p>
                     <img class="image" src="/img/geometry.png" alt="">
                     <h3 class="title">Geometria</h3>
                 </div>
-                <!--
-                <div class="card blue">
-                  <div class="level-bg"></div>
-                  <p class="card-level">1</p>
-                  <img class="image" src="img/calculo.webp" alt="">
-                  <h3 class="title">Calcul</h3>
-              </div>
-              -->
-                <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id, answer.id)"
-                    v-if="turn && ans != {} && this.mostResp == true" :value="answer.id">
+                <div :class="['ans', { 'ans-mobile': isMobileDevice() }]" v-for="(answer, index) in ans" :key="index"
+                    @click="compAns(quest.id, answer.id)" v-if="turn && ans != {} && this.mostResp == true"
+                    :value="answer.id">
                     <div class="level-bg"></div>
                     <p class="card-level">{{ index + 1 }}</p>
                     <h3 class="title-ans">{{ answer.resposta }}</h3>
@@ -191,7 +176,7 @@ export default {
         this.stopTimer();
     },
     methods: {
-        
+
         genQuest() {
             this.questionSelected = true;
             this.est = '';
@@ -218,15 +203,15 @@ export default {
         startTimer() {
             const store = useAppStore();
             this.intervalId = setInterval(() => {
-            if (this.timer > 0) {
-                this.timer--;
-            } else {
-                this.stopTimer();
-                socket.emit('timerUp', this.room.id);
-                if (this.turn == true && this.ans.length == 4) {
-                    socket.emit('noAnswer', this.room.id,this.player);
+                if (this.timer > 0) {
+                    this.timer--;
+                } else {
+                    this.stopTimer();
+                    socket.emit('timerUp', this.room.id);
+                    if (this.turn == true && this.ans.length == 4) {
+                        socket.emit('noAnswer', this.room.id, this.player);
+                    }
                 }
-            }
             }, 1000);
         },
         stopTimer() {
@@ -235,6 +220,20 @@ export default {
                 this.intervalId = null;
             }
         },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
+        }
 
     },
     computed: {
@@ -265,15 +264,23 @@ export default {
     font-size: 30px;
 }
 
-.turn{
+.turn {
     font-size: 30px;
     animation: blink 1.3s linear infinite;
 }
 
 @keyframes blink {
-  0% {opacity: 1;}
-  50% {opacity: 0;}
-  100% {opacity: 1;}
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 * {
@@ -287,11 +294,13 @@ export default {
     background-size: cover;
     background-position: 0 60%;
     background-image: url('/img/combate.jpg');
+    height: 100vh;
+    display: flex;
 }
 
 .game {
     width: 100%;
-    height: 100vh;
+    /* height: 100vh; */
     display: grid;
     grid-template-rows: repeat(3, 1fr);
     align-items: center;
@@ -512,6 +521,7 @@ main {
 .cards {
     display: flex;
     gap: 10px;
+    overflow: scroll;
 }
 
 .card {
@@ -529,6 +539,14 @@ main {
     overflow: hidden;
     transition: all .3s ease-in-out;
 
+}
+
+.card-mobile {
+    font-size: 8px;
+    width: 75px;
+    height: 100px;
+    border: 3px solid white;
+    border-radius: 5px;
 }
 
 .level-bg {
@@ -568,6 +586,14 @@ main {
     background-repeat: no-repeat;
     z-index: 2;
     transition: all .3s ease-in-out;
+}
+
+.ans-mobile {
+    font-size: 5px;
+    width: 75px;
+    height: 100px;
+    /* border: 3px solid white; */
+    border-radius: 5px;
 }
 
 .title-ans {
@@ -631,7 +657,6 @@ main {
     top: 3%;
     right: 5%;
     width: 6vw;
-    height: 3vh;
 }
 
 .sortir::after {
