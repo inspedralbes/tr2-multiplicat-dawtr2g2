@@ -48,6 +48,17 @@
 </div>
 
 <style>
+
+    .notification.is-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        padding: .75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: .25rem;
+    }
+
     * {
     padding: 0;
     margin: 0;
@@ -119,7 +130,6 @@ td {
     border-bottom: 2px solid #388E3C; /* Añade una línea debajo del encabezado */
     font-size: 1.2em; /* Aumenta el tamaño del texto */
 }
-
 
 </style>
 

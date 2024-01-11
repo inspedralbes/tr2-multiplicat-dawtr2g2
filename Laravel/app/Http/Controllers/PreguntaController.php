@@ -139,8 +139,6 @@ class PreguntaController extends Controller
         $resposta = Resposta::where('id', $pregunta->resposta_correcta_id)->first(); 
         $pregunta->resposta = $resposta ? $resposta->resposta : null;
        
-        $tema = DB::table('temes')->where('id', $pregunta->tema_id)->first();
-        $pregunta->tema = $tema ? $tema->nom_tematica : null;
         
         $dificultat = Dificultat::where('id', $pregunta->dificultat_id)->first();
         $pregunta->dificultat = $dificultat ? $dificultat->nom_dificultat : null;
@@ -151,7 +149,7 @@ class PreguntaController extends Controller
         $pregunta->dificultat = $dificultats->pluck('nom_dificultat');
 
 
-        return view('preguntes.modificar', ['pregunta' => $pregunta, 'dificultats' => $dificultats, 'dificultat' => $dificultat, 'tema' => $tema]);
+        return view('preguntes.modificar', ['pregunta' => $pregunta, 'dificultats' => $dificultats, 'dificultat' => $dificultat]);
     }
     
 
@@ -159,14 +157,14 @@ class PreguntaController extends Controller
 {
     $pregunta = Pregunta::find($id); 
 
-    // Actualizar los campos de la pregunta
+    
     $pregunta->update([
         'pregunta' => $request->pregunta,
         'tema_id' => $request->tema_id,
         'dificultat_id' => $request->dificultat_id,
     ]);
 
-    // Encontrar y actualizar la respuesta correspondiente
+   
     $resposta = Resposta::find($pregunta->resposta_correcta_id);
     if ($resposta) {
         $resposta->update(['resposta' => $request->resposta]);

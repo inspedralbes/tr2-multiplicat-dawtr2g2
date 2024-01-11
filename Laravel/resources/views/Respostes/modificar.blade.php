@@ -11,12 +11,19 @@
             <input type="text" name="resposta" class="input" value="{{ $resposta->resposta }}">
         </div>
         <div class="field">
-            <label for="tema_id" class="label">Tema_id</label>
-            <input type="text" name="tema_id" class="input" value="{{ $resposta->tema_id }}">
+            <label for="tema_id" class="label">Tema</label>
+            <p value="">Geometria</option>
         </div>
         <div class="field">
-            <label for="dificultat_id" class="label">dificultat_id</label>
-            <input type="text" name="dificultat_id" class="input" value="{{ $resposta->dificultat_id }}">
+            <label for="dificultat" class="label">Dificultat</label>
+
+            <select name="dificultat_id" id="">
+                <option value="">{{$dificultat->nom_dificultat}}</option>
+                @foreach($dificultats as $dificultat)
+                <option value="{{ $dificultat->id }}">{{ $dificultat->nom_dificultat }}</option>
+                @endforeach
+            </select>
+
         </div>
 
         <button type="submit" class="button button--icon is-warning is-rounded is-responsive mt-4">
