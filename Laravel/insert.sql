@@ -77,7 +77,7 @@ INSERT INTO `respostes` (id, `resposta`, `tema_id`, `dificultat_id`) VALUES
 (35, '12 cm²', 5, 2),
 (36, '24 cm²', 5, 2),
 (37, '180 graus', 5, 2),
-(38, '180 graus', 5, 2),
+(38, '90 graus', 5, 2),
 (39, '360 graus', 5, 2),
 (40, 'π×r', 5, 2),
 (41, '2×π×r', 5, 2),
