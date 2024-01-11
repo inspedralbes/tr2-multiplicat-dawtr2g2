@@ -31,6 +31,9 @@
                 </ul>
             </div>
         </div>
+        <div class="logout">
+            <img class="iconsLanding" src="https://cdn-icons-png.flaticon.com/512/3596/3596149.png" alt="LogOut" width="30px" style="margin-right: 20px;cursor:pointer;" onclick="window.location.href='{{route('logout')}}'">
+        </div>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
