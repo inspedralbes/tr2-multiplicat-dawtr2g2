@@ -276,10 +276,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addPlayer", (playerInfo) => {
+    playerInfo.socketID = socket.id;
     if (players.length === 0) {
-
       players.push(playerInfo);
-      players[players.length - 1].socketID = socket.id;
 
     } else {
       var i = 0;
@@ -287,14 +286,12 @@ io.on("connection", (socket) => {
         var exist = false;
         if (players[i].id === playerInfo.id) {
           players[i] = playerInfo;
-          players[i].socketID = socket.id;
           exist = true;
         }
         i++;
       }
       if (!exist) {
         players.push(playerInfo);
-        players[players.length - 1].socketID = socket.id;
       }
     }
 
@@ -319,12 +316,15 @@ io.on("connection", (socket) => {
   });
 
 
-  socket.on("disconnect", (playerInfo) => {
-    let playerToDelete = players.findIndex(player => player.socketID !== socket.id);
+  socket.on("disconnect", () => {
+    console.log(socket.id);
+    let playerToDelete = players.findIndex(player => player.socketID === socket.id);
+    console.log(players[playerToDelete]);
     if (playerToDelete !== -1) {
       console.log(`Player ${players[playerToDelete].username} disconnected`);
+      players.splice(playerToDelete, 1);
     } else {
-      console.log("Player not found");
+      console.log("Player disconnected");
     }
     io.emit("viewPlayers", players);
   });

@@ -93,6 +93,7 @@ socket.on("exit", () => {
 
 socket.on("viewPlayers", (players) => {
   const store = useAppStore();
+  console.log("SocketID en manager: ", socket.id);
   store.addPlayers(players);
 });
 

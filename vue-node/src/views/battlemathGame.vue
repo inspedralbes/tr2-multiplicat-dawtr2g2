@@ -1190,6 +1190,7 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
+            console.log(socket.id);
             socket.emit("addPlayer", this.playerInfo);
         },
 
