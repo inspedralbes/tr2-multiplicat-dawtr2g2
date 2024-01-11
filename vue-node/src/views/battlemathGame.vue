@@ -75,13 +75,12 @@
         <button class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
 
         <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
-            <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
-                <img src="/img/Tuto.png" alt="">
-            </div>
-
-            <button v-if="$route.path === '/game' && !isMobileDevice" class="interactMobile" @click="mobileClick"></button>
-            <div class="gameCanvas" ref="gameContainer"></div>
+            <img src="/img/Tuto.png" alt="">
         </div>
+
+        <button v-if="$route.path === '/game' && !isMobileDevice" class="interactMobile" @click="mobileClick"></button>
+        <div class="gameCanvas" ref="gameContainer"></div>
+    </div>
 </template>
 
 <script>
