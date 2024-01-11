@@ -3,7 +3,7 @@
         <div class="win-container" v-if="win == true">
             <div class="win">
                 <h1>VICTORIA</h1>
-                <img :src="`/characters/${skin}_fight.png`" alt="">
+                <img :src="`/vue/characters/${skin}_fight.png`" alt="">
                 <button class="nes-btn" @click=tornarRooms()>Tornar</button>
                 <img class="confetti" src="/img/confetti-gif-8.gif" alt="">
                 <img class="confetti" src="https://i.pinimg.com/originals/fd/b0/9c/fdb09cd5e747f5c8330f998f11efb0a1.gif"
