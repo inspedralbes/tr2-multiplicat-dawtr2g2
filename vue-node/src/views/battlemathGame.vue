@@ -321,6 +321,7 @@ export default defineComponent({
                         self.dialogo(this, 'npcRyu');
                         store.firstTime = false;
                     }
+                    self.viewPlayers(this);
                 },
                 update: function () {
                 },
@@ -1060,6 +1061,9 @@ export default defineComponent({
                 parts[1] = "idle";
                 this.player.anims.play(parts.join("_"));
                 this.player.setVelocity(0, 0);
+                if (scene.scene.isActive("lobby")) {
+                    this.addPlayerInfo(scene);
+                }
             }
         },
         createPlayerAnims(scene, skin) {
@@ -1171,7 +1175,7 @@ export default defineComponent({
             this.playerInfo.y = this.player.y;
 
             socket.emit("addPlayer", this.playerInfo);
-            this.viewPlayers(scene);
+
         },
 
         viewPlayers(scene) {
@@ -1192,14 +1196,6 @@ export default defineComponent({
                                 fontFamily: "Arial",
                                 fontSize: 10,
                                 color: "#fff",
-                                // backgroundColor: "#00000069",
-                                // padding: {
-                                //     left: 2,
-                                //     right: 2,
-                                //     top: 1,
-                                //     bottom: 1,
-                                // },
-
                             }
                         );
 
