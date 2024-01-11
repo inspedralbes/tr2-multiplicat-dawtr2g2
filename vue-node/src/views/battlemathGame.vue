@@ -71,10 +71,14 @@
             </div>
         </div>
 
-        <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+
+        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
+
+        <div v-if="!isMobileDevice()" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
+        <button v-if="$route.path === '/game' && isMobileDevice()" class="interactMobile" @click="mobileClick"></button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -166,6 +170,17 @@ export default defineComponent({
             playerSprites: {},
         };
     },
+    created() {
+        const store = useAppStore();
+        if (store.getLastRoute() === '/rooms') {
+            this.navigation_menus.sceneStart = 2;
+            setTimeout(() => {
+                this.navigation_menus.sceneStart = 1;
+            }, 2000);
+        } else {
+            this.navigation_menus.sceneStart = 1;
+        }
+    },
     mounted() {
         const store = useAppStore();
         this.isLogged = store.getIsLogged();
@@ -178,14 +193,6 @@ export default defineComponent({
         }
 
         this.recibirsuccessLogout();
-        if (store.getLastRoute() === '/rooms') {
-            this.navigation_menus.sceneStart = 2;
-            setTimeout(() => {
-                this.navigation_menus.sceneStart = 1;
-            }, 1000);
-        } else {
-            this.navigation_menus.sceneStart = 1;
-        }
         this.initializeGame();
         store.setLastRoute("/game");
     },
@@ -252,22 +259,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 851);
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
-
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
+                        let joystick = self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -290,14 +282,17 @@ export default defineComponent({
                     self.preloadSkins(this);
                 },
                 create: function () {
+                    const store = useAppStore();
+
                     self.createLobby(this);
 
                     self.createNPC(this, 910, 420, 'npcRyu', 0);
                     ///Create player
                     if (self.navigation_menus.sceneStart === 1) {
-
                         self.playerCreate(this, 888, 390, self.playerSprite);
-                    } else {
+                    } else if (self.navigation_menus.sceneStart === 2) {
+                        self.playerCreate(this, 687, 554, self.playerSprite);
+                    } else if (store.lastRoute === '/rooms') {
                         self.playerCreate(this, 687, 554, self.playerSprite);
                     }
 
@@ -312,22 +307,7 @@ export default defineComponent({
                     );
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
-
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
+                        let joystick = self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -1190,7 +1170,6 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
-            console.log("Estoy en el emit addPlayer");
             socket.emit("addPlayer", this.playerInfo);
             this.viewPlayers(scene);
         },
@@ -1250,6 +1229,54 @@ export default defineComponent({
             ];
 
             return mobileKeywords.some(keyword => userAgent.includes(keyword));
+        },
+
+        toggleControls() {
+            if (this.controlsHidden) {
+                this.controlsHidden = false;
+            } else {
+                this.controlsHidden = true;
+            }
+        },
+        createJoystick(scene) {
+            const baseColor = 0x888888;
+            const thumbColor = 0xCCCCCC;
+
+            const gameHeight = scene.sys.game.config.height;
+
+            const joystickHeight = gameHeight * 0.2;
+
+            const joystickX = 60;
+            const joystickY = gameHeight - joystickHeight - 20;
+
+            const base = scene.add.circle(0, 0, 30, baseColor);
+            base.setFillStyle(baseColor, 0.5);
+
+            const thumb = scene.add.circle(0, 0, 15, thumbColor);
+            thumb.setFillStyle(thumbColor, 0.5);
+
+            const joystick = scene.plugins.get('rexVirtualJoystick').add(scene, {
+                x: joystickX,
+                y: joystickY,
+                radius: 30,
+                base: base,
+                thumb: thumb,
+            });
+
+            return joystick;
+        },
+        mobileClick() {
+            // Emulando la tecla "Space" al hacer clic en el botón
+            const event = new KeyboardEvent('keydown', {
+                key: ' ',
+                code: 'Space',
+                keyCode: 32,
+                which: 32,
+                bubbles: true,
+            });
+
+            // Simulando la propagación del evento hacia arriba en el DOM
+            this.$el.dispatchEvent(event);
         }
 
     },
@@ -1377,6 +1404,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 3;
 }
 
 .modal {
@@ -1401,6 +1429,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .textBox {
@@ -1428,16 +1457,37 @@ button:hover::after {
     gap: 2rem;
 }
 
+.interactMobile {
+    width: 50vw;
+    /* Ocupa 1/3 del ancho de la pantalla */
+    height: 100vh;
+    /* Ocupa la altura completa de la pantalla */
+    background-color: rgba(255, 0, 0, 0) !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none !important;
+    outline: none !important;
+    z-index: 0;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                  CONTROLS                                  */
 /* -------------------------------------------------------------------------- */
+
+.controls-btn {
+    position: absolute;
+    top: 30px;
+    left: 100px;
+}
+
 .controls {
     width: 100%;
     text-align: center;
     position: absolute;
     bottom: -100px;
-    animation: animControlsUp 1s ease-in-out 1s both;
     background-color: #141b1ba4;
+    animation: animControlsUp 1s ease-in-out .3s both;
 }
 
 .controlsHide {
