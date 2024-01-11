@@ -256,7 +256,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 851);
 
                     if (self.isMobileDevice()) {
-                        self.createJoystick(this);
+                        let joystick = self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -301,7 +301,7 @@ export default defineComponent({
                     );
 
                     if (self.isMobileDevice()) {
-                        self.createJoystick(this);
+                        let joystick = self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -1448,6 +1448,20 @@ button:hover::after {
     width: 100%;
     padding-left: 20px;
     gap: 2rem;
+}
+
+.interactMobile {
+    width: 50vw;
+    /* Ocupa 1/3 del ancho de la pantalla */
+    height: 100vh;
+    /* Ocupa la altura completa de la pantalla */
+    background-color: rgba(255, 0, 0, 0.5) !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none !important;
+    outline: none !important;
+    z-index: 0;
 }
 
 /* -------------------------------------------------------------------------- */
