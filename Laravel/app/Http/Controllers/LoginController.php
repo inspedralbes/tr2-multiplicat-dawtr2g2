@@ -15,35 +15,38 @@ class LoginController extends Controller
 
     
 
-public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'username' => 'required|string',
-        'password' => 'required|string',
-    ]);
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-    if ($credentials['username'] != 'admin') {
-        return redirect()->back()->withErrors(['error' => 'Només l\' administrador pot iniciar sessió']);
+        if ($credentials['username'] != 'admin') {
+            return redirect()->back()->withErrors(['error' => 'Només l\' administrador pot iniciar sessió']);
+        }
+
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $user->createToken('BattleMath')->plainTextToken;
+
+            return redirect()->route('preguntes');
+        } else {
+            
+            return redirect()->back()->withErrors(['error' => 'Les credencials no són correctes']);
+        }
     }
-
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
-        $user->createToken('BattleMath')->plainTextToken;
-
-        // Autenticación correcta
-        return redirect()->route('preguntes');
-    } else {
-        // La autenticación falló
-        return redirect()->back()->withErrors(['error' => 'Les credencials no són correctes']);
-    }
-}
 
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        if (Auth::user()) {
+            Auth::user()->tokens()->delete();
+        } else {
+            return response()->json(['message' => 'No hi ha cap sessió iniciada'], 400);
+        }
 
-        return redirect('/');
+        return redirect()->route('login');
     }
 
 }

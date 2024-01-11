@@ -43,4 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/respostes/modificar/{id}', [RespostaController::class, 'adminShow'])->name('view-modificar-resposta');
     Route::delete('/respostes/{id}', [RespostaController::class, 'adminDelete'])->name('eliminar-resposta');
     Route::patch('/respostes/modificar/{id}', [RespostaController::class, 'adminUpdate'])->name('modificar-resposta');
+
+    //logout
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 });
