@@ -72,13 +72,13 @@
         </div>
 
 
-        <button class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
+        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
 
-        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+        <div v-if="!isMobileDevice()" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
-        <button v-if="$route.path === '/game' && isMobileDevice" class="interactMobile" @click="mobileClick"></button>
+        <button v-if="$route.path === '/game' && isMobileDevice()" class="interactMobile" @click="mobileClick"></button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
@@ -1399,6 +1399,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 3;
 }
 
 .modal {
@@ -1423,6 +1424,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .textBox {
@@ -1455,7 +1457,7 @@ button:hover::after {
     /* Ocupa 1/3 del ancho de la pantalla */
     height: 100vh;
     /* Ocupa la altura completa de la pantalla */
-    background-color: rgba(255, 0, 0, 0.5) !important;
+    background-color: rgba(255, 0, 0, 0) !important;
     position: absolute;
     top: 0;
     right: 0;
