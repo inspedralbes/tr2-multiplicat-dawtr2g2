@@ -74,16 +74,17 @@
 
         <button class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
 
-        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+        <div v-if="!isMobileDevice" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
+        <button v-if="$route.path === '/game'" class="interactMobile" @click="mobileClick"></button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
 
 <script>
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import char_select from '@/components/char_select.vue';
 import login from '@/components/Login.vue';
 import register from '@/components/Register.vue';
@@ -167,6 +168,7 @@ export default defineComponent({
                 y: "",
             },
             playerSprites: {},
+            mobileButton: false
         };
     },
     mounted() {
@@ -255,22 +257,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 851);
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
-
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
+                        let joystick = self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -280,6 +267,7 @@ export default defineComponent({
                     }
 
                     self.playerMovement(this, self.playerSprite);
+
                 },
                 update: function () { },
             };
@@ -315,22 +303,7 @@ export default defineComponent({
                     );
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
-
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
+                        let joystick = self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -344,6 +317,8 @@ export default defineComponent({
                         self.dialogo(this, 'npcRyu');
                         store.firstTime = false;
                     }
+
+
                 },
                 update: function () {
                 },
@@ -802,6 +777,10 @@ export default defineComponent({
             this.npc.npcs.push(NPC);
         },
         triggerWithNPC(scene) {
+            if (!scene) {
+                scene = this;
+            }
+
             for (let i = 0; i < this.npc.npcs.length; i++) {
                 let npc = this.npc.npcs[i];
                 let npcName = npc.texture.key;
@@ -843,39 +822,36 @@ export default defineComponent({
 
                 let dialogoMostrado = false;
 
-                scene.physics.add.overlap(
-                    this.player,
-                    trigger,
-                    (player, trigger) => {
-                        if (trigger.body.touching.none) {
-                            this.npc.playerInTrigger = true;
-                            if (trigger.child != "npcdoorPHouse") {
-                                dialogInfo.setAlpha(1);
-                            }
-                            if (!dialogoMostrado) {
-                                if (
-                                    this.isLogged &&
-                                    trigger.child === "npcdoorPHouse"
-                                ) {
-                                    this.cambiarEscena(scene, "lobby");
-                                } else if (
-                                    !this.isLogged &&
-                                    trigger.child === "npcdoorPHouse"
-                                ) {
-                                    this.dialogo(scene, trigger.child);
-                                }
-                                dialogoMostrado = true;
-                                this.interactWithNPC(scene, npc);
-                            }
-                        } else {
-                            if (trigger.child != "npcdoorPHouse") {
-                                dialogInfo.setAlpha(0);
-                            }
-                            this.npc.playerInTrigger = false;
-                            scene.input.keyboard.off("keydown-SPACE");
-                            dialogoMostrado = false;
+                scene.physics.add.overlap(this.player, trigger, (player, trigger) => {
+                    if (trigger.body.touching.none) {
+                        this.npc.playerInTrigger = true;
+                        if (trigger.child != "npcdoorPHouse") {
+                            dialogInfo.setAlpha(1);
                         }
+                        if (!dialogoMostrado) {
+                            if (
+                                this.isLogged &&
+                                trigger.child === "npcdoorPHouse"
+                            ) {
+                                this.cambiarEscena(scene, "lobby");
+                            } else if (
+                                !this.isLogged &&
+                                trigger.child === "npcdoorPHouse"
+                            ) {
+                                this.dialogo(scene, trigger.child);
+                            }
+                            dialogoMostrado = true;
+                            this.interactWithNPC(scene, npc);
+                        }
+                    } else {
+                        if (trigger.child != "npcdoorPHouse") {
+                            dialogInfo.setAlpha(0);
+                        }
+                        this.npc.playerInTrigger = false;
+                        scene.input.keyboard.off("keydown-SPACE");
+                        dialogoMostrado = false;
                     }
+                }
                 );
             }
         },
@@ -960,6 +936,7 @@ export default defineComponent({
                 this.npc.interactingWithNPC = newVal;
                 this.navigation_menus.showCharSelectModal = false;
                 this.canMove = true;
+                this.mobileButton = false;
             }, 10);
         },
         playerCreate(scene, x, y, skin) {
@@ -1056,24 +1033,27 @@ export default defineComponent({
 
             let currentSpeed = speed;
 
+            if (this.canMove) {
 
-            if (Math.abs(directionX) > Math.abs(directionY)) {
-                // Movimiento horizontal
-                if (directionX > 0) {
-                    this.player.anims.play(`${skin}_move_right`, true);
-                    this.player.setVelocity(currentSpeed, 0);
-                } else if (directionX < 0) {
-                    this.player.anims.play(`${skin}_move_left`, true);
-                    this.player.setVelocity(-currentSpeed, 0);
-                }
-            } else {
-                // Movimiento vertical
-                if (directionY > 0) {
-                    this.player.anims.play(`${skin}_move_down`, true);
-                    this.player.setVelocity(0, currentSpeed);
-                } else if (directionY < 0) {
-                    this.player.anims.play(`${skin}_move_up`, true);
-                    this.player.setVelocity(0, -currentSpeed);
+
+                if (Math.abs(directionX) > Math.abs(directionY)) {
+                    // Movimiento horizontal
+                    if (directionX > 0) {
+                        this.player.anims.play(`${skin}_move_right`, true);
+                        this.player.setVelocity(currentSpeed, 0);
+                    } else if (directionX < 0) {
+                        this.player.anims.play(`${skin}_move_left`, true);
+                        this.player.setVelocity(-currentSpeed, 0);
+                    }
+                } else {
+                    // Movimiento vertical
+                    if (directionY > 0) {
+                        this.player.anims.play(`${skin}_move_down`, true);
+                        this.player.setVelocity(0, currentSpeed);
+                    } else if (directionY < 0) {
+                        this.player.anims.play(`${skin}_move_up`, true);
+                        this.player.setVelocity(0, -currentSpeed);
+                    }
                 }
             }
 
@@ -1193,11 +1173,9 @@ export default defineComponent({
             this.playerInfo.x = this.player.x;
             this.playerInfo.y = this.player.y;
 
-            console.log("Estoy en el emit addPlayer");
             socket.emit("addPlayer", this.playerInfo);
             this.viewPlayers(scene);
         },
-
         viewPlayers(scene) {
             socket.on("viewPlayers", (players) => {
                 for (let i = 0; i < players.length; i++) {
@@ -1253,15 +1231,7 @@ export default defineComponent({
             ];
 
             return mobileKeywords.some(keyword => userAgent.includes(keyword));
-        },
-
-        toggleControls() {
-            if (this.controlsHidden) {
-                this.controlsHidden = false;
-            }else{
-                this.controlsHidden = true;
-            }
-        },
+        }
 
     },
 });
@@ -1388,6 +1358,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 3;
 }
 
 .modal {
@@ -1412,6 +1383,7 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .textBox {
@@ -1439,11 +1411,25 @@ button:hover::after {
     gap: 2rem;
 }
 
+.interactMobile {
+    width: 50vw;
+    /* Ocupa 1/3 del ancho de la pantalla */
+    height: 100vh;
+    /* Ocupa la altura completa de la pantalla */
+    background-color: rgba(255, 0, 0, 0) !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none !important;
+    outline: none !important;
+    z-index: 0;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                  CONTROLS                                  */
 /* -------------------------------------------------------------------------- */
 
-.controls-btn{
+.controls-btn {
     position: absolute;
     top: 30px;
     left: 100px;
