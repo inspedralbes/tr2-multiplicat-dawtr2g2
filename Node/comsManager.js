@@ -44,7 +44,7 @@ async function logout(token) {
 
 async function getRandomQuestion() {
     try {
-        const randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
+        const randomNumber = Math.floor(Math.random() * (70 - 1 + 1)) + 1;
         const response = await axios.get(`${url}preguntes/mostrar/${randomNumber}`);
         return response.data;
     } catch (error) {
