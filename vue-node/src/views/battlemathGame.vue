@@ -256,22 +256,7 @@ export default defineComponent({
                     self.createParticleHouse(this, 920, 851);
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
-
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
+                        self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -316,22 +301,7 @@ export default defineComponent({
                     );
 
                     if (self.isMobileDevice()) {
-                        const baseColor = 0x888888; // Color gris para la base
-                        const thumbColor = 0xCCCCCC; // Color gris claro para el "thumb"
-
-                        const base = this.add.circle(0, 0, 30, baseColor);
-                        base.setFillStyle(baseColor, 0.5); // Reducir la opacidad del color base a 50%
-
-                        const thumb = this.add.circle(0, 0, 15, thumbColor);
-                        thumb.setFillStyle(thumbColor, 0.5); // Reducir la opacidad del color del "thumb" a 50%
-
-                        const joystick = this.plugins.get('rexVirtualJoystick').add(this, {
-                            x: 50,
-                            y: 150,
-                            radius: 30,
-                            base: base,
-                            thumb: thumb,
-                        });
+                        self.createJoystick(this);
 
                         joystick.on('update', () => {
                             const directionX = joystick.forceX;
@@ -1263,6 +1233,33 @@ export default defineComponent({
                 this.controlsHidden = true;
             }
         },
+        createJoystick(scene) {
+            const baseColor = 0x888888;
+            const thumbColor = 0xCCCCCC;
+
+            const gameHeight = scene.sys.game.config.height;
+
+            const joystickHeight = gameHeight * 0.2;
+
+            const joystickX = 60;
+            const joystickY = gameHeight - joystickHeight - 20;
+
+            const base = scene.add.circle(0, 0, 30, baseColor);
+            base.setFillStyle(baseColor, 0.5);
+
+            const thumb = scene.add.circle(0, 0, 15, thumbColor);
+            thumb.setFillStyle(thumbColor, 0.5);
+
+            const joystick = scene.plugins.get('rexVirtualJoystick').add(scene, {
+                x: joystickX,
+                y: joystickY,
+                radius: 30,
+                base: base,
+                thumb: thumb,
+            });
+
+            return joystick;
+        }
 
     },
 });
