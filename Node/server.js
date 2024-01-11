@@ -318,13 +318,16 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     let playerToDelete = players.findIndex(player => player.socketID === socket.id);
+    let playerDisconnected = "";
     if (playerToDelete !== -1) {
+      playerDisconnected = players[playerToDelete];
       console.log(`Player ${players[playerToDelete].username} disconnected`);
       players.splice(playerToDelete, 1);
     } else {
       console.log("Player disconnected");
     }
     io.emit("viewPlayers", players);
+    io.emit("playerDisconnected", playerDisconnected);
   });
 });
 

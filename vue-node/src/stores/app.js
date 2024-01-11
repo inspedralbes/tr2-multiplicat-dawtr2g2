@@ -123,7 +123,6 @@ export const useAppStore = defineStore('app', {
     },
     addPlayers(players) {
       this.players = players;
-      console.log(this.players);
     },
     setNewSkin(skin) {
       this.user.skin = skin;

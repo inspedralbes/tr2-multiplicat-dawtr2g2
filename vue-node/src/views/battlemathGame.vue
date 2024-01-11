@@ -1202,6 +1202,8 @@ export default defineComponent({
                             this.playerSprites[players[i].id].sprite.destroy();
                             this.playerSprites[players[i].id].text.destroy();
                         }
+
+
                         //Añadimos el username encima del personaje
                         const text = scene.add.text(
                             players[i].x - 10,
@@ -1227,6 +1229,14 @@ export default defineComponent({
                             text: text,
                         };
                     }
+                }
+            });
+
+            socket.on("playerDisconnected", (player) => {
+                console.log(this.playerSprites[player.id].sprite.texture.key)
+                if (this.playerSprites[player.id]) {
+                    this.playerSprites[player.id].sprite.destroy();
+                    this.playerSprites[player.id].text.destroy();
                 }
             });
         },
