@@ -1233,7 +1233,6 @@ export default defineComponent({
             });
 
             socket.on("playerDisconnected", (player) => {
-                console.log(this.playerSprites[player.id].sprite.texture.key)
                 if (this.playerSprites[player.id]) {
                     this.playerSprites[player.id].sprite.destroy();
                     this.playerSprites[player.id].text.destroy();
