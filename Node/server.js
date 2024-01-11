@@ -316,6 +316,7 @@ io.on("connection", (socket) => {
 
 
   socket.on("disconnect", (playerInfo) => {
+    console.log("Player info: ",playerInfo);
     players = players.filter(player => player.id !== playerInfo.id);
     io.emit("viewPlayers", players);
     console.log("Client desconectat");
