@@ -22,6 +22,10 @@ public function login(Request $request)
         'password' => 'required|string',
     ]);
 
+    if ($credentials['username'] != 'admin') {
+        return redirect()->back()->withErrors(['error' => 'Només l\' administrador pot iniciar sessió']);
+    }
+
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
         $user->createToken('BattleMath')->plainTextToken;
