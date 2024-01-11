@@ -74,7 +74,7 @@
 
         <button class="nes-btn controls-btn" @click="toggleControls()">Controls</button>
 
-        <div v-if="!isMobileDevice" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
+        <div :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
             <img src="/img/Tuto.png" alt="">
         </div>
 
