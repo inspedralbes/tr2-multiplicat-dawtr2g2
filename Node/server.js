@@ -317,9 +317,7 @@ io.on("connection", (socket) => {
 
 
   socket.on("disconnect", () => {
-    console.log(socket.id);
     let playerToDelete = players.findIndex(player => player.socketID === socket.id);
-    console.log(players[playerToDelete]);
     if (playerToDelete !== -1) {
       console.log(`Player ${players[playerToDelete].username} disconnected`);
       players.splice(playerToDelete, 1);
