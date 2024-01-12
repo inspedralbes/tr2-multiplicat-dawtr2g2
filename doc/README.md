@@ -1,9 +1,22 @@
 # Documentació bàsica del projecte
-Ha d'incloure, com a mínim
 ## Instruccions per crear un entorn de desenvolupament
-  - eines
-  - plugins
-  - ...
+  - Eines + Plugins:
+    - VUE3:
+      - Express
+      - Nes.css
+      - Pinia
+      - Pinia-plugin-persistedstate
+      - Socket.io-client
+      - uid
+      - vue-router
+      - vue3-toastify
+    - NODE.js
+      - Axios
+      - Express
+      - socket.io
+    - LARAVEL
+      - Sanctum
+    - Phaser3
 
 ## Instruccions per desplegar el projecte a producció
 Quins fitxers s'han d'editar i com (típicament per connectar la BD etc...)
