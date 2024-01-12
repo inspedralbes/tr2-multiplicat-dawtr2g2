@@ -2,7 +2,7 @@
     <div>
         <button class="option tornar" @click="returnGame">Torna al joc</button>
         <div class="rooms__container">
-            <div class="box">
+            <div :class="['box', { 'box-mobile': isMobileDevice() }]">
                 <div class="options">
                     <button class="option" :class="{ active: screen === 0 }" @click="changeScreen(0)">
                         LLISTA PARTIDES
@@ -11,7 +11,7 @@
                         CREAR PARTIDES
                     </button>
                 </div>
-                <div class="rooms" v-if="screen == 0">
+                <div :class="['rooms', { 'rooms-mobile': isMobileDevice() }]" v-if="screen == 0">
                     <div style="width: 100%" v-for="room in rooms" :key="room">
                         <div class="room" v-if="room.players.length < 2">
                             <h2 class="title">{{ room.name }}</h2>
@@ -26,11 +26,11 @@
                     </div>
                 </div>
                 <div class="createRoom" v-if="screen == 1">
-                    <div class="info__container">
+                    <div :class="['info__container', { 'info__container-mobile': isMobileDevice() }]">
                         <div class="room__info">
                             <div class="info__box">
                                 <label for="name">Nom de la sala:</label>
-                                <input type="text" v-model="this.room" />
+                                <input type="text" maxlength="20" v-model="this.room" />
                             </div>
                         </div>
                         <div class="privacity">
@@ -63,14 +63,19 @@ export default {
             }
         };
     },
+    created() {
+        const store = useAppStore();
+        if (!store.isLogged) {
+            this.$router.push("/");
+        }
 
+
+        store.setLastRoute("/rooms");
+    },
     mounted() {
         socket.emit("getRooms");
         const store = useAppStore();
 
-        if (!store.isLogged) {
-            this.$router.push("/");
-        }
 
         watch(
             () => store.rooms,
@@ -80,7 +85,6 @@ export default {
         );
         this.player.name = store.getUsername();
         this.player.skin = store.getSkin();
-        store.setLastRoute("/rooms");
     },
     methods: {
         createRoom() {
@@ -96,6 +100,20 @@ export default {
         },
         returnGame() {
             this.$router.push("/game");
+        },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
         }
     },
 };
@@ -121,6 +139,10 @@ export default {
     border-radius: 20px;
 }
 
+.box-mobile {
+    margin-top: 30px;
+}
+
 .options {
     position: absolute;
     top: -30px;
@@ -136,6 +158,7 @@ export default {
     padding: 15px 10px;
     border: 2px solid #e58d08;
     border-radius: 15px;
+    margin-left: 20px;
 }
 
 .rooms {
@@ -160,6 +183,10 @@ export default {
     color: white;
     border-radius: 10px;
     border: 2px solid #e58d08;
+}
+
+.rooms-mobile {
+    height: 100%;
 }
 
 .title {
@@ -218,6 +245,10 @@ export default {
     flex-direction: column;
     gap: 20px;
     justify-content: center;
+}
+
+.info__container-mobile {
+    height: 100% !important;
 }
 
 label {

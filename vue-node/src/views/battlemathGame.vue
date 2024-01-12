@@ -20,11 +20,17 @@
                 </button>
             </div>
         </div>
-        <div class="npc-modal" v-if="npc.interactingWithNPC">
+        <div :class="['npc-modal', { 'npc-modal-mobile': isMobileDevice() }]" v-if="npc.interactingWithNPC">
             <div class="npcFace-container" v-if="npc.npcImage != 'doorPHouse'">
-                <img class="npcFace" :src="`/npc/face_${npc.npcImage}.png`" alt="" />
+                <img class="npcFace" :src="`/vue/npc/face_${npc.npcImage}.png`" alt="" />
             </div>
-            <div class="modal nes-container is-rounded textBox">
+            <div :class="[
+                'modal',
+                'nes-container',
+                'is-rounded',
+                'textBox',
+                { 'textBox-mobile': isMobileDevice() },
+            ]">
                 <button @click="closeNPCModal" class="nes-btn boton-cerrar boton-cerrar-npc">
                     <img src="../../public/icons/cross.svg" alt="" />
                 </button>
@@ -71,26 +77,33 @@
             </div>
         </div>
 
-        <div v-if="!isLogged" :class="{ 'controls': !controlsHidden, 'controlsHide': controlsHidden }">
-            <img src="/img/Tuto.png" alt="">
+        <button v-if="!isMobileDevice()" class="nes-btn controls-btn" @click="toggleControls()">
+            Controls
+        </button>
+
+        <div v-if="!isMobileDevice()" :class="{ controls: !controlsHidden, controlsHide: controlsHidden }">
+            <img src="/img/Tuto.png" alt="" />
         </div>
 
+        <button v-if="$route.path === '/game' && isMobileDevice()" class="nes-btn interactMobile"
+            @click="mobileClick">Acció</button>
         <div class="gameCanvas" ref="gameContainer"></div>
     </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import char_select from '@/components/char_select.vue';
-import login from '@/components/Login.vue';
-import register from '@/components/Register.vue';
-import textBox from '@/components/textBox.vue';
-import Phaser from 'phaser';
-import Router from '../router';
-import { socket } from '@/socket';
+import { computed, defineComponent } from "vue";
+import char_select from "@/components/char_select.vue";
+import login from "@/components/Login.vue";
+import register from "@/components/Register.vue";
+import textBox from "@/components/textBox.vue";
+import Phaser from "phaser";
+import Router from "../router";
+import { socket } from "@/socket";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useAppStore } from "../stores/app";
+import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
 export default defineComponent({
     name: "battlemathGame",
@@ -154,9 +167,7 @@ export default defineComponent({
                 playerInTrigger: false,
                 profile: false,
             },
-            firstTime: true,
             controlsHidden: false,
-
             playerInfo: {
                 id: null,
                 username: "",
@@ -167,26 +178,29 @@ export default defineComponent({
             playerSprites: {},
         };
     },
+    created() {
+        const store = useAppStore();
+        if (store.getLastRoute() === "/rooms") {
+            this.navigation_menus.sceneStart = 2;
+            setTimeout(() => {
+                this.navigation_menus.sceneStart = 1;
+            }, 2000);
+        } else {
+            this.navigation_menus.sceneStart = 1;
+        }
+    },
     mounted() {
         const store = useAppStore();
         this.isLogged = store.getIsLogged();
         if (this.isLogged) {
             this.username = store.getUsername();
-            this.token = store.getToken();
+            this.token = store.user.token;
             this.playerSprite = store.getSkin();
         } else {
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
         }
 
         this.recibirsuccessLogout();
-        if (store.getLastRoute() === '/rooms') {
-            this.navigation_menus.sceneStart = 2;
-            setTimeout(() => {
-                this.navigation_menus.sceneStart = 1;
-            }, 1000);
-        } else {
-            this.navigation_menus.sceneStart = 1;
-        }
         this.initializeGame();
         store.setLastRoute("/game");
     },
@@ -211,6 +225,7 @@ export default defineComponent({
     methods: {
         initializeGame() {
             const self = this;
+            const store = useAppStore();
 
             const playerHouseConfig = {
                 key: "playerHouse",
@@ -219,8 +234,9 @@ export default defineComponent({
                     self.preloadPlayerHouse(this);
                     self.preloadNPC(this);
                     self.preloadSkins(this);
-                    this.load.image("door", "/objects/door.png");
-                    this.load.image("dialogBox", "/img/DialogBoxFaceset.png");
+                    this.load.image("door", "/vue/objects/door.png");
+                    this.load.image("dialogBox", "/vue/img/DialogBoxFaceset.png");
+
                 },
                 create: function () {
                     ///Create map
@@ -244,11 +260,26 @@ export default defineComponent({
 
                     self.addHouseCollisions(this);
 
-                    this.cameras.main.centerOn(780, 774);
+                    this.cameras.main.centerOn(790, 795);
                     self.createPlayerHouse_foreground(this);
                     self.createParticleHouse(this, 664, 851);
                     self.createParticleHouse(this, 856, 851);
                     self.createParticleHouse(this, 920, 851);
+
+                    if (self.isMobileDevice()) {
+                        let joystick = self.createJoystick(this);
+
+                        joystick.on("update", () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(
+                                this,
+                                self.playerSprite,
+                                directionX,
+                                directionY
+                            );
+                        });
+                    }
 
                     self.playerMovement(this, self.playerSprite);
                 },
@@ -264,16 +295,19 @@ export default defineComponent({
                     self.preloadSkins(this);
                 },
                 create: function () {
+                    const store = useAppStore();
+
                     self.createLobby(this);
 
-                    self.createNPC(this, 910, 420, 'npcRyu', 0);
+                    self.createNPC(this, 910, 420, "npcRyu", 0);
                     ///Create player
                     if (self.navigation_menus.sceneStart === 1) {
                         self.playerCreate(this, 888, 390, self.playerSprite);
-                    } else {
+                    } else if (self.navigation_menus.sceneStart === 2) {
+                        self.playerCreate(this, 687, 554, self.playerSprite);
+                    } else if (store.lastRoute === "/rooms") {
                         self.playerCreate(this, 687, 554, self.playerSprite);
                     }
-
 
                     self.triggerWithNPC(this);
                     self.addLobbyCollisions(this);
@@ -284,10 +318,29 @@ export default defineComponent({
                         self.lobby_layers.fg
                     );
 
+                    if (self.isMobileDevice()) {
+                        let joystick = self.createJoystick(this);
+
+                        joystick.on("update", () => {
+                            const directionX = joystick.forceX;
+                            const directionY = joystick.forceY;
+                            self.playerMovementWithJoystick(
+                                this,
+                                self.playerSprite,
+                                directionX,
+                                directionY
+                            );
+                        });
+                    }
+
                     self.playerMovement(this, self.playerSprite);
+                    if (store.firstTime) {
+                        self.dialogo(this, "npcRyu");
+                        store.firstTime = false;
+                    }
+                    self.viewPlayers(this);
                 },
-                update: function () {
-                },
+                update: function () { },
             };
 
             const config = {
@@ -310,6 +363,15 @@ export default defineComponent({
                         gravity: { y: 0 },
                         debug: false,
                     },
+                },
+                plugins: {
+                    global: [
+                        {
+                            key: "rexVirtualJoystick",
+                            plugin: VirtualJoystickPlugin,
+                            start: true,
+                        },
+                    ],
                 },
             };
 
@@ -342,11 +404,13 @@ export default defineComponent({
             this.navigation_menus.loginModal = false;
         },
         logout() {
+            const store = useAppStore();
+
             this.isLogged = false;
             this.username = "";
             this.playerSprite = this.randomStartSkin("eggBoy", "eggGirl");
             this.closeNPCModal();
-            socket.emit("logout", this.token);
+            socket.emit("logout", store.getToken());
         },
         recibirsuccessLogout() {
             socket.on("successLogout", (response) => {
@@ -379,7 +443,6 @@ export default defineComponent({
             this.player.skinID = character.id;
             this.playerSprite = character.name;
             store.setNewSkin(character.name);
-
         },
         openCharSelectModal() {
             this.npc.interactingWithNPC = false;
@@ -454,15 +517,15 @@ export default defineComponent({
             });
 
             ///Preload facesets
-            scene.load.image("npcWoman_face", "npc/face_Woman.png");
-            scene.load.image("npcVillager1_face", "npc/face_Villager1.png");
-            scene.load.image("npcVillager2_face", "npc/face_Villager2.png");
-            scene.load.image("npcVillager3_face", "npc/face_Villager3.png");
-            scene.load.image("npcVillager4_face", "npc/face_Villager4.png");
-            scene.load.image("npcMaster_face", "npc/face_Master.png");
-            scene.load.image("npcRyu_face", "npc/face_Ryu.png");
-            scene.load.image("npcSamurai_face", "npc/face_Samurai.png");
-            scene.load.image("npcBlueSamurai_face", "npc/face_BlueSamurai.png");
+            scene.load.image("npcWoman_face", "/vue/npc/face_Woman.png");
+            scene.load.image("npcVillager1_face", "/vue/npc/face_Villager1.png");
+            scene.load.image("npcVillager2_face", "/vue/npc/face_Villager2.png");
+            scene.load.image("npcVillager3_face", "/vue/npc/face_Villager3.png");
+            scene.load.image("npcVillager4_face", "/vue/npc/face_Villager4.png");
+            scene.load.image("npcMaster_face", "/vue/npc/face_Master.png");
+            scene.load.image("npcRyu_face", "/vue/npc/face_Ryu.png");
+            scene.load.image("npcSamurai_face", "/vue/npc/face_Samurai.png");
+            scene.load.image("npcBlueSamurai_face", "/vue/npc/face_BlueSamurai.png");
         },
         preloadSkins(scene) {
             scene.load.spritesheet("eggBoy", "characters/eggBoy.png", {
@@ -608,9 +671,9 @@ export default defineComponent({
                 "tiles/lobby_map/TilesetLobby.png"
             );
             scene.load.image("TilesetElement", "tiles/TilesetElement.png");
-            scene.load.image("dojo_door_left", "/objects/dojo_door_left.png");
-            scene.load.image("dojo_door_right", "/objects/dojo_door_right.png");
-            scene.load.image("phouse_door", "/objects/phouse_door.png");
+            scene.load.image("dojo_door_left", "/vue/objects/dojo_door_left.png");
+            scene.load.image("dojo_door_right", "/vue/objects/dojo_door_right.png");
+            scene.load.image("phouse_door", "/vue/objects/phouse_door.png");
             scene.load.spritesheet("leaves", "particles/Leaf.png", {
                 frameWidth: 16,
                 frameHeight: 16,
@@ -880,8 +943,11 @@ export default defineComponent({
                     }
                     break;
                 case "Ryu":
-                    this.npc.npcText = [`Hola ${this.username}, hauries d'anar al Dojo.`,
-                        `Allà podràs lluitar contra altres jugadors.`, `Es l'edifici amb el terrat vermell.`];
+                    this.npc.npcText = [
+                        `Hola ${this.username}, hauries d'anar al Dojo.`,
+                        `Allà podràs lluitar contra altres jugadors.`,
+                        `Es l'edifici amb el terrat vermell.`,
+                    ];
                     break;
                 default:
                     break;
@@ -916,7 +982,6 @@ export default defineComponent({
                 this.player.height * 0.8
             );
             scene.physics.world.enable(this.player);
-
         },
         debugCollision(scene) {
             const debugGraphics = scene.add.graphics().setAlpha(0.75);
@@ -940,6 +1005,7 @@ export default defineComponent({
                     if (skin != this.playerSprite) {
                         skin = this.playerSprite;
                     }
+
 
 
                     switch (event.code) {
@@ -968,19 +1034,58 @@ export default defineComponent({
             scene.input.keyboard.on("keyup", (event) => {
                 switch (event.code) {
                     default:
-                        // clearInterval(this.playerInfoInterval);
-                        if (scene.scene.isActive("lobby")) {
-                            this.addPlayerInfo(scene);
-                        }
+
+
                         const parts =
                             this.player.anims.currentAnim.key.split("_");
                         parts[1] = "idle";
                         this.player.anims.play(parts.join("_"));
                         this.player.setVelocity(0, 0);
 
+                        if (scene.scene.isActive("lobby")) {
+                            this.addPlayerInfo(scene);
+                        }
+
                         break;
                 }
             });
+        },
+        playerMovementWithJoystick(scene, skin, directionX, directionY) {
+            const speed = 30;
+            const runSpeedMultiplier = 1.5;
+
+            let currentSpeed = speed;
+
+            if (Math.abs(directionX) > Math.abs(directionY)) {
+                // Movimiento horizontal
+                if (directionX > 0) {
+                    this.player.anims.play(`${skin}_move_right`, true);
+                    this.player.setVelocity(currentSpeed, 0);
+                } else if (directionX < 0) {
+                    this.player.anims.play(`${skin}_move_left`, true);
+                    this.player.setVelocity(-currentSpeed, 0);
+                }
+            } else {
+                // Movimiento vertical
+                if (directionY > 0) {
+                    this.player.anims.play(`${skin}_move_down`, true);
+                    this.player.setVelocity(0, currentSpeed);
+                } else if (directionY < 0) {
+                    this.player.anims.play(`${skin}_move_up`, true);
+                    this.player.setVelocity(0, -currentSpeed);
+                }
+            }
+
+            // Si el joystick está en reposo, detener al jugador
+            if (directionX === 0 && directionY === 0) {
+                const parts = this.player.anims.currentAnim.key.split("_");
+                parts[1] = "idle";
+                this.player.anims.play(parts.join("_"));
+                this.player.setVelocity(0, 0);
+                if (scene.scene.isActive("lobby")) {
+                    this.addPlayerInfo(scene);
+                }
+            }
         },
         createPlayerAnims(scene, skin) {
             const frameRate = 8;
@@ -989,7 +1094,6 @@ export default defineComponent({
             if (this.navigation_menus.sceneStart === 2) {
                 skin = store.getSkin();
             }
-
 
             scene.anims.create({
                 key: `${skin}_idle_down`,
@@ -1091,7 +1195,6 @@ export default defineComponent({
             this.playerInfo.y = this.player.y;
 
             socket.emit("addPlayer", this.playerInfo);
-            this.viewPlayers(scene);
         },
 
         viewPlayers(scene) {
@@ -1104,6 +1207,7 @@ export default defineComponent({
                             this.playerSprites[players[i].id].text.destroy();
                         }
 
+
                         //Añadimos el username encima del personaje
                         const text = scene.add.text(
                             players[i].x - 10,
@@ -1113,14 +1217,6 @@ export default defineComponent({
                                 fontFamily: "Arial",
                                 fontSize: 10,
                                 color: "#fff",
-                                // backgroundColor: "#00000069",
-                                // padding: {
-                                //     left: 2,
-                                //     right: 2,
-                                //     top: 1,
-                                //     bottom: 1,
-                                // },
-                                
                             }
                         );
 
@@ -1132,12 +1228,87 @@ export default defineComponent({
                         );
 
                         // Almacenamos el sprite y el texto en nuestro objeto
-                        this.playerSprites[players[i].id] = { sprite: jugador, text: text };
+                        this.playerSprites[players[i].id] = {
+                            sprite: jugador,
+                            text: text,
+                        };
                     }
                 }
             });
-        }
 
+            socket.on("playerDisconnected", (player) => {
+                if (this.playerSprites[player.id]) {
+                    this.playerSprites[player.id].sprite.destroy();
+                    this.playerSprites[player.id].text.destroy();
+                }
+            });
+        },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                "Android",
+                "webOS",
+                "iPhone",
+                "iPad",
+                "iPod",
+                "BlackBerry",
+                "Windows Phone",
+            ];
+
+            return mobileKeywords.some((keyword) =>
+                userAgent.includes(keyword)
+            );
+        },
+
+        toggleControls() {
+            if (this.controlsHidden) {
+                this.controlsHidden = false;
+            } else {
+                this.controlsHidden = true;
+            }
+        },
+        createJoystick(scene) {
+            const baseColor = 0x888888;
+            const thumbColor = 0xcccccc;
+
+            const gameHeight = scene.sys.game.config.height;
+
+            const joystickHeight = gameHeight * 0.2;
+
+            const joystickX = 60;
+            const joystickY = gameHeight - joystickHeight - 20;
+
+            const base = scene.add.circle(0, 0, 30, baseColor);
+            base.setFillStyle(baseColor, 0.5);
+
+            const thumb = scene.add.circle(0, 0, 15, thumbColor);
+            thumb.setFillStyle(thumbColor, 0.5);
+
+            const joystick = scene.plugins
+                .get("rexVirtualJoystick")
+                .add(scene, {
+                    x: joystickX,
+                    y: joystickY,
+                    radius: 30,
+                    base: base,
+                    thumb: thumb,
+                });
+
+            return joystick;
+        },
+        mobileClick() {
+            // Emulando la tecla "Space" al hacer clic en el botón
+            const event = new KeyboardEvent("keydown", {
+                key: " ",
+                code: "Space",
+                keyCode: 32,
+                which: 32,
+                bubbles: true,
+            });
+
+            // Simulando la propagación del evento hacia arriba en el DOM
+            this.$el.dispatchEvent(event);
+        },
     },
 });
 </script>
@@ -1257,12 +1428,13 @@ button:hover::after {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.784);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 3;
 }
 
 .modal {
@@ -1287,10 +1459,21 @@ button:hover::after {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
+}
+
+.npc-modal-mobile {
+    height: 50vh;
 }
 
 .textBox {
     width: 40vw;
+    height: 150px;
+}
+
+.textBox-mobile {
+    width: 80vw;
+    height: 150px;
 }
 
 .npcFace-container {
@@ -1313,16 +1496,35 @@ button:hover::after {
     gap: 2rem;
 }
 
+.interactMobile {
+    width: 20%;
+    /* Ocupa 1/3 del ancho de la pantalla */
+    height: 10%;
+    /* Ocupa la altura completa de la pantalla */
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    z-index: 0;
+    opacity: .5;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                  CONTROLS                                  */
 /* -------------------------------------------------------------------------- */
+
+.controls-btn {
+    position: absolute;
+    top: 30px;
+    left: 100px;
+}
+
 .controls {
     width: 100%;
     text-align: center;
     position: absolute;
     bottom: -100px;
-    animation: animControlsUp 1s ease-in-out 1s both;
     background-color: #141b1ba4;
+    animation: animControlsUp 1s ease-in-out 0.3s both;
 }
 
 .controlsHide {

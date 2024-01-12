@@ -1,8 +1,8 @@
 <template>
     <button class="nes-btn" @click="toggleMuteAndPlay">
         <img :src="isMuted
-            ? '/img/mute-sound.png'
-            : '/img/unmute-sound.png'
+            ? '/vue/img/mute-sound.png'
+            : '/vue/img/unmute-sound.png'
             " alt="" />
     </button>
 </template>
@@ -31,7 +31,7 @@ export default {
             }
         },
         initAudio() {
-            this.audio = new Audio("/audio/coral-chorus.mp3");
+            this.audio = new Audio("/vue/audio/coral-chorus.mp3");
             this.audio.loop = true;
         },
     },

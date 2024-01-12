@@ -32,6 +32,7 @@ io.on("connection", (socket) => {
           token: response.data.token,
           skin: response.data.skin,
         };
+
         socket.emit("loginParameters", user);
         socket.emit("success", response);
       })
@@ -94,6 +95,7 @@ io.on("connection", (socket) => {
       const quest = {
         id: questData.id,
         pregunta: questData.pregunta,
+        dificultat: questData.dificultat_id,
       };
 
       io.to(id).emit("viewQuest", quest);
@@ -128,7 +130,6 @@ io.on("connection", (socket) => {
                     .getDamage(response.dificultat_id)
                     .then((response) => {
                       player.life = player.life - response;
-                      console.log(player.life);
                       io.to(id).emit("life", player);
                       if (player.life <= 0) {
                         io.to(id).emit("gameOver", player);
@@ -230,7 +231,7 @@ io.on("connection", (socket) => {
     }, 3000);
   });
 
-  
+
 
   socket.on("getSkins", () => {
     comsManager
@@ -259,14 +260,14 @@ io.on("connection", (socket) => {
     io.to(id).emit("disconnectRoom", id);
     io.to(id).emit("exit", id);
     const socketsInRoom = io.sockets.adapter.rooms.get(id);
-  
-    
+
+
     for (const socketId of socketsInRoom) {
       const socket = io.sockets.sockets.get(socketId);
       socket.leave(id);
     }
-    
-  
+
+
     const roomIndex = rooms.findIndex((room) => room.id === id);
     if (roomIndex !== -1) {
       rooms.splice(roomIndex, 1);
@@ -275,8 +276,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addPlayer", (playerInfo) => {
+    playerInfo.socketID = socket.id;
     if (players.length === 0) {
       players.push(playerInfo);
+
     } else {
       var i = 0;
       while (i < players.length && !exist) {
@@ -292,15 +295,40 @@ io.on("connection", (socket) => {
       }
     }
 
-    console.log(players);
     io.emit("viewPlayers", players);
   });
 
-  socket.on("disconnect", () => {
-    console.log("Client desconectat");
+  socket.on("noAnswer", (id, user) => {
+    const room = rooms.find((room) => room.id === id);
+    if (room) {
+      let c = 0;
+      while (c < room.players.length) {
+        const player = room.players[c];
+        if (player.name === user) {
+          player.life = player.life - 10;
+          io.to(id).emit("life", player);
+        }
+        c++;
+      }
+    } else {
+      console.log(`No se encontró la sala con el ID ${id}`);
+    }
   });
 
 
+  socket.on("disconnect", () => {
+    let playerToDelete = players.findIndex(player => player.socketID === socket.id);
+    let playerDisconnected = "";
+    if (playerToDelete !== -1) {
+      playerDisconnected = players[playerToDelete];
+      console.log(`Player ${players[playerToDelete].username} disconnected`);
+      players.splice(playerToDelete, 1);
+    } else {
+      console.log("Player disconnected");
+    }
+    io.emit("viewPlayers", players);
+    io.emit("playerDisconnected", playerDisconnected);
+  });
 });
 
 const PORT = process.env.PORT || 3817;

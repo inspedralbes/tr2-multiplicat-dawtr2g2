@@ -29,7 +29,6 @@ async function register(username, email, password, password_confirmation, skin_i
 }
 
 async function logout(token) {
-
     try {
         const response = await axios.post(`${url}logout`, {}, {
             headers: {
@@ -45,7 +44,7 @@ async function logout(token) {
 
 async function getRandomQuestion() {
     try {
-        const randomNumber = Math.floor(Math.random() * (40 - 1 + 1)) + 1;
+        const randomNumber = Math.floor(Math.random() * (70 - 1 + 1)) + 1;
         const response = await axios.get(`${url}preguntes/mostrar/${randomNumber}`);
         return response.data;
     } catch (error) {

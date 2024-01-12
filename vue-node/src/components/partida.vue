@@ -1,14 +1,11 @@
 <template>
-    <head>
-        <link rel="stylesheet" href="style.css">
-    </head>
     <div class="container__game">
         <button class="nes-btn sortir" @click="sortir">Surt</button>
 
         <div class="game">
             <header class="header">
                 <div class="player player1">
-                    <img :src="`/characters/${room.players[0].skin}_face.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[0].skin}_face.png`" alt="">
                     <div class="info">
                         <div class="bar">
                             <div class="progress" :class="{ 'low-life': room.players[0].life < 30 }"
@@ -19,12 +16,13 @@
                     </div>
                 </div>
 
-                <div class="timer">
-                    <p class="time">{{ timer }}</p>
-                    <div class="title">
-                        <p>TIME</p>
+                <TransitionGroup name="beat" mode="out-in">
+                    <div class="timer">
+                        <transition name="fade" mode="out-in">
+                            <p :key="timer" class="time" :style="timerColor">{{ timer }}</p>
+                        </transition>
                     </div>
-                </div>
+                </TransitionGroup>
 
                 <div class="player player2" v-if="room.players.length == 2">
                     <div class="info">
@@ -35,53 +33,42 @@
                         </div>
                         <p class="name">{{ room.players[1].name }}</p>
                     </div>
-                    <img :src="`/characters/${room.players[1].skin}_face.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[1].skin}_face.png`" alt="">
                 </div>
             </header>
 
             <main>
                 <div class="character">
-                    <img :src="`/characters/${room.players[0].skin}_fight.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[0].skin}_fight.png`" alt="">
                 </div>
                 <div class="question__container">
                     <h2 class="tematica">GEOMETRIA</h2>
                     <H3 class="question">{{ quest.pregunta }}</H3>
                     <h3 class="question" v-if="room.players.length == 1"> {{ quest }}</h3>
+                    <h3 class=" turn" v-if="turn && !quest.pregunta && !questionSelected && room.players.length == 2">Et
+                        toca tirar</h3>
+                    <h3 class=" turn" v-if="!turn && !questionSelected && room.players.length == 2">Esperant atac</h3>
+                    <h3 class=" turn" v-if="!turn && questionSelected && room.players.length == 2">Esperant resposta</h3>
+
                     <h4 v-if="showEst" :class="{ correct: est === 'Correcte', incorrect: est === 'Incorrecte' }">{{ est }}
                     </h4>
                 </div>
                 <div class="character" v-if="room.players.length == 2" style="transform: scaleX(-1);">
-                    <img :src="`/characters/${room.players[1].skin}_fight.png`" alt="">
+                    <img :src="`/vue/characters/${room.players[1].skin}_fight.png`" alt="">
                 </div>
             </main>
 
             <footer class="cards" v-if="room.players.length == 2 && room.timeUp == false">
-                <!--
-                <div class="card red">
-                  <div class="level-bg"></div>
-                  <p class="card-level">2</p>
-                  <img class="image" src="img/mesures.png" alt="">
-                  <h3 class="title">Mesures</h3>
-              </div>
-              -->
-
-                <div class="card yellow" v-for="i in numQuest" :key="i" @click="genQuest()"
-                    v-if="turn && this.mostResp == false">
+                <div :class="['card', 'yellow', { 'card-mobile': isMobileDevice() }]" v-for="i in numQuest" :key="i"
+                    @click="genQuest()" v-if="turn && this.mostResp == false">
                     <div class="level-bg"></div>
-                    <p class="card-level">3</p>
+                    <p class="card-level">{{ Math.floor(Math.random() * 4) + 1 }}</p>
                     <img class="image" src="/img/geometry.png" alt="">
                     <h3 class="title">Geometria</h3>
                 </div>
-                <!--
-                <div class="card blue">
-                  <div class="level-bg"></div>
-                  <p class="card-level">1</p>
-                  <img class="image" src="img/calculo.webp" alt="">
-                  <h3 class="title">Calcul</h3>
-              </div>
-              -->
-                <div class="ans" v-for="(answer, index) in ans" :key="index" @click="compAns(quest.id, answer.id)"
-                    v-if="turn && ans != {} && this.mostResp == true" :value="answer.id">
+                <div :class="['ans', { 'ans-mobile': isMobileDevice() }]" v-for="(answer, index) in ans" :key="index"
+                    @click="compAns(quest.id, answer.id)" v-if="turn && ans != {} && this.mostResp == true"
+                    :value="answer.id">
                     <div class="level-bg"></div>
                     <p class="card-level">{{ index + 1 }}</p>
                     <h3 class="title-ans">{{ answer.resposta }}</h3>
@@ -112,6 +99,7 @@ export default {
             mostResp: false,
             est: '',
             showEst: false,
+            questionSelected: false,
         };
     },
     created() {
@@ -140,7 +128,7 @@ export default {
 
         watch(() => store.turn, newTurn => {
             this.turn = newTurn;
-            this.timer = 10;
+            this.timer = 15;
             if (this.turn == true) {
                 this.mostResp = false;
             }
@@ -155,24 +143,25 @@ export default {
         });
 
         socket.on('correct', () => {
+            this.questionSelected = false;
             this.quest = '';
             this.est = 'Correcte'
-            this.timer = 10;
+            this.timer = 15;
             this.showEstForThreeSeconds();
 
         });
 
         socket.on('incorrect', () => {
+            this.questionSelected = false;
             this.quest = '';
             this.est = 'Incorrecte'
-            this.timer = 10;
+            this.timer = 15;
             this.showEstForThreeSeconds();
         });
-        
-
 
         socket.on('startTimer', () => {
-            this.timer = 10;
+            this.questionSelected = false;
+            this.timer = 15;
             this.quest = '';
             this.startTimer();
         });
@@ -187,13 +176,16 @@ export default {
         this.stopTimer();
     },
     methods: {
+
         genQuest() {
+            this.questionSelected = true;
             this.est = '';
             this.numQuest--;
             socket.emit('genQuest', this.room.id);
             this.mostResp = true;
         },
         compAns(quest, ans) {
+            this.questionSelected = false;
             this.mostResp = false;
             this.ans = [];
             this.est = '';
@@ -209,23 +201,54 @@ export default {
             socket.emit('exitRoom', this.room.id);
         },
         startTimer() {
+            const store = useAppStore();
             this.intervalId = setInterval(() => {
-            if (this.timer > 0) {
-                this.timer--;
-            } else {
-                this.stopTimer();
-                socket.emit('timerUp', this.room.id);
-            }
+                if (this.timer > 0) {
+                    this.timer--;
+                } else {
+                    this.stopTimer();
+                    socket.emit('timerUp', this.room.id);
+                    if (this.turn == true && this.ans.length == 4) {
+                        socket.emit('noAnswer', this.room.id, this.player);
+                    }
+                }
             }, 1000);
         },
         stopTimer() {
             if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+                clearInterval(this.intervalId);
+                this.intervalId = null;
             }
         },
+        isMobileDevice() {
+            const userAgent = navigator.userAgent;
+            const mobileKeywords = [
+                'Android',
+                'webOS',
+                'iPhone',
+                'iPad',
+                'iPod',
+                'BlackBerry',
+                'Windows Phone'
+            ];
+
+            return mobileKeywords.some(keyword => userAgent.includes(keyword));
+        }
 
     },
+    computed: {
+        timerColor() {
+            if (this.timer < 4) {
+                return {
+                    color: 'red'
+                }
+            } else {
+                return {
+                    color: 'black'
+                }
+            }
+        }
+    }
 
 };
 </script>
@@ -241,6 +264,25 @@ export default {
     font-size: 30px;
 }
 
+.turn {
+    font-size: 30px;
+    animation: blink 1.3s linear infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -252,11 +294,13 @@ export default {
     background-size: cover;
     background-position: 0 60%;
     background-image: url('/img/combate.jpg');
+    height: 100vh;
+    display: flex;
 }
 
 .game {
     width: 100%;
-    height: 100vh;
+    /* height: 100vh; */
     display: grid;
     grid-template-rows: repeat(3, 1fr);
     align-items: center;
@@ -398,8 +442,8 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     color: black;
     background-color: #fff;
     border-radius: 50%;
@@ -407,7 +451,7 @@ export default {
 }
 
 .timer .time {
-    font-size: 40px;
+    font-size: 60px;
     font-weight: bold;
     width: 35px;
     height: 35px;
@@ -477,6 +521,10 @@ main {
 .cards {
     display: flex;
     gap: 10px;
+    overflow: auto;
+    width: 90%;
+    justify-content: center;
+    align-items: center;
 }
 
 .card {
@@ -494,6 +542,14 @@ main {
     overflow: hidden;
     transition: all .3s ease-in-out;
 
+}
+
+.card-mobile {
+    font-size: 8px;
+    width: 100%;
+    height: 100px;
+    border: 3px solid white;
+    border-radius: 5px;
 }
 
 .level-bg {
@@ -527,12 +583,20 @@ main {
     align-items: center;
     flex-direction: column;
     overflow: hidden;
-    background-image: url(img/card-background.jpg);
+    background-image: url(/img/card-background.jpg);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     z-index: 2;
     transition: all .3s ease-in-out;
+}
+
+.ans-mobile {
+    font-size: 5px;
+    width: 75px;
+    height: 100px;
+    /* border: 3px solid white; */
+    border-radius: 5px;
 }
 
 .title-ans {
@@ -596,7 +660,6 @@ main {
     top: 3%;
     right: 5%;
     width: 6vw;
-    height: 3vh;
 }
 
 .sortir::after {
@@ -613,6 +676,22 @@ main {
 
 .nes-btn:active:not(.is-disabled)::after {
     box-shadow: inset 4px 4px #e46d3a !important;
+}
+
+/* TRANSITIONS */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all .5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
   
