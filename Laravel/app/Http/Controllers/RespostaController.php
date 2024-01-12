@@ -15,9 +15,9 @@ class RespostaController extends Controller
      */
     public function index()
     {
-        $preguntes = Resposta::all();
+        $respostes = Resposta::all();
 
-        return response()->json($preguntes);
+        return response()->json($respostes);
     }
 
     /**

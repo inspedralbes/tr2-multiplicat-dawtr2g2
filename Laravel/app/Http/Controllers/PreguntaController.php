@@ -81,7 +81,7 @@ class PreguntaController extends Controller
 
         $pregunta->delete();
 
-        return response()->json(['message' => 'Resposta eliminada']);
+        return response()->json(['message' => 'Pregunta eliminada']);
     }
 
 
